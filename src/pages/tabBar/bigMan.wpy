@@ -1,0 +1,214 @@
+<style lang="scss">
+  @import '../../sass/base/reset';
+  @import '../../sass/commons/function';
+  @import '../../sass/pages/bigMan';
+  .common-form-btn{
+    position: absolute;
+    width:100%;
+    height:100%;
+    padding:0;
+    margin:0;
+    top:0;
+    left:0;
+  }
+  .common-form-btn[plain]{
+    border:none;
+  }
+</style>
+
+<template>
+<viewScroll :url.sync="url" :param.sync="param" @dataLoad.user="setPageData">
+  <view slot="content">
+    <lodingPage></lodingPage>
+    <view class="bigMan">
+      <!-- 轮播 -->
+      <view class="bigMan-swiper" wx:if="{{recommendData.length>0}}">
+        <swiper circular="true" indicator-dots="{{showBannerDots}}" autoplay="true"
+                interval="4000" duration="1000" indicator-color="rgba(255, 255, 255, 0.5)" indicator-active-color="#ffffff">
+          <block>
+            <repeat for="{{recommendData}}" item="value">
+              <swiper-item catchtouchmove='{{recommendData.length==1}}'>
+                <view class="swiper-blank blank-top"></view>
+                <repeat for="{{value}}" item="item" index="index">    
+                  <view class="teacher {{index==1?'teacher-mid':''}}">
+                    <form bindsubmit="toUserDetail({{item.contents.userid}})" report-submit='true'>
+                      <button class="common-form-btn" formType="submit" plain="{{true}}"></button>
+                    </form>
+                    <image class="shadow-lef" src="/static/images/shadow-lef.png" wx:if="{{index==1}}"></image>
+                    <image class="man-icon" src="{{item.contents.user_ico}}" wx:if="{{item.contents.user_ico}}"></image>
+                    <image class="man-icon" src="/static/images/person.png" wx:else></image>
+                    <view>
+                      <text class="man-tg">{{item.contents.user_title}}</text>
+                    </view>
+                    <view class="man-name">{{item.contents.user_name}}</view>
+                    <view class="man-int">{{item.recommended_msg}}</view>
+                    <view class="man-detail">查看主页</view>
+                    <image class="shadow-rig" src="/static/images/shadow-rig.png" wx:if="{{index==1}}"></image>
+                  </view>       
+                </repeat>
+                <view class="swiper-blank blank-bom"></view>
+              </swiper-item>
+            </repeat>
+          </block>
+        </swiper>
+      </view>
+      <!-- 列表 -->
+      <view class="bigMan-list">
+        <repeat for="{{listData}}" item="item" key="userid">
+          <view class="list">
+            <form bindsubmit="toUserDetail({{item.userid}})" report-submit='true'>
+              <button class="common-form-btn" formType="submit" plain="{{true}}"></button>
+            </form>
+            <view class="li-lef">
+              <image src="{{item.user_ico}}" wx:if="{{item.user_ico}}"></image>
+              <image src="/static/images/person.png" wx:else></image>
+            </view>
+            <view class="li-btw">
+              <view class="btw-man">
+                <text class="man-name">{{item.user_name}}</text>
+                <text class="man-tg"> | {{item.user_title}}</text>
+              </view>
+              <view class="man-int">{{item.user_profiles}}</view>
+              <view class="man-num">关注: {{item.user_notice_num}}</view>
+            </view>
+            <view class="li-rig" @tap.stop='preventTap'>
+              <form bindsubmit="notice({{item.userid}})" report-submit='true'>
+                <button hidden="{{item.my_noticed==1}}" class="man-atten atten-add" formType="submit">加关注</button>
+              </form>
+              <form bindsubmit="cancelNotice({{item.userid}})" report-submit='true'>
+                <button hidden="{{item.my_noticed==0}}" class="man-atten atten-cancle" formType="submit">取消关注</button>
+              </form>
+            </view>
+          </view>
+        </repeat>
+      </view>
+    </view>
+    <!--关注组件-->
+    <notice></notice>
+  </view>
+</viewScroll>
+</template>
+
+<script>
+  import wepy from 'wepy'
+  import http from '@/utils/http-util'
+  import utils from '@/utils/common-util'
+  import { API_URL,DEFAULT_ICO, formIdUrl } from '@/const'
+  import BigManNotice from '@/components/bigManNotice'
+  import ScrollView from '@/components/scrollView'
+  import LodingPage from '@/components/lodingPage'
+  export default class BigMan extends wepy.page {
+    config = {
+      navigationBarTitleText: '大咖'
+    }
+    components = {
+      notice: BigManNotice,
+      viewScroll: ScrollView,
+      lodingPage:LodingPage,
+    }
+    data = {
+      url: API_URL.DAKA_LIST,
+      param: {
+        'page_no': 1,
+        'page_size': 10
+      },
+      // 推荐数据
+      recommendData: [],
+      // 列表数据
+      listData: [],
+      // 当前页码
+      currPageNo: 1,
+      // 每页条数
+      currPageSize: 10
+    }
+
+    computed = {
+      showBannerDots () {
+        return this.recommendData.length > 1
+      }
+    }
+
+    methods = {
+      // 跳转详情
+      toUserDetail (userId,e) {
+        wx.navigateTo({url: `/subPages/content/pages/detail/bigManDetail?id=${userId}`})
+        var formId = e.detail.formId
+        this.sendFormId(formId)
+      },
+      setPageData (data,type) {
+        if(!type){
+          this.listData=data
+        }else{
+          this.listData.push(...data)
+        }   
+        // this.hideLoading()
+        this.$apply()
+      },
+      // 关注
+      notice (userId,e) {
+        var formId = e.detail.formId
+        this.$invoke('notice', 'notice', userId)
+        this.sendFormId(formId)
+      },
+      // 取消关注
+      cancelNotice (userId,e) {
+        var formId = e.detail.formId
+        this.$invoke('notice', 'cancel', userId)
+        this.sendFormId(formId)
+      },
+      // 
+      preventTap(){
+        return false
+      }
+    }
+
+    events = {
+      // 关注操作成功触发事件
+      noticeOptionSuccess (userId) {
+        let item = this.listData.find(e => e.userid == userId)
+        item.my_noticed = (item.my_noticed==1?0:1)
+        item.user_notice_num=item.my_noticed?(item.user_notice_num+1):(item.user_notice_num-1)
+        this.$apply()
+      }
+    }
+
+    onLoad () {  
+      this.showLoading() 
+      this.loadRecommendData()
+      this.$invoke('viewScroll','refresh');
+    }
+    onShow(){   
+    }
+    onPullDownRefresh () {
+      this.loadRecommendData()
+      this.$invoke('viewScroll','refresh');
+    }
+    onReachBottom () {
+      this.$invoke('viewScroll','nextPage');
+    }
+    // 加载推荐数据
+    loadRecommendData () {
+      http.getRequest(API_URL.RECOMMEND, {
+        positionid: 200101
+      }).then(data => {
+        // 将推荐数据分为3个一组，并过滤掉不足三个的
+        this.recommendData = utils.spiltArray(data, 3).filter(e => e.length === 3)
+        this.hideLoading()
+        this.$apply()
+      })
+    }
+    // 显示加载层
+    showLoading(){
+        this.$invoke('lodingPage','show')
+    }
+    // 隐藏加载层
+    hideLoading(){
+        this.$invoke('lodingPage','hide')
+    }
+    // 提交formId数据
+    sendFormId(formId){
+      this.$root.$parent.sendFormId(formId)
+    }
+  }
+
+</script>

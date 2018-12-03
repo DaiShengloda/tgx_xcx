@@ -1,0 +1,505 @@
+<style lang='scss'>
+@import '../../../sass/base/reset';
+@import '../../../sass/commons/function';
+.coinRecharge {
+  height: 100%;
+  background: #efeff5;
+  .iosPay{
+    position:fixed;
+    width:100%;
+    height:100%;
+    top:0;
+    left:0;
+    background: rgba(0,0,0,0.8);
+    .iosPay-layer{
+      background:#fff;
+      width:78%;
+      margin:0 auto;
+      position:relative;
+      top:30%;
+      border-top-left-radius:8rpx;
+      border-top-right-radius:8rpx;
+      .layer-box{
+        display:flex;
+        align-content: center;
+        flex-wrap: wrap;
+        border-bottom:#e6e6e6 1px solid;
+        .box-title{
+          display:flex;
+          align-items:center;
+          justify-content:center;
+          width:100%;
+          font-size:36rpx;
+          color:#000;
+          padding-top: 30rpx;
+        }
+        .box-content{
+          display:flex;
+          align-items:center;
+          justify-content:center;
+          width:100%;
+          font-size:28rpx;
+          color:#999;
+          letter-spacing: 2rpx;
+          padding:10rpx 45rpx 30rpx 45rpx;
+        }
+      }
+      .btn-sure{
+        display:flex;
+        align-items:center;
+        justify-content:center;
+        margin:0rpx;
+        padding:0rpx;
+        width:100%;
+        height:90rpx;
+        background:#fff;
+        font-size:36rpx;
+        border-radius: 0;
+        border:none;
+        color:#3CC51F;
+        border-bottom-right-radius:8rpx;
+        border-bottom-left-radius:8rpx;
+      }
+    }
+  }
+  .kfcz{
+    width: 100%;
+    position: fixed;
+    bottom: r(0);
+    color: #fff;
+    button{
+       width: 100%;
+       color: #fff;
+       height:r(100);
+       background-color: #e93030; 
+       border-radius: 0;
+    }
+  }
+}
+.coinRecharge .header {
+  height: 120rpx;
+  background: #e93030;
+  padding: 0rpx 30rpx;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 15px;
+  color: #fff;
+  .item {
+    display: flex;
+    align-items: center;
+    image {
+      width: 40rpx;
+      height: 40rpx;
+      margin-right: 10rpx;
+    }
+  }
+}
+.coinRecharge .fg {
+  width: 100%;
+  height: 20rpx;
+  background: #efeff5;
+}
+.coinRecharge .main {
+  padding: 30rpx;
+  background: #fff;
+  .title {
+    font-size: 16px;
+  }
+  .content {
+    display: flex;
+    flex-flow: row wrap;
+    width: 700rpx;
+    .rec_item {
+      border: 1px solid #dadada;
+      border-radius: 5px;
+      text-align: center;
+      width: 200rpx;
+      margin: 20rpx 15rpx;
+      padding: 20rpx 0;
+      .coin {
+        display: block;
+        font-size: 32rpx;
+      }
+      .price {
+        font-size: 26rpx;
+        color: #666;
+      }
+    }
+    .click {
+      border: 1px solid #e93030;
+      color: #e93030 !important;
+    }
+    .red {
+      color: #e93030;
+    }
+  }
+  .ads {
+    font-size: 12px;
+    color: #666;
+    display: flex;
+    margin: 20rpx 0;
+  }
+}
+
+.cover {
+  width: 100%;
+  height: 100%;
+  position: fixed;
+  top: 0;
+  left: 0;
+  background: rgba($color: #000000, $alpha: 0.5);
+  z-index: 100;
+}
+
+#dialog {
+  width: 100%;
+  height: 80%;
+  z-index: 2;
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  background: #fff;
+  z-index: 101;
+  .title {
+    text-align: center;
+    border-bottom: 1px solid #ccc;
+    padding: 20rpx 0;
+    font-size: 18px;
+    position: relative;
+  }
+  .close {
+    position: absolute;
+    left: 30rpx;
+    top: 50%;
+    transform: translate(0, -50%);
+    width: 50rpx;
+    height: 50rpx;
+  }
+  .pay_info {
+    padding: 0 30rpx;
+    .total {
+      text-align: center;
+      font-size: 30px;
+      padding: 40rpx;
+    }
+    .pay_item {
+      padding: 20rpx 0;
+      border-bottom: 1px solid #ccc;
+      font-size: 16px;
+      display: flex;
+      justify-content: space-between;
+      .l {
+        color: #929292;
+      }
+    }
+  }
+  .mz {
+    font-size: 16px;
+    margin: 20px 10px;
+    display: block;
+    // checkbox{
+    //   transform: scale(0.8);
+    //   border: #e93030 1px solid;
+    // }
+  }
+  .pay_btn {
+    width: 90%;
+    position: fixed;
+    left: 50%;
+    transform: translate(-50%, 0);
+    bottom: 100rpx;
+    color: #fff;
+    font-size: 17px;
+  }
+  .dis {
+    background: #ccc;
+  }
+  .active {
+    background: #e93030;
+  }
+}
+</style>
+<template>
+  <view class='coinRecharge'>
+    <block wx:if="{{isIOS}}">
+      <!-- ios隐藏使用 -->
+      <view class="iosPay">
+        <view class="iosPay-layer">
+          <view class="layer-box">
+            <view class="box-title">提示</view>
+            <view class="box-content">小程序暂不支持</view>
+          </view>  
+          <button 
+            class="btn-sure" 
+            @tap.stop="action('userCenter')" 
+          >
+            确定
+          </button>
+        </view>
+      </view>
+    </block>
+    <block wx:if="{{!isIOS}}">
+    <view class='header'>
+      <view class='item'>
+        <image src='/static/images/my_spent_money.png'/>
+        <text>大咖币剩余: {{coin}}</text>
+      </view>
+      <view class='item'>
+        <image src='/static/images/czjl.png'/>
+        <navigator url='coinRechargeLog'>充值记录</navigator>
+      </view>
+    </view>
+    <!--分割线-->
+    <view class='fg'></view>
+    <view class='main'>
+      <text class='title'>充值推荐</text>
+      <view class='content'>
+        <repeat for='{{recommend}}' key='id'>
+          <view class="rec_item {{selected.id==item.id?'click':''}}" @tap='confirmPay({{item}})'>
+            <text class='coin'>{{item.standardRecharge}}大咖币</text>
+            <text class="price" style="{{selected.id==item.id?'color:#e93030':''}}">售价 {{item.paymentRecharge}}元</text>
+          </view>
+        </repeat>
+      </view>
+      <view class='ads'>
+        <view style='width:100px'><text>温馨提示:</text></view>
+        <view><text>{{notice}}</text></view>
+      </view>
+    </view>
+
+    <view class='cover' hidden='{{!confirmPay}}'></view>
+    <!--充值弹窗-->
+    <view id='dialog' hidden='{{!confirmPay}}'>
+      <view class='title'>
+          <image class='close' @tap='closeConfirm' src='/static/images/close.png'/>
+          <text>确认使用</text>
+      </view>
+      <view class='pay_info'>
+        <view class='total'><text>￥{{selected.paymentRecharge}}</text></view>
+        <view class='pay_item'>
+          <text class='l'>使用信息</text>
+          <text class='r'>大咖币充值</text>
+        </view>
+        <view class='pay_item'>
+          <text class='l'>使用方式</text>
+          <text class='r'>微信使用</text>
+        </view>
+      </view>
+      <label class='mz' for='ck' @tap='checkRule'>
+        <checkbox  checked='{{isReadRule}}' color='red' id='ck'/>
+        <view style='display:inline'>我已认真阅读并签署《<text style='color:#e93030' @tap='toFxjjs'>风险揭示书</text>》</view>
+      </label>
+      <form bindsubmit='pay' report-submit='true'>
+        <button wx:if="{{isReadRule}}" class="pay_btn active" formType="submit">立即使用</button>
+        <button wx:else class='pay_btn dis' @tap='notAgree'>立即使用</button>
+      </form>
+    </view>
+
+    <hegui @fxcpFinish.user='fxcpFinish'></hegui>
+  </block>
+  </view>
+  
+</template>
+
+<script>
+import wepy from 'wepy';
+import http from '@/utils/http-util';
+import { domain, API_URL, hgStatus, formIdUrl } from '@/const';
+import windowUtil from '@/utils/window-util';
+import userManager from '@/utils/user-manager';
+import util from '@/utils/common-util';
+import HeGui from '@/components/hegui';
+import { navigateTo, switchTab } from '@/utils/route';
+export default class CoinRecharge extends wepy.page {
+  config = {
+    navigatorBarTitleText: '充值',
+    enablePullDownRefresh: false
+  };
+  components = {
+    hegui: HeGui
+  };
+  data = {
+    //大咖币数量
+    coin: 0,
+    //推荐充值列表
+    recommend: null,
+    //温馨提示
+    notice: '',
+    //是否显示确认弹窗
+    confirmPay: false,
+    //是否阅读使用条款
+    isReadRule: false,
+    //选中的额度
+    selected: {},
+    //是否是ios系统
+    isIOS:false
+  };
+  methods = {
+    //点击推荐,弹出确认框
+    confirmPay(item) {
+      this.confirmPay = true;
+      this.selected = item;
+    },
+    //关闭确认框
+    closeConfirm() {
+      this.confirmPay = false;
+    },
+    //点击使用条款
+    checkRule(e) {
+      this.isReadRule = !this.isReadRule;
+    },
+    //点击使用
+    async pay(e) {
+      let formId = e.detail.formId
+      //商品id
+      let id = this.selected.id;
+      //下单
+      let orderData = null;
+      windowUtil.showLoading();
+      let code = await wepy.login();
+      try {
+        orderData = await http.getRequest(API_URL.PAY_ORDER, {
+          body: '投顾说',
+          productId: id,
+          platform: 'mini_app',
+          code: code.code
+        });
+      } catch (error) {
+        windowUtil.error('下单失败');
+        throw error;
+      }
+      //隐藏弹窗
+      this.confirmPay = false;
+      let outTradeNo = orderData.out_trade_no;
+      this.$apply();
+      windowUtil.hideLoading();
+      wx.requestPayment({
+        paySign: orderData.paySign,
+        timeStamp: orderData.timeStamp,
+        nonceStr: orderData.nonceStr,
+        package: orderData.package,
+        signType: orderData.signType,
+        complete: function(data) {
+          let msg = data.errMsg;
+          windowUtil.showLoading();
+          http
+            .getRequest(API_URL.PAY_RESULT, {
+              outTradeNo: outTradeNo,
+              productId: this.selected.id
+            })
+            .then(success => {
+              windowUtil.success('充值成功');
+              //刷新大咖币
+              this.getCoin();
+              this.sendFormId(formId);
+            })
+            .catch(err => {
+              windowUtil.alert(err.errmessage);
+            });
+          // if (msg === 'requestPayment:ok') {
+          //   //付款成功,请求后台接口
+          // } else if (msg === 'requestPayment:fail cancel') {
+          //   windowUtil.alert('取消充值');
+          // } else {
+          //   windowUtil.alert(msg.replace(/requestPayment:fail/, ''));
+          // }
+        }.bind(this)
+      });
+    },
+    notAgree() {
+      windowUtil.alert('请勾选声明');
+    },
+    //跳转风险揭示书
+    toFxjjs() {
+      let userInfo = userManager.getLocalUserInfo();
+      let src = `${domain}/api/business/riskProtocolHtml.do?name=fxjss&userid=${
+        userInfo.userid
+      }`;
+      src = encodeURIComponent(src);
+      wx.navigateTo({ url: 'webview?src=' + src });
+    },
+    fxcpFinish() {
+      navigateTo({ url: 'coinRecharge' });
+    },
+    action(action){
+      switchTab({url:action})
+    },
+  };
+  onLoad() {
+      //ios充值跳转客服
+    var res = wx.getSystemInfoSync();
+    if(res.platform == "devtools" || res.platform == "ios"){
+      this.isIOS = true;
+      return;
+    }
+    windowUtil.showLoading();
+    //获取推荐额度
+    http
+      .getRequest(API_URL.RECHARGE_RECOMMEND, {
+        type: 1
+      })
+      .then(data => {
+        this.recommend = data.list;
+        //测试充值
+        // this.recommend.push({
+        //   id:116,
+        //   standardRecharge:1,
+        //   paymentRecharge:0.01
+        // })
+        this.activity = data.activity;
+        this.notice = data.notice;
+        this.$apply();
+        windowUtil.hideLoading();
+      });
+  }
+  //获取大咖币剩余
+  getCoin() {
+    http.getRequest(API_URL.QUERY_COIN).then(data => {
+      this.coin = data;
+      this.$apply();
+    });
+  }
+  onShow() {
+    this.getCoin();
+     //合规
+    this.requireHegui();
+  }
+  //合规
+  async requireHegui() {
+    windowUtil.showLoading();
+    let data = await userManager.getUserDetail();
+    //是否风险测评
+    let answerResult = JSON.parse(data.answer);
+    //是否登记
+    let registration = data.registration == 1;
+    let status = hgStatus.NO_SHOW;
+    //是否风险测评
+    let answer =
+      answerResult &&
+      answerResult.answer_result &&
+      answerResult.answer_result.level >= 0;
+    if (!registration && !answer) {
+      status = hgStatus.NO_ALL;
+    } else if (!registration) {
+      //未登记
+      status = hgStatus.NO_REGISTRATED;
+    } else if (!answer) {
+      //未风险测评
+      status = hgStatus.NO_ANSWER;
+    } else {
+      //合规完成可充值
+      status = hgStatus.NO_SHOW;
+    }
+    windowUtil.hideLoading();
+    if (status != hgStatus.NO_SHOW) {
+      this.$invoke('hegui', 'startHeguiForRecharge', status);
+    }
+  }
+  // 提交formId数据
+  sendFormId(formId){
+      this.$root.$parent.sendFormId(formId)
+  }
+}
+</script>
+

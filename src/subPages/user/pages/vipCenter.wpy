@@ -1,0 +1,256 @@
+<style lang="scss">
+@import '../../../sass/pages/vipCenter';
+.common-form-btn{
+    position: absolute;
+    width:100%;
+    height:100%;
+    padding:0;
+    margin:0;
+    top:0;
+    left:0;
+    z-index:9;
+  }
+  .common-form-btn[plain]{
+    border:none;
+  }
+</style>
+<template>
+<view class="vip-center">
+    <lodingPage></lodingPage>
+
+    <!-- user -->
+    <view class="vip-user">
+        <image class="user-img" src="{{vipZoneData.user_ico}}" wx:if="{{vipZoneData.user_ico}}"></image>
+        <image class="user-img" src="/static/images/person.png" wx:else></image>
+        <view class="user-msg">
+            <view class="msg-name">尊敬的{{vipZoneData.user_name}}</view>
+            <view class="msg-status">
+                <text class="status-text" wx:if="{{vipZoneData.vip_status==0}}">您还不是VIP用户，购买后立享专属权益</text>
+                <text class="status-text" wx:if="{{vipZoneData.vip_status==-1}}">您的VIP服务已到期，续费后立享专属权益</text>
+                <text class="status-text" wx:if="{{vipZoneData.vip_status==1}}">您是VIP用户，有效期至{{vipZoneData.vip_expire_date}}</text>
+            </view>
+        </view>
+    </view>
+
+    <!-- 购买vip -->
+    <view class="vip-buy">
+        <view class="buy-top">
+            <view class="top-title">
+                购买VIP服务
+            </view>
+            <view class="top-text">
+                到期前续费可自动延长服务有效期
+            </view>
+        </view>
+        <view class="buy-goods">
+            <repeat for="{{vipZoneData.goods}}" item="item" index="index">
+                <view class="good-box">
+                    <view class="box-lef">
+                        <view class="lef-name">
+                            <text class="name">{{item.name}}</text>
+                            <image class="img" src="{{item.image}}" wx:if="{{item.image}}"></image>
+                        </view>
+                        <view class="lef-price">￥{{item.price}}</view>
+                    </view>
+                    <view class="box-rig" wx:if="{{vipZoneData.vip_status==0}}">
+                        <form bindsubmit="buyGood({{item.link}})" report-submit='true'>
+                            <button class="common-form-btn" formType="submit" plain="{{true}}"></button>
+                        </form>
+                        购买
+                    </view>
+                    <view class="box-rig" wx:else>
+                        <form bindsubmit="buyGood({{item.link}})" report-submit='true'>
+                            <button class="common-form-btn" formType="submit" plain="{{true}}"></button>
+                        </form>
+                        续费
+                    </view>
+                </view>
+            </repeat>
+        </view>
+    </view>
+
+    <!-- vip用户权益 -->
+    <view class="vip-service">
+        <view class="ser-top">
+            VIP用户权益
+        </view>   
+        <view class="ser-cont">
+            <view class="cont-title">内容特权</view>
+            <view class="cont-ser">
+                <!-- <view class="cont-box" @tap.stop="clickHandler('vip')">
+                    <image class="box-img" src="http://file.dakawengu.com/img/celuemianf%403x.png"></image>
+                    <view class="box-title">VIP专属服务</view>
+                    <view class="box-pro">策略组合、核心内参</view>
+                </view> -->
+                <repeat for="{{vipZoneData.content_service}}" item="item" index="index">
+                    <view class="cont-box" @tap.stop="clickHandler({{item.action}})">
+                        <image class="box-img" src="{{item.icon}}"></image>
+                        <view class="box-title">{{item.title}}</view>
+                        <view class="box-pro">{{item.profile}}</view>
+                    </view>
+                </repeat>
+            </view>
+        </view>
+        <view class="ser-fun">
+            <view class="fun-title">功能特权</view>
+            <view class="fun-ser">
+                <repeat for="{{vipZoneData.func_service}}" item="item" index="index">
+                    <view class="fun-box" @tap.stop="clickHandler({{item.action}})" wx:if="{{index<3}}">
+                        <image class="box-img" src="{{item.icon}}"></image>
+                        <view class="box-title">{{item.title}}</view>
+                    </view>
+                </repeat>
+            </view>
+        </view>
+    </view>
+
+    <!-- footer -->
+    <view class="vip-footer">
+        <view class="ins" @tap.stop="toServerPage()">
+            <text>VIP服务介绍</text>
+            <image class="img" src="/static/images/arrow-right.png"></image>
+        </view>
+        <view class="line"></view>
+        <view class="recored" @tap.stop="buyDetail()">
+            <text>查看购买记录</text>
+            <image class="img" src="/static/images/arrow-right.png"></image>
+        </view>   
+    </view>
+
+    <!-- 客服 -->
+    <view class="vip-contact">
+        <image class="contact-img" src="/static/images/contact.png"></image>
+        <button open-type="contact">联系在线客服</button>
+        <image class="img" src="/static/images/arrow-right.png"></image>
+    </view>
+
+</view>
+
+<!--微信使用组件 -->
+<payMoney @paySucess.user="paySucess" @fxcpFinish.user='fxcpFinish'></payMoney>
+<!-- ios -->
+<iosLayer :isIOS.sync="isIOS" :backColor.sync="backColor"></iosLayer>
+</template>
+<script>
+import wepy from 'wepy'
+import http from '@/utils/http-util'
+import utils from '@/utils/common-util'
+import { API_URL } from '@/const'
+import LodingPage from '@/components/lodingPage'
+import {navigateTo, switchTab } from '@/utils/route'
+import PayMoney from '@/components/payMoney'
+import IosLayer from '@/components/iosLayer'
+export default class VipCenter extends wepy.page {
+    config = {
+        navigationBarTitleText: 'VIP用户中心'
+    }
+    components = {
+        lodingPage:LodingPage,
+        payMoney:PayMoney,
+        iosLayer:IosLayer,
+    }
+    data={
+        // vip类型
+        vipType:0,
+        // 数据
+        vipZoneData:'',
+        //是否是ios系统
+        isIOS:false,
+        backColor:'#000'
+    }
+    methods={
+        // 
+        clickHandler(action){
+            var param={
+                url:action,
+                fail:function(err){
+                    console.log('跳转tabBar')
+                    switchTab({url:action})
+                }
+            }
+            navigateTo(param)
+        },
+        // 购买vip服务
+        buyGood(link,e){
+            var payData=link.split('?')[1]
+            payData=payData.split('&')
+            var key,value,item,payObj={}
+            for(var i in payData){
+                item=payData[i]
+                item=item.split('=')
+                key=item[0]
+                value=item[1]
+                payObj[key]=value
+            }
+            this.$invoke('payMoney', 'show', payObj);
+            var formId = e.detail.formId
+            this.$root.$parent.sendFormId(formId)
+        },
+        // 购买记录
+        buyDetail(){
+            wx.navigateTo({
+                url:'/subPages/user/pages/vipPayDetail'
+            })
+        },
+        // 使用成功回调
+        paySucess(){
+            this.loadVipZoneData()
+        },
+        // 服务介绍
+        toServerPage(){  
+            wx.navigateTo({
+                url:'/subPages/user/pages/webview?src='+encodeURIComponent(API_URL.VIP_SERVER_PAGE)
+            })
+        },
+    }
+    events = {
+      //风险测评结束触发
+      fxcpFinish(){
+        wx.redirectTo({url:'/subPages/user/pages/vipCenter?vipType='+this.vipType});
+     },
+    }
+    onLoad(options){
+        this.vipType=options.vipType
+        this.showLoading()
+        this.loadVipZoneData()
+        var res = wx.getSystemInfoSync()
+        if(res.platform == "devtools" || res.platform == "ios"){
+            this.isIOS = true
+            return
+        }
+    }
+    onPullDownRefresh() {
+        this.loadVipZoneData()
+    }
+    loadVipZoneData(){
+        http.getRequest(API_URL.VIP_ZONE, {
+            'version':3.8,
+        }).then(data => {
+            this.vipZoneData = data 
+            this.formatData(this.vipZoneData)
+            this.$apply()  
+            this.hideLoading()
+            wx.stopPullDownRefresh()
+        })
+    }
+    // 时间戳
+    formatData(data){
+        var time;
+        time = data.vip_expire_date;
+        if(!time)return
+        time=utils.formatTimestamp(time)
+        time=time.split(' ')[0]
+        time=time.split('-')
+        time=time[0]+'年'+time[1]+'月'+time[2]+'日'
+        data.vip_expire_date = time
+    }
+    // 显示加载层
+    showLoading(){
+        this.$invoke('lodingPage','show')
+    }
+    // 隐藏加载层
+    hideLoading(){
+        this.$invoke('lodingPage','hide')
+    }
+}
+</script>

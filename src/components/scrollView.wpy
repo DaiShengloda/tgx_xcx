@@ -1,0 +1,153 @@
+<style style="scss">
+@import '../sass/components/scrollView';
+</style>
+<template>
+  <view> 
+    <slot name="content"></slot>
+    <view class="scroll-loading" hidden="{{!isBottomLoading}}">
+      <image src="https://dakaname.oss-cn-hangzhou.aliyuncs.com/mini_app_icons/load.gif"/>数据正在加载中...
+    </view>
+    <view class="scroll-loading"  wx:if="{{!hasMore&&!isNoData}}">
+      数据加载完毕
+    </view>
+    <view class="scroll-loading no-data"  wx:if="{{isNoData}}">
+      暂无数据
+    </view>
+  </view>
+</template>
+
+<script>
+import wepy from 'wepy';
+import http from '@/utils/http-util';
+import utils from '@/utils/common-util';
+import windowUtil from '@/utils/window-util';
+
+export default class ScrollView extends wepy.component {
+  data = {
+    // 数据
+    items: [],
+    // 当前页码
+    currPageNo: 1,
+    // 是否还有更多数据
+    hasMore: true,
+    // 是否正在加载,若正在加载,不做任何操作
+    isLoading: false,
+    // 窗口高度
+    scrollHeight: utils.getSystemInfoSync().windowHeight + 'px',
+    // 下拉刷新
+    isTopLoading: false,
+    // 上拉加载
+    isBottomLoading: false,
+    // 无数据
+    isNoData: false
+  };
+  props = {
+    // 请求数据的地址
+    url: String,
+    // 每页显示数据条数
+    pageSize: {
+      type: String,
+      default: 10
+    },
+    pageNoName: {
+      type: String,
+      default: 'page_no'
+    },
+    pageSizeName: {
+      type: String,
+      default: 'page_size'
+    },
+    // 请求参数
+    param: {
+      // type:String,
+      default: {}
+    },
+    // 分页数据为对象鉴别hasMore
+    objArryField: String
+  };
+  methods = {};
+
+  // 向上滑动到顶部刷新页面
+  refresh() {
+    if (this.isLoading) {
+      return false;
+    }
+    // wx.startPullDownRefresh();用户主动触发下拉刷新
+    this.currPageNo = 1;
+    this.isTopLoading = true;
+    this.getData(data => {
+      this.isTopLoading = false;
+      wx.stopPullDownRefresh();
+    }, 0);
+  }
+  // 下一页
+  nextPage() {
+    if (this.isLoading || !this.hasMore) {
+      return false;
+    }
+    this.isBottomLoading = true;
+    this.$apply();
+    this.getData(data => {
+      this.isBottomLoading = false;
+    }, 1);
+  }
+
+  // 获取数据
+  getData(callback, type) {
+    this.isLoading = true;
+    // 设置分页参数
+    if (typeof this.param === 'string') {
+      this.param = JSON.parse(this.param);
+    }
+    this.param[this.pageNoName] = this.currPageNo;
+    this.param[this.pageSizeName] = this.pageSize;
+    http
+      .getRequest(this.url, this.param)
+      .then(data => {
+        callback(data);
+        let arrayData;
+        if (data instanceof Array) {
+          arrayData = this.items = [...data];
+        } else {
+          this.items = data;
+          arrayData = data[this.objArryField];
+        }
+        if (arrayData.length == 0) {
+          if (this.currPageNo == 1) {
+            this.isNoData = true;
+          } else {
+            this.hasMore = false;
+            this.isNoData = false;
+          }
+        } else {
+          this.hasMore = this.pageSize <= arrayData.length;
+          this.isNoData = false;
+        }
+        if(this.isNoData){
+          this.hasMore = false;
+        }
+        this.currPageNo += 1;
+        this.$emit('dataLoad', this.items, type);
+        this.isLoading = false;
+        this.$apply();
+      })
+      .catch(error => {
+        windowUtil.error('网络异常');
+        this.isBottomLoading = false;
+        this.isTopLoading = false;
+        this.isNoData = false;
+        this.isLoading = false;
+        wx.stopPullDownRefresh();
+        this.$apply();
+      });
+  }
+
+  init() {
+    this.nextPage();
+  }
+
+  getItems() {
+    return this.items;
+  }
+}
+</script>

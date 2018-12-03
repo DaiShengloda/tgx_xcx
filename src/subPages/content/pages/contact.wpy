@@ -1,0 +1,117 @@
+<style lang="scss">
+page{
+    height:100%;
+    .wx-contact{
+        width:100%;
+        height:100%;
+        background:rgba(0,0,0,0.9);
+        .contact-layer{
+            background:#fff;
+            width:80%;
+            margin:0 auto;
+            position:relative;
+            top:30%;
+            border-top-left-radius:8rpx;
+            border-top-right-radius:8rpx;
+            .layer-title{
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                height: 80rpx;
+                font-size: 34rpx;
+            }
+            .layer-content{
+                width: 100%;
+                height: 80rpx;
+                color: #888;
+                font-size:30rpx;
+                text-align: center;
+            }
+            .layer-buttons{
+                display:flex;
+                align-items:center;
+                height:100rpx;
+                border-top:#e6e6e6 1px solid;
+                .btn-cancle{
+                    width:50%;
+                    height:100rpx;
+                    line-height:100rpx;
+                    text-align:center;
+                    font-size:34rpx;
+                    border-right:#e6e6e6 1px solid;
+                    color: #000;
+                }
+                .btn-sure{
+                    margin:0rpx;
+                    padding:0rpx;
+                    width:50%;
+                    height:100rpx;
+                    line-height:100rpx;
+                    background:#fff;
+                    font-size:34rpx;
+                    border-radius: 0;
+                    border:none;
+                    color: #3cc51f;
+                }
+                .btn-sure::after {
+                    border-radius: 0;
+                    border:none;
+                }
+            }
+        }
+    }
+}
+</style>
+<template>
+<view class="wx-contact" wx:if="{{showContact}}">
+    <view class="contact-layer">
+        <view class="layer-title">提示</view>
+        <view class="layer-content">点击确定按钮跳转到微信客服</view>
+        <view class="layer-buttons">
+            <view class="btn-cancle" @tap.stop="cancle">取消</view>
+            <button class="btn-sure" open-type="contact">确定</button>
+        </view>
+    </view>
+</view>
+</template>
+<script>
+import wepy from 'wepy';
+import {navigateTo, switchTab } from '@/utils/route';
+export default class Contact extends wepy.page {
+    config = {
+        enablePullDownRefresh: false
+    }
+    data={
+        showContact:false,
+        _options:null,
+    }
+    methods={
+        cancle(){
+            wx.navigateBack({
+                delta:1
+            })
+        }
+    }
+    onLoad(options){
+        this._options=options   
+    }
+    onShow(){
+        var type=this._options.type
+        if(type=='wxContact'){
+            this.showContact=true
+        }else{
+            this.showContact=false
+            wx.navigateBack({
+                delta:1
+            })
+        } 
+    }
+    onReady(){
+    }
+    onHide(){
+        this._options.type=null
+    }
+    onUnload() {
+    }
+}
+</script>

@@ -1,0 +1,181 @@
+//轮播
+.bigMan-swiper {
+    background:#f24837;  
+    swiper {
+        height: r(510);
+        margin:0 18rpx;           
+        swiper-item {
+            background:#fff; 
+            display: flex;
+            .shadow-lef{
+                position:absolute;
+                width:14rpx;
+                height:373rpx;     
+                left:-12rpx;
+                top:33rpx;                                
+            }
+            .shadow-rig{
+                position:absolute;
+                width:14rpx;
+                height:373rpx; 
+                right:-12rpx; 
+                top:33rpx;                
+            }
+            .teacher {
+                display: inline-block;
+                width: 33%;
+                text-align: center;
+                font-size: r(25); 
+                height:410rpx;
+                margin-top:55rpx;   
+                border-top-left-radius:8rpx;
+                border-top-right-radius:8rpx;    
+                position: relative;                        
+                .man-icon {
+                    width: r(110);
+                    height: r(110);
+                    border-radius:50%;
+                    margin-top:10rpx;  
+                    margin-bottom:6rpx;                    
+                }
+                .man-tg {
+                    margin:r(5) auto;
+                    background:#e93030;
+                    color:#fff;
+                    border-radius: r(8);   
+                    padding:r(6) r(10);  
+                    font-size:24rpx;
+                    letter-spacing:1.5rpx           
+                }
+                .man-name {
+                    margin:r(6) 0; 
+                    font-size:30rpx;
+                                       
+                }
+                .man-int {
+                    width:88%;
+                    min-height:r(106);                    
+                    margin:0rpx auto;
+                    color:#999;   
+                    overflow: hidden;
+                    text-overflow: ellipsis;
+                    display: -webkit-box;
+                    -webkit-line-clamp: 3;
+                    -webkit-box-orient: vertical;   
+                    font-size:24rpx              
+                }
+                .man-detail {
+                    width:r(140);
+                    margin:r(10) auto;
+                    border:1px solid #e93030;
+                    color:#e93030;
+                    border-radius:r(8);
+                    height:46rpx;
+                    line-height:46rpx
+                }
+            }
+            .teacher-mid{
+                position:relative;
+                background:#fff;
+                margin-top:22rpx;
+                padding-top:19rpx; 
+                border-top-left-radius:8rpx;
+                border-top-right-radius:8rpx;
+                .man-icon {
+                    width: r(125);
+                    height: r(125);                   
+                }
+            }
+            .swiper-blank {
+                background:#f24837;
+                position:absolute;
+                height:r(55);
+                width:100%;               
+            }
+            .blank-top {
+                top:0; 
+            }
+            .blank-bom {
+                height: 46rpx;
+                bottom:0;
+            }
+        }
+        
+    }
+}
+
+//列表
+.bigMan-list {
+    background:#fff;    
+    .list {
+        margin: 0 15rpx;
+        display: flex;
+        justify-content:center;
+        align-items: center;
+        height:r(180);
+        border-bottom:1px solid #e6e6e6;   
+        position:relative;     
+        .li-lef {
+            width:20%;
+            text-align:center;        
+            image {
+                width: r(110);
+                height: r(110);
+                border-radius: 50%;
+            }
+        }
+        .li-btw {
+            width: 65%;
+            padding:0 20rpx 0 10rpx;  
+            .btw-man{
+                white-space:nowrap;
+                overflow:hidden;
+                text-overflow:ellipsis;                
+                .man-name {
+                    // font-weight:bold;
+                    font-size: r(28); 
+                }
+                .man-tg {
+                    color:#e93030;
+                    font-size:r(26);                
+                }
+            }             
+            .man-int {
+                color:#999; 
+                font-size: r(24);
+                margin:4rpx 0;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                display: -webkit-box;
+                -webkit-line-clamp: 2;
+                -webkit-box-orient: vertical;
+            }
+            .man-num {
+                color:#999; 
+                font-size: r(24);
+            }
+        }
+        .li-rig {
+            width:15%; 
+            .man-atten {
+                width:r(90);      
+                border-radius:6rpx;
+                text-align:center;  
+                height:r(47);
+                line-height:r(47);  
+                font-size:20rpx;   
+                padding:0;
+                margin:0;
+                background:none; 
+            } 
+            .atten-add {
+                border:1px solid #e93030;
+                color:#e93030;               
+            }  
+            .atten-cancle {
+                border:1px solid #999;
+                color:#999;
+            }               
+        }
+    }
+}

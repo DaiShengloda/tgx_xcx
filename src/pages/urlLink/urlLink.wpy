@@ -1,0 +1,17 @@
+<style lang="scss">
+</style>
+<template>
+   <web-view src="{{action}}"></web-view>
+</template>
+
+<script>
+import wepy from 'wepy'
+export default class UrlLink extends wepy.page {
+    data = {
+        action: ''
+    }
+    onLoad(option) {
+        this.action = option.action
+    }
+}
+</script>

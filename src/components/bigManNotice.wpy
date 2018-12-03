@@ -1,0 +1,66 @@
+<style lang="scss">
+  @import '../sass/components/bigManNotice';
+</style>
+<template>
+  <view class="myToast" hidden="{{!show}}">
+    <view class="toast-box">
+      <image wx:if="{{op == 'notice'}}" src="../static/images/atten.png"/>
+      <image wx:if="{{op == 'cancel'}}" src="../static/images/gou2.png"/>
+      <view class="status-cacel" hidden="{{op == 'notice'}}">取消关注成功</view>
+      <view class="status" hidden="{{op == 'cancel'}}">关注成功</view>
+      <view wx:if="{{op == 'notice'}}" class="note">请到个人中心查看</view>
+    </view>
+  </view>
+</template>
+<script>
+  import wepy from 'wepy'
+  import http from '@/utils/http-util'
+  import { API_URL, formIdUrl} from '@/const'
+  import windowUtil from '@/utils/window-util.js'
+
+  export default class BigManNotice extends wepy.component {
+    data = {
+      //是否显示弹窗
+      show: false,
+      //操作类型 notice/cancel
+      op: null,
+    }
+    methods = {
+      // 关注操作
+      notice (userId) {
+        this.op = 'notice'
+        this.$apply()
+        http.getRequest(API_URL.DAKA_NOTICE, {
+          userid: userId
+        }).then((success) => {
+          this.showLayer()
+          this.$emit('noticeOptionSuccess', userId)
+        }).catch(err => {
+          windowUtil.alert(err.errmessage);
+        })
+      },
+      // 取消关注操作
+      cancel (userId) {
+        this.op = 'cancel'
+        this.$apply()
+        http.getRequest(API_URL.DAKA_CANCEL_NOTICE, {
+          userid: userId
+        }).then(success => {
+          this.showLayer()
+          this.$emit('noticeOptionSuccess', userId)
+        }).catch(err => {
+           windowUtil.alert(err.errmessage);
+        })
+      }
+    }
+
+    showLayer (type) {
+      this.show = true
+      this.$apply()
+      setTimeout(() => {
+        this.show = false
+        this.$apply()
+      }, 1200)
+    }
+  }
+</script>

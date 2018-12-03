@@ -1,0 +1,204 @@
+.ques-detail {
+    background:#fff;
+    height: 100%;
+    .quser {
+        padding: r(20) r(30);  
+        border-bottom:1px solid #e6e6e6;        
+        .quser-box {
+            font-size: r(24);           
+            .quser-name {
+                color:#2b8ff7;                
+            }
+        }
+        .quser-content {
+            font-size: 16px;
+            margin: r(25) r(0) r(10) r(0);           
+        }
+    }
+    .ques-content {
+        background:#fff;
+        padding:0 25rpx;  
+        padding-bottom:100rpx;        
+        .detail-man {
+            background:#fff; 
+           // margin: 0 r(20);
+            display: flex;
+            justify-content:center;
+            align-items: center;
+            height:r(150);
+            .li-lef {
+                //width:20%;
+                text-align:center;        
+                image {
+                    width: r(110);
+                    height: r(110);
+                    border-radius: 50%;
+                }
+            }
+            .li-btw {
+                width: 65%;
+                margin: r(0) r(10);
+                .man-name {
+                    font-weight:bold;
+                    font-size: r(27); 
+                }
+                .man-title {
+                    color:#e93030;
+                    font-size:r(20);                
+                }
+                .man-int {
+                    color:#999; 
+                    font-size: r(25);
+                    margin:2rpx 0;
+                    overflow: hidden;
+                    text-overflow: ellipsis;
+                    display: -webkit-box;
+                    -webkit-line-clamp: 3;
+                    -webkit-box-orient: vertical;
+                }
+            }
+            .li-rig {
+                margin: 0 auto;
+                .man-atten {
+                    width: r(100);
+                    border-radius: 10rpx;
+                    text-align: center;
+                    height: r(50);
+                    line-height: r(50);
+                    font-size: r(26); 
+                    position: relative;
+                } 
+                .atten-add {
+                    border:1px solid #e93030;
+                    color:#e93030;
+                }  
+                .atten-cancle {
+                    border:1px solid #999;
+                    color:#999;
+                }               
+            }
+        }
+        .cont-audio {
+            display: flex;
+            align-items: center;
+            .answer {
+                width:60rpx;
+                height:60rpx
+            }
+            .audio {
+                width: 75%;
+                margin: 0 20rpx;
+                height: 95rpx;
+                line-height: 95rpx;
+                position: relative;
+                background-repeat:no-repeat; 
+                background-size:100% 100%;
+                background-color: #2b8ff7;
+                border-radius: 50px;
+                position: relative;
+                .bac {
+                  position: absolute;
+                  width:70%;
+                  height:100%;
+                  right: 30px;
+                  top: r(0);
+                  background-color:	#6BA2F1;
+                  overflow: hidden;
+                  .bac_image {
+                    position: absolute;
+                    border:none;
+                    left: 0;
+                    top: -1px;
+                    width: 100%;
+                    height: 110%;
+                    z-index: 5;
+                  }
+                  .waves {
+                      position: absolute;
+                      left: 0;
+                      top: 15%;
+                      height: 70%;
+                      background-color: #fff;
+                      z-index: 2;
+                    }
+                }
+                .audioTxt {
+                    color: #fff;
+                    font-size: r(28);
+                    text-align: center;
+                    height: 100%;
+                    width: 40%;
+                    margin-left: r(94);
+                  }
+                .audio-txt {
+                  position: absolute;
+                  color: #fff;
+                  font-size: 30rpx;
+                  left: 22%;
+                  top: auto;
+                }
+                .audio-start {
+                  width: r(95);
+                  height: r(95);
+                  border-radius: 50%;
+                  position: absolute;
+                  left: 0.5%;
+                  top: auto;
+                }
+                .audio-contro {
+                  width: 16%;
+                  height: 95rpx;
+                  position: absolute;
+                  top: 0;
+                }
+              }
+            .audio-len {
+                font-size:30rpx;
+                color:#999; 
+            }
+        }
+        .cont-declare {
+            margin-top: r(22);
+            font-size:r(25); 
+            color: #e93030;
+        }
+        .cont-bom {
+            margin-top:20rpx;            
+            .finger {
+                margin:0 r(50);
+                text-align:center;    
+                .finger-btn{
+                    width:150rpx;
+                    height:135rpx;
+                    margin:0 auto;
+                    padding:0;                    
+                }   
+                .finger-btn[plain]{
+                    border:none;
+                }             
+                image {
+                    width:120rpx;
+                    height:120rpx;                    
+                }
+                view {
+                    font-size:34rpx;
+                    font-weight: bold;
+                    color:#e93030;
+                }
+            }
+            .bom-msg {
+                border-bottom:#e6e6e6 1px solid;
+                border-top: #e6e6e6 1px solid;
+                padding:15rpx 0rpx;
+                margin-top:20rpx;
+                color:#999;   
+                font-size:28rpx;                
+                .msg-time {
+
+                }
+                .msg-finger {padding-left:20rpx;}
+            }
+        }
+        
+    }
+}

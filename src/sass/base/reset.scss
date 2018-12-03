@@ -1,0 +1,187 @@
+@import "../commons/variables";
+
+/*CSS Reset*/
+input,button,view,page,image,
+button {
+    // margin: 0;
+    // padding: 0;
+    // box-sizing: border-box;
+}
+button:after {
+  border: none;
+}
+
+page {
+    font: 12px/150% "Microsoft YaHei","iconfont",Verdana; /*宋体 unicode */
+    line-height: $line-height-base;
+    font-size: $font-size-base;
+    color: $font-color-base;
+    background-color: $bg-base;
+    -webkit-tap-highlight-color: transparent;
+    outline: 0;
+    -webikit-overflow-scrolling: touch;
+
+}
+
+page{
+    width: 100%;
+    height: 100%;
+}
+image {
+    border: 0;
+}
+view{
+  display: block;
+}
+.span{
+  display: inline-block;
+}
+.p{
+  display: block;
+  font-size: 14px;
+  line-height: 1.5;
+}
+.title{
+  display: block;
+  font-size: 18px;
+  line-height: 2;
+}
+  
+  /*字体颜色*/
+  .lz-col-666 {
+    color: #666;
+  }
+  .lz-col-000 {
+    color: #000;
+  }
+  
+  .lz-col-333 {
+    color: #333;
+  }
+  .lz-col-888 {
+    color: #888;
+  }
+  
+  .lz-col-fff {
+    color: #fff;
+  }
+  /*产品详情-红*/
+  .lz-col-fe5066 {
+    color: #fe5066;
+  }
+  /*橙色*/
+  .lz-col-base {
+    color: $baseColor;
+  }
+  
+  .lz-bg-fff {
+    background-color: #ffffff;
+  }
+  
+
+  /*首行缩进*/
+  .t-indent {
+    text-indent: 32rpx;
+  }
+  
+  /*文字排版*/
+  .t-align-c {
+    text-align: center;
+  }
+  
+  .t-align-r {
+    text-align: right;
+  }
+  
+  .t-align-l {
+    text-align: left;
+  }
+  
+  /*加粗*/
+  .t-strong {
+    font-weight: 700;
+  }
+  
+  /*边框*/
+  .lz_bor {
+    border: 1px solid #e5e5e5;
+  }
+  
+  .lz_active_bor-b {
+    border-bottom: 1px solid #ff6e06;
+  }
+  
+  /*浮动*/
+  .fl {
+    float: left;
+  }
+  
+  .fr {
+    float: right;
+  }
+  
+  .hidden {
+    display: none
+  }
+  
+  /*清除浮动*/
+  .clearfix:before, .clearfix:after {
+    content: "";
+    display: table;
+  }
+  
+  .clearfix:after {
+    clear: both;
+  }
+  
+  .clear {
+    clear: both;
+    overflow: hidden;
+  }
+  
+  
+  /*图片*/
+  .img-t {
+    width: 100%;
+    height: 100%;
+    display: block;
+  }
+  /*图片居中*/
+  .img-c{
+    display: block;
+    margin: 0 auto;
+  }
+  
+  .w-box-c {
+    width: 100%;
+    padding: 0 10rpx;
+    background-color: #fff;
+  }
+  
+  
+  /*隐藏*/
+  .hide{
+    display: none!important;
+  }
+  /*弹性布局*/
+  .lz-display-flex{
+    background-color: #fff;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+  }
+  .lz-flex-box{
+    display: flex;
+    flex-direction:column;
+    padding: 0 30rpx 20rpx;
+  }
+  .lz-flex-table{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20rpx;
+    border-bottom: 1px solid #eee;
+  }
+
+
+

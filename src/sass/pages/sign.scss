@@ -1,0 +1,227 @@
+.page-sign{
+    // 
+    .sign-layer{
+        position: fixed;
+        top:0;
+        z-index: 999;
+        background: rgba(0,0,0,0.5);
+        text-align: center;
+        width:100%;
+        height:100%;        
+        .layer-box{
+            width:614rpx;
+            height:651rpx;
+            position: relative;
+            margin:0 auto;
+            margin-top:150rpx;            
+            .box-img{
+                width:614rpx;
+                height:651rpx;
+            }
+            .box-btn{
+                position:absolute;
+                width:400rpx;
+                height:100rpx;
+                bottom:30rpx;
+                left:100rpx;                
+            }
+        }
+    }
+    // 
+    .sign-gift-layer{
+        position: fixed;
+        top:0;
+        z-index: 999;
+        background: rgba(0,0,0,0.5);
+        text-align: center;
+        width:100%;
+        height:100%;        
+        .layer-box{
+            width:614rpx;
+            height:770rpx;
+            position: relative;
+            margin:0 auto;
+            margin-top:150rpx;            
+            .box-img{
+                width:614rpx;
+                height:770rpx;
+            }
+            .box-btn{
+                position:absolute;
+                width:400rpx;
+                height:100rpx;
+                bottom:30rpx;
+                left:100rpx;                
+            }
+        }
+    }
+    // 
+    .sign-top{
+        position:relative;
+        height:419rpx;
+        .sign-raider{
+            position:absolute;
+            color:#a04a0f;
+            font-size:26rpx;
+            top:15rpx;
+            right:30rpx;
+            background:#fada2f;
+            border:#fef458 1px solid;
+            border-radius:8rpx;
+            padding:5rpx 10rpx;       
+        }
+        .top-img{
+            width:100%;
+            height:419rpx;  
+            display: block;        
+        }
+        .top-img-qd{
+            position:absolute;
+            top:20rpx;
+            left:37%;
+            width:200rpx;
+            height:200rpx;            
+        }
+        .top-word{
+            text-align:center;
+            position:absolute;
+            bottom:100rpx;
+            width:100%;
+            color:#fff;
+            font-size:32rpx;            
+            .sign-num{
+                color:#fada2f;
+                padding:0 5rpx;                
+            }
+        }
+    }
+    // 
+    .sign-gift{
+        background:#fff;
+        height:304rpx;        
+        .gift-note{
+            height:90rpx;
+            line-height:90rpx;
+            text-align:center;
+            font-size:34rpx;   
+            letter-spacing:2rpx;            
+            .note-text{
+                color:#e93030;                
+            }
+        }
+        .gift-content{
+            display:flex;
+            align-items:center; 
+            padding:0 30rpx;            
+            .gift-box{
+                width:170rpx;
+                text-align:center; 
+                position:relative;               
+                .box-img{
+                    width:170rpx;
+                    height:170rpx;
+                    display:block;
+                }
+                .box-open-img{
+                    width:170rpx;
+                    height:170rpx;  
+                    display:block;                  
+                }
+                .box-title{
+                    font-size:30rpx;                    
+                }
+                .gift-msg{
+                    position:absolute;
+                    width:250rpx;                    
+                    background:#fff;
+                    padding:15rpx 20rpx;  
+                    border:#e6e6e6 1px solid;
+                    border-radius:15rpx;
+                    top:170rpx;                                    
+                    .msg-box{
+                        display:flex;                        
+                        .good-img{
+                            width:50rpx;
+                            height:36rpx;                            
+                        }
+                        .good-box{
+                            font-size:28rpx;
+                            .good-name{           
+                                padding-left:15rpx;                            
+                            }
+                        }       
+                    }
+                }
+                .gift-msg-lef{
+                    left:-15rpx; 
+                }
+                .gift-msg-mid{
+                    left:-75rpx; 
+                }
+                .gift-msg-rig{
+                    right:-15rpx
+                }
+            }
+            .gift-line{
+                height:5rpx;                
+            }
+        }
+    }
+    // 
+    .sign-calendar{
+        margin-top:16rpx;
+        background:#fff; 
+        padding:0 30rpx 30rpx 30rpx;        
+        .cal-title{
+            height:90rpx;
+            line-height:90rpx;
+            text-align:center;
+            font-size:32rpx;
+            color:#e93030;            
+            .title-year{
+
+            }
+            .title-mons{
+
+            }
+        }
+        .cal-header{
+            display:flex;
+            height:70rpx;
+            line-height:70rpx;
+            background:#e83030;
+            color:#fff;
+            border-top-left-radius:10rpx;
+            border-top-right-radius:10rpx;
+            font-size:30rpx;            
+            .header-day{
+                width:17.2%;
+                text-align:center;                
+            }
+        }
+        .cal-body{
+            background:#fef9e6;
+            font-size:30rpx;  
+            border-radius:10rpx;  
+            border-bottom-left-radius:10rpx;
+            border-bottom-right-radius:10rpx;        
+            .body-week{
+                display:flex; 
+                height:70rpx;
+                line-height:70rpx;               
+                .body-day{
+                    width:17.2%;
+                    text-align:center;
+                    position: relative;
+                    .day-qd{
+                        position: absolute;
+                        width:34rpx;
+                        height:34rpx;
+                        left:40%;
+                        bottom:0;                        
+                    }
+                }
+            }
+        }
+    }
+}

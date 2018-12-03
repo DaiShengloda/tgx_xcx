@@ -1,0 +1,330 @@
+.activity{
+  .common-img{
+    width: 100%;
+    display: block;
+  }
+    .common-box{
+      position:relative;
+      .common-view{
+        position: absolute;
+        z-index: 9;
+      }
+      .notice{
+          width: r(150);
+          height: r(53);
+          right: r(15);
+          top: r(15);       
+      } 
+      .swiper-box{
+         position: absolute;
+         width: r(600);
+         height: r(75);
+         top: 0;
+         border-radius: r(150);
+         left: r(90);
+         overflow: hidden;
+         text-align: center;
+         font-size: r(32);
+         color: #ffffff;
+         line-height:r(75);
+         background-color: #fd3a27;
+         swiper{
+          height:100%;
+          swiper-item{
+            height:100%;
+          }
+         }
+      }
+       .drawTime{
+           position: absolute;
+           width: r(600);
+           height: r(75);
+           top: r(45);
+           left: r(75);
+           text-align: center;
+           font-size: r(34);
+           color: #2f2e2e;
+           line-height: r(75);
+       }
+       .hongbao-box{
+           position: absolute;
+           width: r(600);
+           height: r(525);
+           left: r(75);
+           top: r(150);
+            display: flex;
+            flex-wrap: wrap;
+           .hongbao-img {
+               width: r(160);
+               height: r(190);
+               margin: r(20);
+           }
+           .active{
+               animation: enlarge 1s infinite linear;
+                -webkit-animation:enlarge 1s infinite linear;
+           }
+           @keyframes enlarge {
+                0%{
+                    -webkit-animation: scale(1);
+                    transform: scale(1);
+                }
+                50%{
+                    -webkit-animation: scale(1.2);
+                    transform: scale(1.2);
+                }
+                100%{
+                    -webkit-animation: scale(1);
+                    transform: scale(1);
+                }
+           }
+       }
+       .share{
+          position:fixed;
+          width: r(60);
+          height: r(165);
+          right: 0;
+          top: r(450);
+          border:none;
+          margin:0;
+          padding:0;
+          z-index:10;
+       }
+       .contact{
+          position:fixed;
+          width: r(60);
+          height: r(165);
+          right: 0;
+          top: r(630);
+          border:none;
+          margin:0;
+          padding:0;
+          z-index:10;
+       }
+       .award{
+          position:fixed;
+          width: r(60);
+          height: r(165);
+          right: 0;
+          top: r(810);
+          z-index:10;
+       }
+       .wantSign{
+           width: r(150);
+           height: r(120);
+           right: r(67.5);
+           top: r(250);
+       }
+       .wantShare{
+           width: r(150);
+           height: r(120);
+           right: r(67.5);
+           top:r(400);
+           border:none;
+           margin:0;
+           padding:0;
+       }
+       .wantRecharge{
+           width: r(150);
+           height: r(120);
+           right: r(67.5);
+           top:r(540);
+       }
+    }
+  /*弹窗*/
+  .common-bgBox{
+    position:fixed;
+    top:0;
+    width:100%;
+    height:100vh;
+    background:rgba(0,0,0,0.5);
+    z-index:99;
+    /*关闭按钮*/
+    .common-close{
+      position: absolute;
+      width:r(80);
+      height:r(80);
+      top:0;
+      right:0;
+    }
+    /*获奖*/
+    .getPrize-Box{
+        width:r(660);
+        margin:0 auto;
+        position:relative;
+        top:20%;
+        .getPrize-img{
+            width: 100%;
+            display: block;
+        }
+        .again{
+            position: absolute;
+            width: r(260);
+            height: r(70);
+            bottom: r(140);
+            left: r(200);
+        }
+        .getPrize-Content{
+            position: absolute;
+            width: r(660);
+            height: r(150);
+            top: r(240);
+            left: r(0);
+            font-size: r(30);
+            word-wrap: break-word; 
+            word-break: normal;
+            .cont-msg{
+            text-align: center;
+            margin-top: r(10);
+            }
+        }
+    }
+    /*未获奖*/
+    .notPrize-Box{
+        width:r(660);
+        margin:0 auto;
+        position:relative;
+        top:20%;
+        .notPrize-img{
+          width: 100%;
+          display: block
+        }
+        .again{
+          position: absolute;
+          width: r(260);
+          height: r(70);
+          bottom: r(140);
+          left: r(200);
+        }
+    }
+    /*我的奖品*/
+    .myPrize-box{
+      width:r(660);
+      margin: 0 auto;
+      position:relative;
+      top:10%;
+      .myPrize-img{
+          width: 100%;
+          display: block;
+      }
+      .content-box{
+        position: absolute;
+        width:r(560);
+        top:r(250);
+        left:r(50);
+        height:r(580);
+        .scroll-box{
+          height:100%;
+          .content{
+            position:relative;
+            display:flex;
+            justify-content:space-between;
+            align-items:center;
+            height:r(160);
+            background:#cf1e1e;
+            margin:0 r(20);
+            padding:0 r(20);
+            margin-bottom:r(20);
+            border-radius:r(10);
+            .icon{
+              width:r(116);
+              height:r(116);
+              .icon-img{
+                width:100%;
+              }
+            }
+            .describe{
+              position:relative;
+              width:r(300);
+              .describe-data{
+                font-size: r(26);
+                color: #e78f8f;
+              }
+              .describe-content{
+                font-size: r(32);
+                color: #ffffff;
+                margin-top: r(10);
+              }
+            } 
+            .describe-rt{
+              position: absolute;
+              right: 0;
+              top: 0;
+              background-color: #ffcd72;
+              color: #cf1e1e;
+              border-top-right-radius: 10rpx;
+              width: r(110);
+              height: r(45);
+              text-align: center;
+              line-height: r(45);
+              font-size: r(28);
+            }    
+          }
+        }
+        .box-none{
+          color:#ffd457;
+          font-size:r(36);
+          height:r(200);
+          display:flex;
+          align-items:center;
+          justify-content:center;
+          letter-spacing:r(3);
+        }
+      }
+    }
+    /*活动须知*/
+    .notice-box{
+      width:r(675);
+      margin:0 auto;
+      position:relative;
+      top:20%;
+        img{
+          width: 100%;
+          display: block
+        }
+    }
+    /*未登录弹窗*/
+    .login-box{
+      width:r(660);
+      margin:0 auto;
+      position:relative;
+      top:28%;
+      background: #fff;
+      border-radius: r(10);
+      .box-title{
+        text-align: center;
+        font-size: r(34);
+        color: #000000;
+        padding:r(20) 0 r(20) 0;
+      }
+      .box-content{
+        text-align: center;
+        font-size: r(30);
+        color: #a2a2a2;
+        padding-bottom:r(30);
+      }
+      .btns{
+        font-size: r(34);
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        border-top: 1px solid #e6e6e6;
+        height:r(90);
+        .btn-cancle{
+          color: #000000;
+          border-right: 1px solid #e6e6e6;
+          width:50%;
+          height:r(90);
+          line-height: r(90);
+          text-align: center;
+        }
+        .btn-sure{
+          color: #3cc51f;
+          width:50%;
+          height:r(90);
+          line-height: r(90);
+          text-align: center;
+        }
+      }
+    }
+  }
+}

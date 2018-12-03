@@ -1,0 +1,220 @@
+<style lang="scss">
+@import '../sass/base/reset';
+@import '../sass/commons/function';
+@import '../sass/components/commentInput';
+</style>
+<template>
+<view class="poe-input" wx:if="{{inputShow}}" @tap.stop="hideInput">
+    <view class="input-box {{placeholderClass?'poe-active':''}}" @tap.stop="preventInput">
+        <form bindsubmit="postComment" report-submit='true'>
+            <view class="input-top">
+                <text class="top-lef" wx:if="{{commentType==1}}">发表评论</text>
+                <text class="top-lef" wx:if="{{commentType==2}}">回复:</text>
+                <text class="top-lef" style="color:red" wx:if="{{commentType==3}}">{{coinNum}}大咖币向他提问:</text>
+                <text class="top-lef" wx:if="{{commentType==4}}">涨跌理由</text>
+                <text class="top-mid" wx:if="{{commentType==2}}">{{commentName}}</text>
+                <text class="top-rig" @tap.stop="hideInput">取消</text>
+            </view>
+            <view class="input-mid">
+                <textarea wx:if="{{commentType==3}}" show-confirm-bar="{{showConfirm}}" auto-focus="{{autoFocus}}" focus="{{focus}}" cursor-spacing="135"   
+                fixed="{{textFixed}}" adjust-position="{{adjust}}" placeholder="输入您的问题，如果{{userName}}超过预计时间未解答，提问费用会自动退回。"
+                bindfocus="textFocus" bindblur="textBlur" bindinput="textInput"/>
+                <textarea wx:elif="{{commentType==4}}" show-confirm-bar="{{showConfirm}}" auto-focus="{{autoFocus}}" focus="{{focus}}" cursor-spacing="135"   
+                fixed="{{textFixed}}" adjust-position="{{adjust}}" placeholder="写下你的涨跌理由..."
+                bindfocus="textFocus" bindblur="textBlur" bindinput="textInput"/>
+                <textarea wx:else show-confirm-bar="{{showConfirm}}" auto-focus="{{autoFocus}}" focus="{{focus}}" cursor-spacing="135"   
+                fixed="{{textFixed}}" adjust-position="{{adjust}}" placeholder="{{commentType==2?'在这里输入内容...':'发表评论...'}}"
+                bindfocus="textFocus" bindblur="textBlur" bindinput="textInput"/>
+            </view>
+            <view class="input-bom">
+                <button class="bom-btn" formType="submit">发送</button>
+            </view>
+        </form>
+    </view>
+</view>
+</template>
+<script>
+import wepy from 'wepy'
+import http from '@/utils/http-util'
+import window from '@/utils/window-util'
+import utils from '@/utils/common-util'
+import user from '@/utils/user-manager'
+import { API_URL, formIdUrl } from '@/const'
+import {navigateTo, switchTab } from '@/utils/route'
+import userManager from '@/utils/user-manager'
+export default class CommentBtn extends wepy.component {
+    data={
+        // 评论级别
+        commentType:0,
+        // 一级评论name
+        commentName:'',
+        // 显示评论输入框
+        inputShow:false,
+        // 聚焦样式
+        placeholderClass:false,
+        // 是否显示confirm按钮
+        showConfirm:false,
+        // 聚焦
+        focus:true,
+        // 自动聚焦
+        autoFocus:true,
+        // 文本fixed
+        textFixed:true,
+        // 自动上推
+        adjust:true,
+        // 文本框value
+        textAreaValue:'',
+        //问股花费大咖币数量
+        coinNum:'',
+        //问股大咖姓名
+        userName:'',
+        level:'',
+        commentName:'',
+        code:'',
+        //正在提交
+        hasCommit:false,
+        // 登录状态
+        isLoginSuccess:'',
+    }
+    props={
+        // 评论url及参数
+        url:String,
+        param: {
+            default:{}
+        },
+    }
+    methods={
+        showInput(level,commentName,coinNum,userName){     
+            if(!this.checkLogin())return
+            this.commentType=level;
+            this.commentName=commentName;
+            this.coinNum=coinNum;
+            this.userName=userName;
+            this.inputShow=true;
+            this.$apply()
+        },
+        hideInput(event){
+            this.inputShow=false
+            this.textAreaValue = ''
+        },
+        // 阻止向上冒泡
+        preventInput(event){
+            return false
+        },
+        // textarea聚焦
+        textFocus(e){
+            this.placeholderClass=true
+        },
+        // textarea失去焦点
+        textBlur(e){
+            this.placeholderClass=false
+        },
+        // textarea输入
+        textInput(e){
+            this.textAreaValue=e.detail.value
+        },
+        // 发送评论
+        postComment(e){
+            if(this.hasCommit){
+                return
+            }
+            this.hasCommit=true;
+            var formId = e.detail.formId;
+            var that = this;
+            var textContent=this.textAreaValue.replace(/[\r\n]/g, "");
+            textContent=textContent.replace(/[ ]/g, ""); 
+            if(textContent.length ==0){
+                wx.showToast({
+                    title: '内容不能为空！',
+                    icon: 'none',
+                    duration: 2000
+                })
+                this.hasCommit=false;
+                return;
+            }
+            if(this.commentType == 3){
+                //获取code
+                user._getWxCode().then(code => {
+                    // Logger.debug('获取微信code成功:%o', code);
+                     this.param.code=code.code;
+                }).then(data => {
+                    //问股时 获取回答时间 QUESTION_TIME
+                    this.param.question_content=this.textAreaValue
+                    http.getRequest(API_URL.QUESTION_TIME, {answer_userid:this.param.answer_userid})
+                        .then(data => {
+                        // window.hideLoading();
+                        wx.showModal({
+                        // title: '',
+                        content: data.msg,
+                        success: function(res) {
+                            if (res.confirm) {
+                                wx.showLoading({
+                                    title: '正在提交...',
+                                })
+                                that.param.formId=formId;
+                                that.sendMsg(formId);
+                                }else if (res.cancel){
+                                    that.hasCommit=false;
+                                    that.$apply()
+                                } 
+                            }
+                        })
+                    }).catch(error=>{
+                        // window.hideLoading();
+                    });
+                })
+            }else{
+                //评论时  直接提交
+                this.param.commentContent=this.textAreaValue;
+                this.param.content=this.textAreaValue;
+                this.sendMsg(formId);
+            }
+        }    
+    }
+    sendMsg(formId){
+        http.getRequest(this.url, this.param)
+        .then(data=>{
+            this.inputShow=false
+            this.$apply()
+            //关闭加载框
+            wx.hideLoading(); 
+            //提示成功
+            wx.showToast({
+                title: '提交成功',
+                icon: 'success',
+                duration: 2000
+            })
+            this.textAreaValue = '';
+            this.hasCommit=false;
+            this.sendFormId(formId);
+        }).catch(error=>{
+            this.inputShow=false
+            this.$apply()
+            //关闭加载框
+            wx.hideLoading(); 
+            //提示成功
+            wx.showToast({
+                title: error.errmessage,
+                icon: 'none',
+                duration: 2000
+            })
+            this.textAreaValue = '';
+            this.hasCommit=false;
+            console.log(error)
+        })
+    }
+    // 是否登录
+    checkLogin(){
+        this.isLoginSuccess = wx.getStorageSync('loginSuccess')
+        if(!this.isLoginSuccess ){
+            userManager.triggerIntercept()
+            return false
+        }
+        return true
+    }
+    // 提交formId数据
+    sendFormId(formId){
+        this.$root.$parent.sendFormId(formId)
+    }
+}
+</script>

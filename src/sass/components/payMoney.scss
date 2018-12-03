@@ -1,0 +1,78 @@
+
+    .cover {
+        width: 100%;
+        height: 100%;
+        position: fixed;
+        top: 0;
+        left: 0;
+        background: rgba($color: #000000, $alpha: 0.5);
+        z-index: 100;
+      }
+      
+      #dialog {
+        width: 100%;
+        height: 80%;
+        z-index: 2;
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        background: #fff;
+        z-index: 101;
+        .title {
+          text-align: center;
+          border-bottom: 1px solid #ccc;
+          padding: 20rpx 0;
+          font-size: 18px;
+          position: relative;
+        }
+        .close {
+          position: absolute;
+          left: 30rpx;
+          top: 50%;
+          transform: translate(0, -50%);
+          width: 50rpx;
+          height: 50rpx;
+        }
+        .pay_info {
+          padding: 0 30rpx;
+          .total {
+            text-align: center;
+            font-size: 30px;
+            padding: 40rpx;
+          }
+          .pay_item {
+            padding: 20rpx 0;
+            border-bottom: 1px solid #ccc;
+            font-size: 16px;
+            display: flex;
+            justify-content: space-between;
+            .l {
+              color: #929292;
+            }
+          }
+        }
+        .mz {
+          font-size: 16px;
+          margin: 20px 10px;
+          display: block;
+          // checkbox{
+          //   transform: scale(0.8);
+          //   border: #e93030 1px solid;
+          // }
+        }
+        .pay_btn {
+          width: 90%;
+          position: fixed;
+          left: 50%;
+          transform: translate(-50%, 0);
+          bottom: 100rpx;
+          color: #fff;
+          font-size: 17px;
+        }
+        .dis {
+          background: #ccc;
+        }
+        .active {
+          background: #e93030;
+        }
+      }

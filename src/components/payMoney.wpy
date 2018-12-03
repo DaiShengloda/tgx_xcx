@@ -1,0 +1,193 @@
+<style lang="scss">
+@import '../sass/components/payMoney';
+</style>
+<template>
+
+   <view class='cover' hidden='{{!confirmPay}}'></view>
+    <!--补充弹窗-->
+    <view id='dialog' hidden='{{!confirmPay}}'>
+      <view class='title'>
+          <image class='close' @tap='closeConfirm' src='/static/images/close.png'/>
+          <text>确认使用</text>
+      </view>
+      <view class='pay_info'>
+        <view class='total'><text>￥{{payPrice}}</text></view>
+        <view class='pay_item'>
+          <text class='l'>使用信息</text>
+          <text class='r'>{{payInfo}}</text>
+        </view>
+        <view class='pay_item'>
+          <text class='l'>使用方式</text>
+          <text class='r'>微信使用</text>
+        </view>
+      </view>
+      <label class='mz' for='ck' @tap='checkRule'>
+        <checkbox  checked='{{isReadRule}}' color='red' id='ck'/>
+        <view style='display:inline'>我已认真阅读并签署《<text style='color:#e93030' @tap='toFxjjs'>风险揭示书</text>》</view>
+      </label>
+      <form wx:if='{{isReadRule}}' bindsubmit="pay" report-submit='true'>
+        <button  class='pay_btn active' formType="submit">立即使用</button>
+      </form>
+      <form wx:else bindsubmit="notAgree" report-submit='true'>
+        <button class='pay_btn dis' formType="submit">立即使用</button>
+      </form>
+    </view>
+<hegui @finish.user='finish'/> 
+</template>
+<script>
+import wepy from 'wepy';
+import http from '@/utils/http-util';
+import utils from '@/utils/common-util';
+import { domain, API_URL, hgStatus } from '@/const';
+import userManager from '@/utils/user-manager';
+import windowUtil from '@/utils/window-util';
+import HeGui from '@/components/hegui';
+import {navigateTo, switchTab } from '@/utils/route';
+export default class PayMoney extends wepy.component {
+  data = {
+    // 合规状态
+    status:0,
+    // 使用相关信息
+    productId:'',
+    payPrice:'',
+    payInfo:'',
+    //是否显示确认弹窗
+    confirmPay: false,
+    //是否阅读使用条款
+    isReadRule: false,
+  };
+  components = {
+    hegui: HeGui
+  };
+  props = {
+    // 使用接口
+    payUrl: String,
+    // 参数
+    payParam: {}
+  };
+  computed = {};
+  methods = {
+    show(payObj) {
+        this.productId=payObj.productId
+        this.payPrice=payObj.payPrice
+        this.payInfo=payObj.payInfo
+        this.$invoke('hegui', 'startHeguiForRecharge', this.status);
+    },
+    //合规结束
+    finish(data) {
+        this.confirmPay = true;
+    },
+    //关闭确认框
+    closeConfirm() {
+      this.confirmPay = false;
+    },
+     //点击使用条款
+    checkRule(e) {
+      this.isReadRule = !this.isReadRule;
+    },
+    //点击使用
+    async pay(e) {
+      //商品id
+      let id = this.productId;
+      //下单
+      let orderData = null;
+      windowUtil.showLoading();
+      let code = await wepy.login();
+      try {
+        orderData = await http.getRequest(API_URL.PAY_ORDER, {
+          body: '测试商品',
+          productId: id,
+          platform: 'mini_app',
+          code: code.code
+        });
+      } catch (error) {
+        windowUtil.error('下单失败');
+        throw error;
+      }
+      //隐藏弹窗
+      this.confirmPay = false;
+      let outTradeNo = orderData.out_trade_no;
+      this.$apply();
+      windowUtil.hideLoading();
+      wx.requestPayment({
+        paySign: orderData.paySign,
+        timeStamp: orderData.timeStamp,
+        nonceStr: orderData.nonceStr,
+        package: orderData.package,
+        signType: orderData.signType,
+        complete: function(data) {
+          let msg = data.errMsg;
+          windowUtil.showLoading();
+          http
+            .getRequest(API_URL.PAY_RESULT, {
+              outTradeNo: outTradeNo,
+              productId: this.productId
+            })
+            .then(success => {
+              windowUtil.success('成功');
+              this.$emit('paySucess');
+            })
+            .catch(err => {
+              windowUtil.alert(err.errmessage);
+            });
+        }.bind(this)
+      });
+      var formId = e.detail.formId
+      this.$root.$parent.sendFormId(formId)
+    },
+    notAgree(e) {
+      windowUtil.alert('请勾选声明');
+      var formId = e.detail.formId
+      this.$root.$parent.sendFormId(formId)
+    },
+    //跳转风险揭示书
+    toFxjjs() {
+      let userInfo = userManager.getLocalUserInfo();
+      let src = `${domain}/api/business/riskProtocolHtml.do?name=fxjss&userid=${
+        userInfo.userid
+      }`;
+      src = 'webview?src='+encodeURIComponent(src);
+      var param={
+        url:src,
+        fail:function(err){
+          console.log('跳转tabBar')
+          switchTab({url:src})
+        }
+      }
+      navigateTo(param)
+    },
+  };
+  onLoad(){
+    //合规
+    this.requireHegui();
+  }
+  async requireHegui() {
+    // windowUtil.showLoading();
+    let data = await userManager.getUserDetail();
+    //是否风险测评
+    let answerResult = JSON.parse(data.answer);
+    //是否登记
+    let registration = data.registration == 1;
+    this.status = hgStatus.NO_SHOW;
+    //是否风险测评
+    let answer =
+      answerResult &&
+      answerResult.answer_result &&
+      answerResult.answer_result.level >= 0;
+    if (!registration && !answer) {
+      this.status = hgStatus.NO_ALL;
+    } else if (!registration) {
+      //未登记
+      this.status = hgStatus.NO_REGISTRATED;
+    } else if (!answer) {
+      //未风险测评
+      this.status = hgStatus.NO_ANSWER;
+    } else {
+      //合规完成可补充
+      this.status = hgStatus.NO_SHOW;
+    }
+    // windowUtil.hideLoading();
+  }
+
+}
+</script>

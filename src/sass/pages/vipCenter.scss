@@ -1,0 +1,211 @@
+.vip-center{
+    // 
+    .vip-user{
+        display:flex;
+        padding:0 40rpx;
+        background:#e93030;
+        height:180rpx;
+        align-items:center;        
+        .user-img{
+            width:120rpx;
+            height:120rpx;
+            border-radius:50%;            
+        }
+        .user-msg{
+            color:#fff;
+            font-size:28rpx;
+            margin-left:30rpx;            
+            .msg-name{
+                font-size:32rpx;                
+            }
+            .msg-status{
+                .status-text{
+
+                }
+            }
+        }
+    }
+    // 
+    .vip-buy{
+        border-bottom:#e6e6e6 1px solid;        
+        .buy-top{
+            text-align:center;
+            background:#fff;
+            padding:30rpx 0;            
+            .top-title{
+                font-size:30rpx;
+            }
+            .top-text{
+                font-size:28rpx;
+                color:#999;
+            }
+        }
+        .buy-goods{
+            background:#fff;            
+            .good-box{
+                padding:15rpx 30rpx;
+                display:flex;
+                align-items:center;
+                justify-content:space-between;
+                font-size:30rpx;
+                border-top:#e6e6e6 1px solid;                
+                .box-lef{
+                    .lef-name{
+                        display:flex;
+                        align-items:center;                        
+                        .name{
+
+                        }
+                        .img{
+                            width:87rpx;
+                            height:51rpx;
+                            margin-left:15rpx;                            
+                        }
+                    }
+                    .lef-price{
+                        color:#e93030; 
+                    }
+                }
+                .box-rig{
+                    width:4em;
+                    background:#e93030;
+                    color:#fff;
+                    text-align:center;
+                    height:1.4rem;
+                    line-height:1.3rem;
+                    border-radius:1.4rem;   
+                    position: relative;                 
+                }
+            }
+        }
+    }
+    // 
+    .vip-service{
+        background:#fff;
+        margin-top:20rpx;
+        border-top:#e6e6e6 1px solid;   
+        border-bottom:#e6e6e6 1px solid;        
+        .ser-top{
+            text-align:center;
+            font-size:30rpx;
+            height:90rpx;
+            border-bottom:#e6e6e6 1px solid;
+            line-height:90rpx
+        }
+        .ser-cont{
+            .cont-title{
+                height:80rpx;
+                line-height:80rpx;
+                padding-left:30rpx;
+                font-size:30rpx;                
+            }
+            .cont-ser{
+                display:flex;
+                align-items:center;
+                justify-content:space-between;    
+                padding:0 15rpx 20rpx 15rpx; 
+                border-bottom:#e6e6e6 1px solid;                
+                .cont-box{
+                    text-align:center;  
+                    font-size:30rpx;   
+                    width:33.3%;                    
+                    .box-img{
+                        width:100rpx;
+                        height:100rpx;                    
+                    }
+                    .box-title{
+                        white-space:nowrap;
+                        overflow:hidden;
+                        text-overflow:ellipsis;                        
+                    }
+                    .box-pro{
+                        font-size:26rpx;
+                        color:#999;    
+                        white-space:nowrap;
+                        overflow:hidden;
+                        text-overflow:ellipsis;                                        
+                    }
+                }
+            }   
+        }
+        .ser-fun{
+            .fun-title{
+                height:80rpx;
+                line-height:80rpx;
+                padding-left:30rpx;
+                font-size:30rpx;                
+            }
+            .fun-ser{
+                display:flex;
+                align-items:center;
+                justify-content:space-between;    
+                padding:0 15rpx 20rpx 15rpx; 
+                .fun-box{
+                    text-align:center;  
+                    font-size:26rpx;                    
+                    width:33.3%;  
+                    .box-img{
+                        width:100rpx;
+                        height:100rpx;
+                    }
+                    .box-title{
+                        white-space:nowrap;
+                        overflow:hidden;
+                        text-overflow:ellipsis;                        
+                    }
+                }
+            }     
+        }
+    }
+    // 
+    .vip-footer{
+        display:flex;
+        align-items:center;
+        justify-content:space-between;
+        font-size:32rpx; 
+        height:90rpx;
+        background:#fff;               
+        .ins,.recored{
+            text-align: center;
+            width:49%;         
+            text{
+
+            }
+            .img{
+                width:30rpx;
+                height:30rpx;    
+                vertical-align: middle;            
+            }
+        }
+        .line{
+            border-left:#e6e6e6 1px solid;
+            height:50rpx;            
+        }
+    }
+    // 
+    .vip-contact{
+        display:flex;
+        align-items:center;
+        justify-content:space-between;        
+        background:#fff;
+        padding:0 30rpx;   
+        height:100rpx;   
+        margin-top:20rpx;        
+        .contact-img{
+            width:70rpx;
+            height:70rpx; 
+        }
+        button{
+            width:78%;
+            text-align:left;
+            margin:0;
+            padding:0;  
+            background:#fff;            
+        }
+        .img{
+            width:40rpx;
+            height:40rpx; 
+        }
+    }
+
+}

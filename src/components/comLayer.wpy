@@ -1,0 +1,91 @@
+<style lang="scss">
+#myToast{
+    position:fixed;
+    top:0;
+    left:0;
+    border-radius:20rpx;
+    background-color:#fff;
+    text-align: center;
+    z-index:999;
+    background:rgba(0,0,0,0.5);
+    width:100%;
+    height:100%;
+    image {      
+    }
+    .status {
+        color:#000;
+        font-weight:bold;
+        width:100%;
+        height:80rpx;
+        line-height:80rpx;
+        font-size:40rpx;
+        text-align:center;
+    }
+    .note {
+        height:40rpx;
+        line-height:40rpx;
+        font-size:28rpx;
+        color:#999;
+        padding-bottom:10px;
+    }
+}
+</style>
+<template>
+<view id="myToast" wx:if="{{show}}" @tap.stop="preventClick">
+    <slot name="content"></slot>
+    <image mode="aspectFit" 
+           src="{{imgSrc}}" 
+           wx:if="{{imgSrc}}" 
+           @tap.stop="hide" 
+           style="{{imgStyle}}">
+    </image>
+    <view class="title" wx:if="{{title}}">{{title}}</view>
+    <view class="content" wx:if="{{content}}">{{content}}</view>
+    <view class="btns">
+        <view class="btn-sure" wx:if="{{sureTxt}}">{{sureTxt}}</view>
+        <view class="btn-calcle" wx:if="{{cancleTxt}}">{{cancleTxt}}</view>
+    </view>
+</view>
+</template>
+<script>
+import wepy from 'wepy';
+export default class ComLayer extends wepy.component {
+    data={
+        show:false, 
+    }
+    props = {
+        imgStyle: {
+            type: String
+        },
+        imgSrc: {
+            type: String
+        },
+        title: {
+            type: String
+        },
+        content: {
+            type: String
+        },
+        sureTxt: {
+            type: String
+        },
+        cancleTxt: {
+            type: String
+        },
+    }
+    methods={
+        preventClick(event){
+            return false
+        },
+        show(){
+            this.show=true           
+            this.$apply()
+        },
+        hide(){
+            this.show=false
+            this.$emit('hideLayer')
+            this.$apply()
+        },
+    }
+}
+</script>

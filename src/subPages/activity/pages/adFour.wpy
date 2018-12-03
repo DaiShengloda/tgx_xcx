@@ -1,0 +1,199 @@
+<style lang="scss">
+@import '../sass/ad'; 
+.ad-form{
+    position:fixed;  
+    margin:0;
+    padding:0;
+    width:100%;
+    // height:9%;
+    bottom:0;
+    left:0;
+    .ad-button{
+        margin:0;
+        padding:0;
+        width:100%;
+        // height: 100%;
+        .btn-img{
+            width:100%;
+        }
+    }
+}
+</style>
+<template>
+    <view class="ad">
+        <image class="ad-img" mode="widthFix" lazy-load="{{true}}" src="https://tgs.gp58.com/static/adXcx/sddy/sddy_01.jpg"/>
+        <image class="ad-img" mode="widthFix" lazy-load="{{true}}" src="https://tgs.gp58.com/static/adXcx/sddy/sddy_02.jpg"/>
+        <image class="ad-img" mode="widthFix" lazy-load="{{true}}" src="https://tgs.gp58.com/static/adXcx/sddy/sddy_03.jpg"/>
+        <image class="ad-img" mode="widthFix" lazy-load="{{true}}" src="https://tgs.gp58.com/static/adXcx/sddy/sddy_04.jpg"/>
+        <form class='ad-form' bindsubmit="submitLogin" report-submit='true'>
+            <button 
+                class='ad-button'
+                plain="{{true}}"
+                open-type='getUserInfo'
+                @getuserinfo="wxLogin('index')"
+                withCredentials='true'
+                formType="submit"
+            >
+            <image class="ad-img" mode="widthFix" lazy-load="{{true}}" src="https://tgs.gp58.com/static/adXcx/sddy/get.png"/>
+            </button>
+        </form>
+    </view>
+    <view class="ad-layer" wx:if="{{layerStatus}}">
+        <view class="layer-box">
+            <image class="box-img" mode="widthFix" lazy-load="{{true}}" src="https://tgs.gp58.com/static/adXcx/ad_layer.png"/>
+            <view class="box-close" @tap.stop="hideLayer"></view>
+            <view class="box-action" @tap.stop="toAction({{layerAction}}))"></view>
+        </view>    
+    </view>
+
+</template>
+<script>
+import wepy from 'wepy'
+import userManager from '@/utils/user-manager';
+import LoggerFactory from '@/utils/log-util';
+import windowUtil from '@/utils/window-util';
+import http from '@/utils/http-util';
+import { subjects,domain,formIdUrl,tokenUrl } from '@/const';
+import {navigateTo, switchTab } from '@/utils/route';
+let Logger = LoggerFactory.getLogger('user-login');
+export default class AdFour extends wepy.page{
+   data={
+        // 用户click_id
+        click_id:'',
+        firUrl:'subPages/activity/pages/adFour',
+        secUrl:'subPages/activity/pages/adFour?',
+        aid:0,
+        loginSuccess:false,
+        // token
+        access_token:'',
+        // user_set_id   
+        user_action_set_id:'1107781358',
+        // 首次注册弹窗
+        layerStatus:false,
+        // 动画队列
+        animationData:{},
+        animation:'',
+        player:null,
+        // 弹窗action
+        layerAction:'index',
+    };
+    methods = {
+        wxLogin(url,e) {
+            this.layerAction=url;
+            if(this.checkLogin()){
+                this.action(url);
+                return
+            }
+            windowUtil.showLoading();
+            userManager
+                .loginByWeChat(e.detail)
+                .then(data => {
+                    windowUtil.hideLoading();
+                    this.checkRegister(data);
+                    this.$apply();
+                })
+                .catch(err => {
+                    Logger.error('微信登录失败:%o', err);
+                    windowUtil.alert('登录异常,请稍后重试');
+                });
+        },
+        submitLogin(e){
+            this.passDataSec()
+            var formId = e.detail.formId
+            this.$root.$parent.sendFormId(formId)
+        },
+        hideLayer(){
+            this.layerStatus=false;
+        },
+        toAction(action){
+            this.action(action);
+        },
+    };
+    onLoad(options){
+        console.log('options: '+JSON.stringify(options))
+        this.click_id = options.gdt_vid
+        var weixinadinfo = options.weixinadinfo
+        if(weixinadinfo){
+            var weixinadinfoArr = weixinadinfo.split('.')
+            this.aid = weixinadinfoArr[0]
+        }
+        for(var name in options){
+            this.secUrl+=name+'='+options[name]+"&"
+        }
+        this.secUrl=this.secUrl.substring(0, this.secUrl.length - 1)
+        this.passDataFir()
+    }
+    onUnload(){
+        if(!this.player)return
+        clearInterval(this.player)
+    }
+     // 检查是否login
+    checkLogin(){
+        this.loginSuccess=wx.getStorageSync('loginSuccess')
+        if(!this.loginSuccess)return false
+        return true
+    }
+    // 检查是否首次注册
+    checkRegister(data){
+
+        var register=data.register
+        if(register==1){
+            this.layerStatus=true
+        }else if(register==0){
+            this.layerStatus=false
+            this.action(this.layerAction)
+        }
+    }
+    action(action){
+        var param={
+            url:action,
+            fail:function(err){
+                switchTab({url:action})
+            }
+        }
+        navigateTo(param)
+    }
+    // 回传
+    passDataFir(){
+        var self=this
+        wx.request({
+            url: tokenUrl, 
+            data: {
+                type:1,
+                url:self.firUrl,
+                click_id:self.click_id,
+                aid:self.aid,
+            },
+            success: function(res) {
+                console.log('......success......')
+                console.log(res)
+                console.log('......success......')
+            },
+            fail: function(err){
+                console.error(err)
+            }
+        })     
+    }
+    // 回传
+    passDataSec(){
+        var self=this
+        wx.request({
+            url: tokenUrl, 
+            data: {
+                type:2,
+                url:self.firUrl,
+                click_id:self.click_id,
+                aid:self.aid,
+            },
+            success: function(res) {
+                console.log('......success......')
+                console.log(res)
+                console.log('......success......')
+            },
+            fail: function(err){
+                console.error(err)
+            }
+        })         
+    }
+}
+</script>

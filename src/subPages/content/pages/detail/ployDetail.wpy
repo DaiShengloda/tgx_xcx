@@ -1,0 +1,224 @@
+<style lang="scss">
+@import '../../../../sass/pages/ployDetail';
+</style>
+<template>
+<view class="ploy-detail">
+    <lodingPage></lodingPage>
+    <!--  -->
+    <view class="vip-live">
+        <image class="box-img" src="{{groupInfo.bannerImage}}" wx:if="{{groupInfo.bannerImage}}"/>        
+        <image class="box-img" mode="aspectFill" src="/static/images/zw1.png" wx:else/>
+    </view>
+    <!-- scroll-view -->
+    <view class="history-msg" wx:if="{{groupInfo.detailList.length>0}}">
+        <view class="msg-title">
+            <view class="title-lef">
+                <image class="lef-img" src="/static/images/ploy-1.png"/>  
+                <text class="lef-word">历史战绩</text>  
+            </view>
+            <view class="title-rig" @tap.stop="toHistoryDetail({{groupInfo}})">更多></view>
+        </view>
+        <view class="msg-scroll">
+            <scroll-view scroll-x class="scroll-box" bindscroll="scroll">
+                <view class="box-slider" style="width:{{160*groupInfo.detailList.length}}px">
+                    <block wx:for="{{groupInfo.detailList}}" wx:for-item="item" wx:for-index="index">
+                        <view class="box-list" @tap="showLayer({{item}},{{index}})" hover-class="none">
+                            <view class="list-top">
+                                <text class="top-name">{{item.secshortName}}</text>
+                                <text class="top-code">{{item.stockCode}}</text>
+                            </view>
+                            <view class="list-mid">
+                                <view class="mid-title">最高涨幅</view>
+                                <view class="mid-max">{{item.maxchgpct}}%</view>
+                            </view>
+                            <view class="list-bom">
+                                <view class="bom-price">
+                                    <view class="price-txt">入选价</view>
+                                    <view class="price-num">{{item.joinPrice}}</view>
+                                </view>
+                                <view style="border:#ddd 1px solid;"></view>
+                                <view class="bom-time">
+                                    <view class="time-txt">入选时间</view>
+                                    <view class="time-join">{{item.joinDate}}</view>
+                                </view>
+                            </view>
+                        </view>
+                    </block>
+                </view>
+            </scroll-view>
+        </view>
+    </view>
+
+    <!--  -->
+    <view class="share-msg">
+        <view class="msg-title">
+            <view class="title-lef">
+                <image class="lef-img" src="/static/images/ploy-2.png"/>  
+                <text class="lef-word">入选股票</text>  
+            </view>
+            <view class="title-rig">{{groupInfo.updateTime}}更新</view>
+        </view>
+        <view class="msg-table">
+            <view class="table-head">
+                <view class="head-name">名称代码</view>
+                <view class="head-ind">所属行业</view>
+                <view class="head-time">入选时间</view>
+                <view class="head-reason">入选理由</view>
+            </view>
+            <view class="table-body">
+                <repeat for="{{groupInfo.partList}}" item="item" index="index">
+                    <view class="li-box" @tap.stop="lookDetail()">
+                        <view class="box-name">
+                            <view class="name">{{item.stockName}}</view>
+                            <view class="code">{{item.stockCode}}</view>
+                        </view>
+                        <view class="box-ind">{{item.industry}}</view>
+                        <view class="box-time">{{item.createTime}}</view>
+                        <view class="box-reason">             
+                            <view class="rea-btn" @tap.stop="wrapDetail({{index}})" wx:if="{{item.showReason}}">收起</view>
+                            <view class="rea-btn" @tap.stop="scanDetail({{index}})" wx:else>查看</view>
+                        </view>
+                    </view>
+                    <view class="li-box-reason" wx:if="{{item.showReason}}">{{item.joinReason}}</view>
+                </repeat>
+            </view>
+        </view>
+    </view>
+
+</view>
+</template>
+<script>
+import wepy from 'wepy'
+import http from '@/utils/http-util'
+import utils from '@/utils/common-util'
+import { API_URL } from '@/const'
+import LodingPage from '@/components/lodingPage'
+import {navigateTo, switchTab } from '@/utils/route'
+export default class PloyDetail extends wepy.page {
+    config = {
+        navigationBarTitleText: '策略组合',
+        enablePullDownRefresh: false ,
+    }
+    components = {
+        lodingPage:LodingPage,
+    }
+    data={
+        // 组合id
+        _id:'',
+        //策略组合详情
+        groupInfo:'',
+    }
+    methods={
+        // 链接跳转
+        toLivePlace(action){
+            console.log(action)
+        },
+        // 监听图片加载错误
+        imgErr(index){
+            this.courseData[index].video_img=''
+        },
+        // 历史战绩
+        toHistoryDetail(){
+            var id=this.groupInfo.id
+            var name=this.groupInfo.name
+            var authority=this.groupInfo.authority
+            var action=encodeURIComponent(this.groupInfo.action)
+            wx.navigateTo({
+                url: `/subPages/content/pages/detail/historyDetail?id=${id}&name=${name}&authority=${authority}&action=${action}`
+            })
+        },
+        //查看
+        lookDetail(){
+            var authority=this.groupInfo.authority
+            var action=this.groupInfo.action
+            if(authority==1)return
+            var param={
+                url:action,
+                fail:function(err){
+                    console.log('跳转tabBar')
+                    switchTab({url:action})
+                }
+            }
+            navigateTo(param)
+        },
+        scanDetail(index){
+            var authority=this.groupInfo.authority
+            var action=this.groupInfo.action
+            if(authority==1){
+                this.groupInfo.partList[index].showReason=true
+            }else{
+                var param={
+                    url:action,
+                    fail:function(err){
+                        console.log('跳转tabBar')
+                        switchTab({url:action})
+                    }
+                }
+                navigateTo(param)
+            }    
+        },
+        wrapDetail(index){
+            this.groupInfo.partList[index].showReason=false
+        },
+    }
+    onLoad(option){
+        this.showLoading()
+        this._id=option.id
+        this.loadGroupInfoTo(this._id)
+    }
+    loadGroupInfoTo(id){
+        http.getRequest(API_URL.VIP_GROUP_INFO_TO, {
+            id:id 
+        }).then(data => {
+            this.groupInfo=data
+            this.formatDate(this.groupInfo)
+            this.formatDateilList(this.groupInfo.detailList)
+            this.formatPartList(this.groupInfo.partList)
+            this.setPageTitle()
+            this.$apply()  
+            this.hideLoading()
+        })
+    }
+    // 显示加载层
+    showLoading(){
+        this.$invoke('lodingPage','show')
+    }
+    // 隐藏加载层
+    hideLoading(){
+        this.$invoke('lodingPage','hide')
+    }
+    // 时间戳 
+    formatDate(data){
+        var time
+        time=data.updateTime
+        time=utils.formatTimeLocal(time)
+        data.updateTime=time
+    }
+    formatDateilList(data){
+        var list,time,per
+        for(var i in data){
+            list=data[i]
+            time=list.joinDate
+            time=utils.formatTimeLocal(time).split(' ')[0]
+            per=(list.maxchgpct*100).toFixed(2)
+            data[i].joinDate = time
+            data[i].maxchgpct = per
+        }
+    }
+    formatPartList(data){
+        var list,time
+        for(var i in data){
+            list=data[i]
+            time=list.createTime
+            time=utils.formatTimeLocal(time)
+            data[i].createTime = time
+            data[i].showReason=false
+        }
+    }
+    setPageTitle(){
+        wx.setNavigationBarTitle({
+            title: this.groupInfo.name
+        })
+    }
+}
+</script>

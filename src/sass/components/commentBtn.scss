@@ -1,0 +1,55 @@
+.poe-blank{
+    height:110rpx;
+}
+.poe-comment{    
+    bottom:0;
+    width:100%;
+    background:#e6e6e6;
+    position:fixed;
+    .com-box {
+        display:flex;
+        height:70rpx;
+        line-height:70rpx;
+        background:#e6e6e6;
+        padding:20rpx;
+        .com-text{
+            width:80%;
+            text-align:center;
+            background:#fff;
+            border-radius:8rpx;
+            font-size:26rpx;
+            color:#999;        
+        }
+        .com-share{
+            width:16%;
+            margin-left:4%;
+            text-align:center;
+            font-size:24rpx;
+            color:#999;        
+            .share-btn{
+                padding:0;
+                line-height: unset;
+                border-radius: unset;
+                overflow: unset;
+                background: unset;
+                height:70rpx;
+                .btn-img{
+                    width:40rpx;
+                    height:40rpx;
+                    display:block;
+                    margin:0 auto;
+                    
+                }
+                .btn-text{
+                    font-size:24rpx;
+                    color:#676767;
+                    margin:0;
+                    height:20rpx;
+                    line-height:20rpx;
+                    padding-top:10rpx;
+                    
+                }
+            }    
+        }
+    }
+}

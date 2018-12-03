@@ -1,0 +1,329 @@
+<!--用户信息登记-->
+<style lang='scss'>
+.ck-form {
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  padding: 0;
+}
+.top {
+  width: 100%;
+  top: 0;
+  overflow: scroll;
+}
+.placeholder-class {
+  font-size: 26rpx;
+  color: #8e8e8e;
+}
+.input {
+  height: 45px;
+  line-height: 45px;
+  display: flex;
+  justify-content: space-between;
+  padding: 0 10px;
+  border-bottom: 1px solid #d4d4d4;
+  font-size: 30rpx;
+  text {
+    white-space: nowrap;
+  }
+  input {
+    height: 100%;
+    text-align: right;
+  }
+  picker {
+    height: 100%;
+    image {
+      width: 10px;
+      height: 15px;
+      vertical-align: middle;
+    }
+    width: 50%;
+    text-align: right;
+  }
+}
+.bottom {
+  box-sizing: border-box;
+  font-size: 12px;
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  padding: 10px;
+  background: #fff;
+  box-shadow: 1px 0px 10px #ccc;
+  z-index: 100;
+  height: 120px;
+  border-top: 1px solid #ccc;
+  .mz {
+    display: flex;
+  }
+  button {
+    width: 90%;
+    font-size: 14px;
+    color: white;
+    margin: 30rpx auto;
+  }
+  .btn_dis {
+    background: #ccc;
+  }
+  .btn_act {
+    background: #d6433b;
+  }
+}
+</style>
+<template>
+  <form @submit='submit' class='ck-form'>
+    <view class='top'>
+      <view class='input'>
+        <text>投资者姓名</text>
+        <input name='name' placeholder='请输入真实姓名' value='{{info.name}}' @input='inputName' placeholder-class='placeholder-class'/>
+      </view>
+      <view class='input'>
+        <text>实际投资控制人</text>
+        <input name='realOperator' placeholder='实际投资控制者姓名' value='{{info.realOperator}}' @change="setValue('realOperator')" placeholder-class='placeholder-class'/>
+      </view>
+      <view class='input'>
+        <text>实际投资受益人姓名</text>
+        <input name='realBeneficiary' placeholder='交易的实际受益人姓名' value='{{info.realBeneficiary}}' @change="setValue('realBeneficiary')"/> 
+      </view>
+      <view class='input'>
+        <text>出生日期</text>
+        <picker mode='date' value='{{info.birthday}}' start='1949-01-01' end='{{curDate}}' @change="setValue('birthday')">
+          {{info.birthday}}
+          <image src='/static/images/youjiantou@3x.png'/>
+        </picker>
+      </view>
+      <view class='input'>
+        <text>二代身份证号码</text>
+        <input type='idcard' name='identityCard' value='{{info.identityCard}}' maxlength='18' @input="setValue('identityCard')"/>
+      </view>
+      <view class='input'>
+        <text>证件到期日</text>
+        <picker mode='date' value='{{info.expirationTime}}' start='1949-01-01' @change="setValue('expirationTime')">
+          {{info.expirationTime}}
+          <image src='/static/images/youjiantou@3x.png'/>
+        </picker>
+      </view>
+      <view class='input'>
+        <text>手机号码</text>
+        <input name='mobile' value='{{info.mobile}}' type='number' maxlength='11' placeholder='请输入手机号码' @input="setValue('mobile')" placeholder-class='placeholder-class'/>
+      </view>
+      <view class='input'>
+        <text>学历</text>
+        <picker mode='selector' range='{{xlEnum}}' @change="setValue('educationBackground')" value='{{info.educationBackground}}'>
+          {{xlEnum[info.educationBackground]}}
+          <image src='/static/images/youjiantou@3x.png'/>
+        </picker>
+      </view>
+      <view class='input'>
+        <text>职业</text>
+        <picker model='selector' range='{{jobEnum}}' value='{{info.job}}' @change="setValue('job')">
+          {{jobEnum[info.job]}}
+          <image src='/static/images/youjiantou@3x.png'/>
+        </picker>
+      </view>
+      <view class='input'>
+        <text>工作单位</text>
+        <input name='workUnit' value='{{info.workUnit}}' placeholder='请填写您现在的工作单位' @input="setValue('workUnit')" placeholder-class='placeholder-class'/>
+      </view>
+      <view class='input'>
+        <text>联系地址</text>
+        <input name='address' value='{{info.address}}' placeholder='请填写投资人详细地址' @input="setValue('address')" placeholder-class='placeholder-class'/>
+      </view>
+      <view class='input'>
+        <text>邮编</text>
+        <input type='number' name='postcode' maxlength='6' value='{{info.postcode}}' placeholder='请填写联系地址的邮编' @input="setValue('postcode')" placeholder-class='placeholder-class'/>
+      </view>
+      <view class='input'>
+        <text>不良诚信记录</text>
+        <picker model='selector' range='{{creditRecordEnum}}' value='{{info.creditRecord}}' @change="setValue('creditRecord')">
+          {{creditRecordEnum[info.creditRecord]}}
+          <image src='/static/images/youjiantou@3x.png'/>
+        </picker>
+      </view>
+    </view>
+    <view style='height:120px'></view>
+    <view class='bottom'>
+      <label class='mz' @tap='agreeRule' for='ck'>
+        <checkbox  color='red' id='ck'></checkbox>
+        <text>本人保证资金来源的合法性和所提供资料的真实性、有效性、准确性、完整性，并对其承担责任。认同本声明视为本人已签名。</text>
+      </label>
+      <button wx:if='{{isSelectRule}}' class='btn_act' form-type='submit'>提交</button>
+      <button wx:else class='btn_dis' @tap='notAgreeRule'>提交</button>
+    </view>
+  </form>  
+</template>
+
+<script>
+import wepy from 'wepy';
+import { regular, formatTimestampToDate } from '@/utils/common-util';
+import http from '@/utils/http-util';
+import { API_URL, subjects } from '@/const';
+import windowUtil from '@/utils/window-util';
+let regularUtil = regular();
+export default class UserCheckIn extends wepy.page {
+  config = {
+    navigationBarTitleText: '投资者信息登记',
+    enablePullDownRefresh: false
+  };
+  data = {
+    //学历枚举
+    xlEnum: [],
+    //职业枚举
+    jobEnum: [],
+    //不良诚信记录枚举
+    creditRecordEnum: [
+      '无不良诚信记录',
+      '中国人民银行征信中心',
+      '最高人民法院失信被执行人名单',
+      '工商行政管理机构',
+      '税务管理机构',
+      '监督机构、自律组织',
+      '证券经营机构投资的失信记录',
+      '恶意维权等不当行为',
+      '其他'
+    ],
+    curDate: null,
+    info: {},
+    //是否同意条款
+    isSelectRule: false
+  };
+  onShow() {
+    let date = new Date();
+    this.curDate = date.toLocaleDateString().replace(/\//g, '-');
+    windowUtil.showLoading();
+    http.getRequest(API_URL.GET_USER_REGISTRATION).then(data => {
+      windowUtil.hideLoading();
+      //学历枚举
+      for (let v of data.educationList) {
+        this.xlEnum.push(v.desc);
+      }
+      //职业枚举
+      for (let v of data.jobList) {
+        this.jobEnum.push(v.desc);
+      }
+      this.info = {
+        name: data.name,
+        realOperator: data.realOperator,
+        realBeneficiary: data.realBeneficiary,
+        birthday: formatTimestampToDate(data.birthday),
+        identityCard: data.identityCard,
+        expirationTime: formatTimestampToDate(data.expirationTime),
+        mobile: data.mobile,
+        //学历
+        educationBackground: data.educationBackground - 1,
+        job: data.job - 1,
+        workUnit: data.workUnit,
+        address: data.address,
+        postcode: data.postcode,
+        creditRecord: this.creditRecordEnum.findIndex(
+          e => data.creditRecord == e
+        )
+      };
+      this.$apply();
+    });
+  }
+  methods = {
+    inputName(e) {
+      let v = e.detail.value;
+      this.info.name = v;
+      this.info.realOperator = v;
+      this.info.realBeneficiary = v;
+    },
+    setValue(name, e) {
+      this.info[name] = e.detail.value;
+    },
+    agreeRule() {
+      this.isSelectRule = !this.isSelectRule;
+    },
+    notAgreeRule() {
+      windowUtil.alert('请勾选声明');
+    },
+    submit(e) {
+      let info = Object.assign({}, this.info, e.detail.value);
+      if (!info.name) {
+        windowUtil.alert('请输入投资者姓名');
+        return false;
+      }
+      if (!regularUtil.isName(info.name.trim())) {
+        windowUtil.alert('投资者姓名为2到10位汉字或字母');
+        return false;
+      }
+      if (!info.realOperator) {
+        windowUtil.alert('请输入实际投资控制人姓名');
+        return false;
+      }
+      if (!regularUtil.isName(info.realOperator.trim())) {
+        windowUtil.alert('实际投资控制人姓名为2到10位汉字或字母');
+        return false;
+      }
+      if (!info.realBeneficiary) {
+        windowUtil.alert('请输入实际投资受益人姓名');
+        return false;
+      }
+      if (!regularUtil.isName(info.realBeneficiary.trim())) {
+        windowUtil.alert('实际投资受益人姓名为2到10位汉字或字母');
+        return false;
+      }
+      if (!info.birthday) {
+        windowUtil.alert('出生日期不能为空');
+        return false;
+      }
+      if (!regularUtil.issfz(info.identityCard)) {
+        windowUtil.alert('请输入正确的18位身份证号');
+        return false;
+      }
+      if (!info.expirationTime) {
+        windowUtil.alert('证件过期时间不能为空');
+        return false;
+      }
+      if (!regularUtil.isPhone(info.mobile)) {
+        windowUtil.alert('请输入正确的11位手机号码');
+        return false;
+      }
+      if (
+        info.educationBackground == undefined ||
+        info.educationBackground == null
+      ) {
+        windowUtil.alert('学历不能为空');
+        return false;
+      }
+      info.educationBackgroundDesc = this.xlEnum[info.educationBackground];
+      if (info.job == null || info.job == undefined) {
+        windowUtil.alert('职业不能为空');
+        return false;
+      }
+      info.jobDesc = this.jobEnum[info.job];
+      if (!info.workUnit) {
+        windowUtil.alert('工作单位不能为空');
+        return false;
+      }
+      if (!info.address) {
+        windowUtil.alert('联系地址不能为空');
+        return false;
+      }
+      if (!regularUtil.isZip(info.postcode)) {
+        windowUtil.alert('请输入正确的6位邮编');
+        return false;
+      }
+      if (info.creditRecord == -1) {
+        windowUtil.alert('不良诚信记录不能为空');
+        return false;
+      }
+      info.creditRecord = this.creditRecordEnum[info.creditRecord];
+      windowUtil.showLoading();
+      http
+        .getRequest(API_URL.SAVE_USER_REGISTRATION, info)
+        .then(data => {
+          windowUtil.hideLoading();
+          let app = this.$parent;
+          let observer = app.observer;
+          observer.broadcast(subjects.userCheckIn);
+        })
+        .catch(err => {
+          windowUtil.alert(err.errmessage);
+        });
+    }
+  };
+}
+</script>
+

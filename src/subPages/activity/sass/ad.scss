@@ -1,0 +1,45 @@
+.ad{
+    position: relative;
+    .ad-img{
+        width:100%;
+        display:block;
+    }
+    .ad-button::after{
+        border: none
+    }
+    .ad-button[plain]{
+        border: none
+    }
+}
+
+.ad-layer{
+    position:fixed;
+    width:100%;
+    height:100%;
+    top:0;
+    background: rgba(0,0,0,0.5);
+    .layer-box{
+        position:absolute;
+        top:20%;
+        width:90%;
+        left:5%;        
+        .box-img{
+            width:100%;
+            display:block;
+        }
+        .box-close{
+            position:absolute;
+            width:100rpx;
+            height:100rpx;
+            right:0;
+            top:10rpx;            
+        }
+        .box-action{
+            position:absolute;
+            width:80%;
+            height:20%;
+            left:10%;
+            bottom:15%;            
+        }
+    }
+}

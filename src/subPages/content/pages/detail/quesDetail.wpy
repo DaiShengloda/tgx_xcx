@@ -1,0 +1,353 @@
+<style lang="scss">
+@import '../../../../sass/base/reset';
+@import '../../../../sass/commons/function';
+@import '../../sass/quesDetail';
+.common-form-btn{
+    position: absolute;
+    width:100%;
+    height:100%;
+    padding:0;
+    margin:0;
+    top:0;
+    left:0;
+    z-index:9;
+    background: unset;
+  }
+  .common-form-btn[plain]{
+    border:none;
+  }
+</style>
+<template>
+<view class="ques-detail">
+  <block wx:if="{{showLoading}}">
+    <!-- 提问者信息 -->
+    <view class="quser">
+        <view class="quser-box">来自<text class="quser-name">{{quesDetailData.question_user_name}}</text>的问题</view>
+        <view class="quser-content">{{quesDetailData.question_content}}</view>
+    </view>
+    <!-- 问股内容 -->
+    <view class="ques-content">
+        <!-- 老师信息 -->
+        <view class="detail-man">
+            <view class="li-lef">
+                <image src="{{quesDetailData.answer_ico}}" wx:if="{{quesDetailData.answer_ico}}"/>
+                <image src="/static/images/person.png" wx:else></image>
+            </view>
+            <view class="li-btw">
+                <view>
+                    <text class="man-name">{{quesDetailData.answer_username}}</text>
+                    <text class="man-title"> | {{quesDetailData.user_title}}</text>
+                </view>
+                <view class="man-int">{{quesDetailData.answer_profiles}}</view>
+            </view>
+            <view class="li-rig" @tap.stop='preventTap'>
+                <view wx:if="{{quesDetailData.mynoticed ==1}}" class="man-atten atten-cancle" >已关注</view>
+                <view wx:if="{{quesDetailData.mynoticed ==0}}" class="man-atten atten-add">
+                  <form bindsubmit="notice({{quesDetailData.answer_userid}})" report-submit='true'>
+                    <button class="common-form-btn" formType="submit" plain="{{true}}"></button>
+                  </form>
+                  加关注
+                </view>
+            </view>
+        </view>
+        <!-- 语音 -->
+        <view class="cont-audio">
+            <image class="answer" src="/static/images/answer.png"/>
+            <view class="audio" style="background-image:url('{{quesDetailData.prem==1?audio_bg_img_1:audio_bg_img_2}}')">
+                <form bindsubmit="toggleAudio({{audioStatus}})" report-submit='true'>
+                  <button class="common-form-btn" formType="submit" plain="{{true}}"></button>
+                </form>
+                <image class="audio-start" src="{{start_ico}}"/>
+                <view  class="bac" wx:if="{{quesDetailData.prem > 1}}">
+                    <image class="bac_image" src="{{bac_img_src}}" alt=""/>
+                    <view class="waves" style="width:{{waves_width}}%"></view>
+                </view>
+                <view class="audioTxt" wx:if="{{quesDetailData.prem == 1}}">
+                <text >{{quesDetailData.listen_price}}大咖币收听</text>
+                </view>
+                <view class="audio-contro"></view>
+            </view>
+            <view class="audio-len">{{quesDetailData.question_answer_length}}"</view>
+        </view>
+        <!-- 声明 -->
+        <view class="cont-declare">{{quesDetailData.declare_content}}</view>
+        <!-- bottom -->
+        <view class="cont-bom">
+            <view class="finger">
+                <form bindsubmit="noteSatisfy({{quesDetailData.questionid}})" report-submit='true'>
+                    <button class="finger-btn" formType="submit" plain="{{true}}">
+                        <image wx:if="{{quesDetailData.mysatisfied==0}}" src="/static/images/finger.png"></image>
+                        <image wx:if="{{quesDetailData.mysatisfied==1}}"  src="/static/images/finger2.png"/>
+                    </button>
+                </form>
+                <view>超值</view>
+            </view>
+            <view class="bom-msg">
+                <text class="msg-time">{{quesDetailData.answer_time}}</text>
+                <text wx:if="{{quesDetailData.listener_nums > 0}}" class="msg-finger">{{quesDetailData.listener_nums}}人听过</text>
+                <text wx:if="{{quesDetailData.satisfied_nums > 0}}" class="msg-finger">{{quesDetailData.satisfied_nums}}人点赞</text>
+            </view>
+        </view>
+    </view>
+    <notice></notice>
+    <payment :payUrl.sync="payUrl" 
+              :payParam.sync="payParam" 
+              :payDetailData.sync="quesDetailData" 
+              @payCallBack.user="payCallBack" 
+              @fxcpFinish.user='fxcpFinish'>
+        <text slot="payCont">{{quesDetailData.question_content}}</text>
+        <text slot="payNum">{{quesDetailData.listen_price}}</text>
+        <text slot="vipPayNum">{{quesDetailData.enablePayModel[0].name}}</text>
+        <text slot="vipExpireNum">{{quesDetailData.enablePayModel[0].num}}</text>
+    </payment>
+    </block>
+    <!-- 评论组件 -->
+    <commentBtn :noteid.sync="_noteid" :Btnparam.sync="Btnparam" @fxcpFinish.user='fxcpFinish'></commentBtn>
+</view>
+</template>
+
+<script>
+import wepy from 'wepy';
+import http from '@/utils/http-util';
+import utils from '@/utils/common-util';
+import window from '@/utils/window-util';
+import { API_URL } from '@/const';
+import Payment from '@/components/payment';
+import CommentBtn from '@/components/commentBtn';
+import BigManNotice from '@/components/bigManNotice';
+export default class QuesDetail extends wepy.page {
+  config = {
+    navigationBarTitleText: '问股详情',
+    enablePullDownRefresh: false
+  };
+  components = {
+    notice: BigManNotice,
+    payment: Payment,
+    commentBtn: CommentBtn,
+  };
+  data = {
+    showLoading: false,
+    // 问股详情
+    quesDetailData: {},
+    // 音频状态
+    audioStatus: false,
+    //播放器状态
+    innerAudioContext: null,
+    //播放器状态图片
+    start_ico: '/static/images/startbf.png',
+    //白色进度图片
+    waves_width: 0,
+    //进度总宽度
+    allWidth: 100,
+    //暂停状态
+    start_status: true,
+
+    bac_img_src:
+      'https://dakaname.oss-cn-hangzhou.aliyuncs.com/mini_app_icons/bac4.png',
+
+    audio_bg_img_1:
+      'https://dakaname.oss-cn-hangzhou.aliyuncs.com/mini_app_icons/wgxqff.png',
+
+    audio_bg_img_2:
+      'https://dakaname.oss-cn-hangzhou.aliyuncs.com/mini_app_icons/bluebg.png',
+    // 问股使用Url及参数
+    payUrl: API_URL.CONSULT_PAY,
+    payParam: {
+      questionid: '',
+      version: 3.8,
+      type:1,
+    },
+    //提问组件数据
+    Btnparam: {
+      placeholder: '',
+      serviceType: '1',
+      userName: '',
+     cert_code : '',
+     note_authorid :''
+    },
+    _noteid: '',
+    //已点赞
+    hasSatisfy:false
+  };
+  //事件处理函数
+  methods = {
+    // 关注
+    notice(userId,e) {
+      this.$invoke('notice', 'notice', userId);
+      var formId = e.detail.formId
+      this.$root.$parent.sendFormId(formId)
+    },
+    // 取消关注
+    cancelNotice(userId) {
+      this.$invoke('notice', 'cancel', userId);
+    },
+    preventTap(){
+      return false;
+    },
+    // 点赞
+    noteSatisfy(questionid,e) {
+      if(!this.hasSatisfy){
+        this.quesDetailData.satisfied_nums =
+        this.quesDetailData.satisfied_nums + 1;
+        this.hasSatisfy = true;
+      http
+        .getRequest(API_URL.QUESTION_SATISFY, {
+          questionid: questionid
+        })
+        .then(data => {
+          this.quesDetailData.mysatisfied = 1;
+          this.$apply();
+        });
+      }
+      var formId = e.detail.formId
+      this.$root.$parent.sendFormId(formId)
+    },
+    payCallBack(data) {
+      this.$invoke('payment', 'hide', '');
+      window.showLoading();
+      //开始自动播放语音
+      this.quesDetailData.prem = 3;
+      this.innerAudioContext.src = data.answer_oss_url;
+      this.start_status = false;
+      this.audioStatus=true;
+      this.$apply();
+      this.innerAudioContext.play();
+    },
+    // 音频状态控制
+    toggleAudio(audioStatus,e) {
+      // console.log("----audioStatus----"+this.audioStatus);
+      // console.log("----start_status----"+this.start_status);
+      // console.log("----prem----"+this.quesDetailData.prem );
+      // console.log("----answer_oss_url----"+this.quesDetailData.answer_oss_url );
+      var that = this;
+      if (that.quesDetailData.prem == 1) {
+        that.payment(that.quesDetailData.listen_price);
+      } else {
+        if (this.start_status) {
+          window.showLoading();
+          this.innerAudioContext.src = this.quesDetailData.answer_oss_url;
+          this.start_status = false;
+          this.$apply();
+        }
+        this.audioStatus = audioStatus ? false : true;
+        if (this.audioStatus) {
+          this.innerAudioContext.play();
+        } else {
+          this.innerAudioContext.pause();
+          this.start_ico = '/static/images/startbf.png';
+        }
+      }
+      var formId = e.detail.formId
+      this.$root.$parent.sendFormId(formId)
+    }
+  };
+  events = {
+    // 关注操作成功触发事件
+    noticeOptionSuccess(userId) {
+      let item = this.quesDetailData;
+      item.mynoticed = item.mynoticed == 1 ? 0 : 1;
+    },
+    //风险测评结束触发
+    fxcpFinish() {
+      wx.redirectTo({
+        url: '/subPages/content/pages/detail/quesDetail?id=' + this.payParam.questionid
+      });
+    }
+  };
+  //页面生命周期函数
+  onLoad(option) {
+    var that = this;
+    //设置使用的questionid
+    this.payParam.questionid = option.questionid;
+    if(!this.payParam.questionid){
+      this.payParam.questionid=option.id
+    }
+    this.innerAudioContext = wx.createInnerAudioContext();
+    this.innerAudioContext.autoplay = false;
+    this.innerAudioContext.onPlay(() => {
+      window.hideLoading();
+      this.start_ico = '/static/images/stopbf.png';
+      this.$apply();
+    });
+    this.innerAudioContext.onTimeUpdate(res => {
+      var allTime = this.innerAudioContext.duration;
+      var nowTime = this.innerAudioContext.currentTime;
+      var width = 0;
+      width = that.allWidth * nowTime / allTime;
+      this.waves_width = width;
+      this.$apply();
+    });
+    this.innerAudioContext.onEnded(() => {
+      console.log('-播放结束-');
+      this.start_ico = '/static/images/startbf.png';
+      this.waves_width = '0';
+      this.audioStatus = false;
+      this.$apply();
+    });
+  }
+  // 加载问股详情数据
+  loadQuesData(questionid) {
+    http
+      .getRequest(API_URL.QUESTION_DETAIL, {
+        questionid: questionid,
+        version: 3.8
+      })
+      .then(data => {
+        this.quesDetailData = data;
+        this.Btnparam.placeholder = data.ask_price;
+        this.Btnparam.userName = data.answer_username;
+        this.Btnparam.cert_code = data.cert_code;
+        this.Btnparam.note_authorid = data.answer_userid;
+        this._noteid = data.answer_userid; //要提问的大咖ID showBtton
+        this.formatTime(this.quesDetailData);
+        window.hideLoading();
+        this.showLoading = true;
+        this.$invoke('commentBtn', 'showBtton');
+        this.$apply();
+      });
+  }
+  // 处理时间戳
+  formatTime(data) {
+    var list, time;
+    time = data.answer_time;
+    time = utils.formatTimeLocal(time);
+    data.answer_time = time;
+    this.$apply();
+  }
+  /**
+   * 生命周期函数--监听页面卸载
+   */
+  onUnload() {
+    this.innerAudioContext.destroy();
+  }
+  //切换APP隐藏的时候
+  onHide() {
+    this.audioStatus = false;
+    this.innerAudioContext.pause();
+    this.start_ico = '/static/images/startbf.png';
+    this.$apply();
+  }
+  onShow() {
+    window.showLoading();
+    this.start_status = true;
+    this.loadQuesData(this.payParam.questionid);
+  }
+  // 显示使用组件
+  payment(paySum) {
+    var cert_code = this.quesDetailData.cert_code;
+    var note_authorid = this.quesDetailData.answer_userid;
+    this.payParam.type=this.quesDetailData.enablePayModel?this.quesDetailData.enablePayModel[0].type:this.payParam.type
+    this.$invoke('payment', 'show', paySum, note_authorid, cert_code);
+  }
+  onShareAppMessage(res) {
+    if (res.from === 'button') {  
+      // 来自页面内转发按钮
+      console.log(res.target);
+    }
+    return {
+      title: '投顾说',
+      path: 'pages/tabBar/index?questionId=' + this.payParam.questionid
+    };
+  }
+}
+</script>

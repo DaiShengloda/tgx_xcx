@@ -1,0 +1,320 @@
+<style lang="scss">
+@import '../../../sass/base/reset';
+@import '../../../sass/commons/function';
+@import '../../../sass/pages/bigManCourse';
+.common-form-btn{
+    position: absolute;
+    width:100%;
+    height:100%;
+    padding:0;
+    margin:0;
+    top:0;
+    left:0;
+    z-index:9;
+  }
+  .common-form-btn[plain]{
+    border:none;
+  }
+</style>
+<template>
+<view class="big-course">
+    <!-- <lodingPage></lodingPage> -->
+    <!-- banner -->
+    <view class="course-banner" wx:if="{{recommendList.length}}">
+        <swiper circular="true" indicator-dots="{{recommendList.length>1?true:false}}" autoplay="true" interval="4000" duration="1000" indicator-color="#f5f5f5" indicator-active-color="#ff6e06">
+            <block>
+                <swiper-item wx:for="{{recommendList}}" wx:for-item="item" wx:for-index="u" @tap="bannerEvt({{item.action}})" catchtouchmove='{{recommendList.length==1}}'>
+                    <image class="slide-image" src="{{item.image}}"></image>
+                </swiper-item>
+            </block>
+        </swiper>
+    </view>
+
+    <!-- tab切换 -->
+    <view class="tab-box {{tabBoxFixed ?'fixed':''}}">
+        <view class="default {{activeTabIndex==0 ?'active':''}}" @tap.stop="swichNav(0)">精品系列</view>
+        <view class="default {{activeTabIndex==1 ?'active':''}}" @tap.stop="swichNav(1)">优质课程</view>
+    </view>
+
+    <!-- 内容区 -->
+    <view class="content-box">
+        <!-- 精品系列 -->
+        <view class="series {{activeTabIndex==0 ?'contShow':'contHid'}}">
+            <seriesScroll :url.sync="seriesUrl" :param.sync="seriesParam" :pageNoName.sync="seriesPageNoName" :pageSizeName.sync="seriesPageSizeName" @dataLoad.user="setSeriesData">  
+                <view slot="content">
+                    <repeat for="{{tabsData[0]}}" item="item">
+                        <view class="series-box" wx:if="{{item.type==1}}">
+                            <form bindsubmit="toSeriesDetail({{item}})" report-submit='true'>
+                                <button class="common-form-btn" formType="submit" plain="{{true}}"></button>
+                            </form>
+                            <image class="box-img-play" src="/static/images/play.png"  wx:if="{{item.type==1}}"></image>
+                            <view class="box-lesson" wx:if="{{item.type==1}}">共{{item.lesson}}课时</view>
+                            <image class="box-img" src="{{item.coverImage}}" wx:if="{{item.coverImage}}"></image>
+                            <image class="box-img" mode="aspectFill" src="/static/images/zw1-2.png" wx:else></image>
+                            <view class="box-msg">
+                                <view class="msg-title">{{item.title}}</view>
+                                <text class="msg-summry">{{item.profile}}</text>
+                                <view class="msg-label" wx:if="{{item.keywords.length>0}}">
+                                    <repeat for="{{item.keywords}}" item="value" index="key_i">
+                                        <text class="label-txt" wx:if="{{value&&key_i<4}}">{{value}}</text>
+                                    </repeat>
+                                </view>
+                                <view class="msg-man">
+                                    <image class="man-pic" src="{{item.authorIco}}" wx:if="{{item.authorIco}}"></image>
+                                    <image class="man-pic" src="/static/images/person.png" wx:else></image>
+                                    <text class="man-name">{{item.authorName}}</text>
+                                    <text class="man-readNum">{{item.playNum}}人看过</text>
+                                </view>
+                            </view>
+                        </view>
+                    </repeat>
+                </view>
+            </seriesScroll>
+        </view>
+        <!-- 优质课程 -->
+        <view class="course {{activeTabIndex==1 ?'contShow':'contHid'}}">
+            <courseScroll :url.sync="courseUrl" :param.sync="courseParam" @dataLoad.user="setCourseData">     
+                <view slot="content">
+                    <repeat for="{{tabsData[1]}}" item="item" index="index">
+                        <view class="course-box">
+                            <form bindsubmit="toCourseDetail({{item.contentid}})" report-submit='true'>
+                                <button class="common-form-btn" formType="submit" plain="{{true}}"></button>
+                            </form>
+                            <view class="box-top">
+                                <view class="top-title">{{item.title}}</view>
+                            </view>
+                            <view class="box-mid">
+                                <image class="mid-img-play" src="/static/images/play.png"></image>
+                                <image class="mid-img" src="{{item.video_img}}" wx:if="{{item.video_img}}" binderror="imgErr({{index}})" bindload="imgLoad"></image>
+                                <image class="mid-img" src="/static/images/zw1.png" wx:else></image>
+                                <view class="mid-msg"> 
+                                <view class="mid-man">
+                                    <image class="icon" src="{{item.user_ico}}" wx:if="{{item.user_ico}}"></image> 
+                                    <image class="icon" src="/static/images/person.png" wx:else></image> 
+                                    <view class="name">{{item.user_name}}</view>
+                                </view>
+                                <view class="mid-int">{{item.summry}}</view>
+                                </view>
+                            </view>
+                            <view class="box-bom">
+                                <view class="top-time">{{item.create_time}}</view>
+                                <view class="top-float">
+                                    <text class="bom-finger">{{item.satifynum}}人点赞</text>
+                                    <text class="bom-scan">{{item.readnum}}人看过</text>
+                                </view>
+                            </view>
+                        </view>
+                    </repeat>
+                </view>        
+            </courseScroll>
+        </view>
+    </view>
+
+</view>
+</template>
+<script>
+import wepy from 'wepy'
+import http from '@/utils/http-util'
+import utils from '@/utils/common-util'
+import { API_URL } from '@/const'
+import ScrollView from '@/components/scrollView'
+import LodingPage from '@/components/lodingPage'
+export default class BigManCourse extends wepy.page {
+    config = {
+        navigationBarTitleText: '大咖课程',
+        enablePullDownRefresh: false,
+    }
+    components = {
+        seriesScroll: ScrollView,
+        courseScroll: ScrollView,
+        lodingPage:LodingPage,
+    }
+    data={
+        // 推荐系列课程数据
+        recommendList:[],
+        // 所有tab列表数据--系列、优质
+        tabsData:[[],[]],
+        //所有tab列表
+        tabs:['seriesScroll','courseScroll'],
+        //当前选中的tab
+        activeTabIndex:0,
+        // tab滚动距离
+        scrollTop:0,
+        tabBoxTop:null,
+        tabBoxFixed:false,
+        // 精品系列Url及参数
+        seriesUrl:API_URL.SERIES_LIST,
+        seriesParam: {
+            'pageNo': 1,
+            'pageSize': 10,
+        },
+        seriesPageNoName:'pageNo',
+        seriesPageSizeName:'pageSize',
+        // 优质课程Url及参数
+        courseUrl:API_URL.NOTE_LIST,
+        courseParam: {
+            'page_no': 1,
+            'page_size': 10,
+            'note_type': 2
+        },
+        // 跳转协议匹配
+        actionData:{
+            "seriesCourse?id":'/subPages/content/pages/detaill/seriesDetail?id=',
+            "web?url":'/pages/urlLink/urlLink?action=',
+        },
+    }
+    props={
+
+    }
+    methods={
+        // banner系列详情
+        bannerEvt(action){
+            var pageUrl,url
+            for(var i in this.actionData){
+                if(action.indexOf(i)>-1){
+                    pageUrl=this.actionData[i]
+                    url=action.split('=')[1]
+                    wx.navigateTo({url: pageUrl+url})
+                    return
+                }
+            }
+        },
+        // 系列详情
+        toSeriesDetail(item,e){
+            var id,type;
+            id=item.id;
+            type=item.type;
+            if(type==1){
+                wx.navigateTo({url: `/subPages/content/pages/detail/seriesDetail?id=${id}`})
+            }else if(type==2){
+                console.log('训练营课程')
+            }
+            var formId = e.detail.formId
+            this.$root.$parent.sendFormId(formId)
+        },
+        // 优质课程详情
+        toCourseDetail(contentid,e){
+            wx.navigateTo({url: `/subPages/content/pages/detail/courseDetail?id=${contentid}`})
+            var formId = e.detail.formId
+            this.$root.$parent.sendFormId(formId)
+        },
+        // tab切换
+        swichNav(index){
+            this.activeTabIndex=index;
+            let currScroll = this.getCurrScroll();
+            var items = this.$invoke(currScroll,'getItems');
+            //没有数据时才重新加载,否则不做任何处理
+            if(items.length <= 0){
+                this.$invoke(currScroll,'refresh');
+            }
+        },
+        setSeriesData(data){
+            this.formatSeriesData(data)
+            this.tabsData[0].push(...data)  
+            this.$apply()
+            this.hideLoading()
+        },
+        setCourseData (data) {
+            this.formatCourseData(data)
+            this.tabsData[1].push(...data)      
+            this.$apply()
+            this.hideLoading()   
+        },
+        // 监听图片加载错误
+        imgErr(index){
+            this.tabsData[1][index].video_img=''
+        },
+    }
+    onLoad(){   
+        this.loadRecommendData()
+    }
+    onShow(){      
+    }
+    onHide(){
+    }
+    // 下拉刷新
+    onPullDownRefresh () {
+    }
+    // 上拉加载
+    onReachBottom () {
+        this.$invoke(this.getCurrScroll(),'nextPage');
+    }
+    // 页面滚动
+    onPageScroll(object){
+        this.scrollTop = object.scrollTop;
+        if(this.scrollTop>=this.tabBoxTop&&!this.tabBoxFixed){
+            this.tabBoxFixed=true
+            this.$apply();
+        }else if(this.tabBoxFixed&&this.scrollTop<this.tabBoxTop){
+            this.tabBoxFixed=false
+            this.$apply();
+        }
+    }
+    // 加载系列课程数据
+    loadRecommendData(){
+        http.getRequest(API_URL.COURSE_ADS, {
+      }).then(data => {
+        this.recommendList = data      
+        this.showLoading()
+        this.$invoke(this.getCurrScroll(),'nextPage');
+        this.$apply() 
+        this.queryMultipleNodes()   
+      }).catch(err=>{
+          this.goLoad=true
+          this.$apply()
+      })
+    }
+    // 节点信息
+    queryMultipleNodes(){
+        var self = this;
+        var query = wx.createSelectorQuery()
+        query.select('.tab-box').boundingClientRect()
+        query.exec(function(res){
+            // if(res[0].top==0)return
+            self.tabBoxTop = res[0].top
+            self.$apply()
+        })
+    }
+    //获取当前激活的tab
+    getCurrScroll(){
+       return this.tabs[this.activeTabIndex]; 
+    } 
+    // 处理精品系列关键字
+    formatSeriesData(data){
+        var list,keywords
+        for(var i in data){
+            list = data[i]
+            keywords = list.keywords
+            if(!keywords){
+              keywords=[]  
+            }else{
+                keywords=keywords.split(',')
+            }       
+            data[i].keywords = keywords
+        }
+    }
+    //时间戳
+    formatCourseData(data){
+        var list,time,video_img
+        for(var i in data){
+            list = data[i]
+            time = list.create_time
+            time = utils.formatTimeLocal(time)
+            video_img=list.video_img
+            if(!video_img.startsWith('http')){
+                video_img=''
+            }
+            data[i].create_time = time
+            // data[i].video_img = video_img
+        }
+    }
+    // 显示加载层
+    showLoading(){
+        this.$invoke('lodingPage','show')
+    }
+    // 隐藏加载层
+    hideLoading(){
+        this.$invoke('lodingPage','hide')
+    }
+}
+</script>

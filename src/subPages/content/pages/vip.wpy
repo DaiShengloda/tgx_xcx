@@ -1,0 +1,381 @@
+<style lang="scss">
+@import '../../../sass/pages/vip';
+</style>
+<template>
+<view class="vip">
+    <lodingPage></lodingPage>
+    <!--  -->
+    <view class="tab-box-blank box-block"></view>
+    <view class="tab-box fixed">
+        <view class="default {{activeTabIndex==0 ?'active':''}}" @tap.stop="swichNav(0)">策略组合</view>
+        <view class="default {{activeTabIndex==1 ?'active':''}}" @tap.stop="swichNav(1)">笔记</view>
+        <view class="default {{activeTabIndex==2 ?'active':''}}" @tap.stop="swichNav(2)">课程</view>
+    </view>
+
+    <!-- ploy -->
+    <view class="ploy {{activeTabIndex==0 ?'contShow':'contHid'}}">
+        <scrollViewPloy :url.sync='url_ploy' :param.sync='param_ploy' @dataLoad.user="setPloyData">
+            <view slot="content">
+                <repeat for="{{ployData}}" item="item" index="index">
+                    <view class="ploy-box" @tap.stop="toPloyDetail({{item.id}})">
+                        <image mode="" class="box-img" src="{{item.coverImageV2}}" wx:if="{{item.coverImageV2}}"/>
+                        <image mode="aspectFill" class="box-img" src="/static/images/zw1.png" wx:else/>
+                    </view>
+                </repeat>
+            </view>
+        </scrollViewPloy>
+    </view>
+
+    <!-- note -->
+    <view class="note {{activeTabIndex==1 ?'contShow':'contHid'}}">
+        <scrollViewNote :url.sync='url_note' :param.sync='param_note' @dataLoad.user="setNoteData">
+            <view slot="content">
+                <repeat for="{{noteData}}" item="item" index="index">
+                    <view class="note-box" @tap="toNoteDetail({{item}})">
+                        <image class="time-line" src="/static/images/timeLine.png"></image>
+                        <!-- <view class="box-top">
+                            <view class="top-time">{{item.create_time}}</view>
+                        </view> -->
+                        <view class="box-mid">
+                            <view class="mid-msg">
+                                <image class="icon" src="{{item.user_ico}}" wx:if="{{item.user_ico}}"></image>
+                                <image class="icon" src="/static/images/person.png" wx:else></image>
+                                <view class="msg">
+                                    <text class="msg-name">{{item.user_name}}</text>
+                                    <text class="msg-title"> | {{item.user_title}}</text>
+                                    <view class="msg-pro">{{item.user_profiles}}</view>
+                                </view>
+                            </view>
+                            <view class="mid-title" wx:if="{{item.summry}}">{{item.title}}</view>
+                            <view class="mid-int">
+                                <view class="int-sign" wx:if="{{item.sign}}">{{item.sign}}</view>
+                                <text class="int-title {{item.sign?'title-indent':''}}" wx:if="{{!item.summry}}">{{item.title}}</text>
+                                <view class="int-title {{item.sign?'title-indent':''}}" wx:if="{{item.summry}}">{{item.summry}}</view>
+                            </view>
+                            <image class="mid-img" mode="" wx:if="{{item.noteImages.length&&item.noteImages[0].imgUrl}}" src="{{item.noteImages[0].imgUrl}}" binderror=""/>
+                            <!-- <image class="mid-img" mode="aspectFill" src="/static/images/zw2.png" wx:else/> -->
+                        </view>
+                        <view class="box-bom">
+                            <view class="bom-time">{{item.create_time}}</view>
+                            <view class="bom-value" wx:if="{{item.value>0}}">价值{{item.value}}大咖币</view>
+                            <view class="bom-scan" wx:if="{{item.readnum>0}}">{{item.readnum}}人读过</view>
+                            <view class="bom-finger" wx:if="{{item.satifynum>0}}">{{item.satifynum}}人点赞</view>
+                        </view>
+                    </view>
+                </repeat>
+            </view>
+        </scrollViewNote>
+    </view>
+
+    <!--course  -->
+    <view class="course {{activeTabIndex==2 ?'contShow':'contHid'}}">
+        <scrollViewCourse :url.sync='url_course' :param.sync='param_course' @dataLoad.user="setCourseData">
+            <view slot="content">
+                <repeat for="{{courseData}}" item="item" index="index">
+                    <view class="course-box" @tap="toCourseDetail({{item}})">
+                        <view class="box-top">
+                            <view class="top-title">{{item.title}}</view>
+                        </view>
+                        <view class="box-mid">
+                            <image class="mid-img-play" src="/static/images/play.png"></image>
+                            <image class="mid-img" src="{{item.video_img}}" wx:if="{{item.video_img}}" binderror="imgErr({{index}})" bindload="imgLoad"></image>
+                            <image class="mid-img" src="/static/images/zw1.png" wx:else></image>
+                            <view class="mid-msg"> 
+                            <view class="mid-man">
+                                <image class="icon" src="{{item.user_ico}}" wx:if="{{item.user_ico}}"></image> 
+                                <image class="icon" src="/static/images/person.png" wx:else></image> 
+                                <view class="name">{{item.user_name}}</view>
+                            </view>
+                            <view class="mid-int">{{item.summry}}</view>
+                            </view>
+                        </view>
+                        <view class="box-bom">
+                            <view class="top-time">{{item.create_time}}</view>
+                            <view class="top-float">
+                                <text class="bom-finger">{{item.satifynum}}人点赞</text>
+                                <text class="bom-scan">{{item.readnum}}人看过</text>
+                            </view>
+                        </view>
+                    </view>
+                </repeat>
+            </view>
+        </scrollViewCourse>
+    </view>
+
+<!-- ios -->
+<iosLayer :isIOS.sync="showIosLayer" :action.sync="action"></iosLayer>
+</view>
+</template>
+<script>
+import wepy from 'wepy'
+import http from '@/utils/http-util'
+import utils from '@/utils/common-util'
+import { API_URL } from '@/const'
+import ScrollView from '@/components/scrollView'
+import LodingPage from '@/components/lodingPage'
+import {navigateTo, switchTab } from '@/utils/route'
+import userManager from '@/utils/user-manager'
+import IosLayer from '@/components/iosLayer'
+export default class Vip extends wepy.page {
+    config = {
+        navigationBarTitleText: 'VIP专属服务'
+    }
+    components = {
+        scrollViewPloy:ScrollView,
+        scrollViewNote:ScrollView,
+        scrollViewCourse:ScrollView,
+        lodingPage:LodingPage,
+        iosLayer:IosLayer,
+    }
+    data={
+        activeTabIndex:0,
+        //所有tab列表
+        tabs:['scrollViewPloy','scrollViewNote','scrollViewCourse'],
+        //数据
+        ployData:[],
+        noteData:[],
+        courseData:[],
+        //下拉组件url及参数
+        url_ploy:API_URL.VIP_GROUP_LIST,
+        param_ploy:{},
+        url_note:API_URL.VIP_NOTE,
+        param_note:{
+            'page_no': 1,
+            'page_size': 10,
+            'type': 1
+        },
+        url_course:API_URL.VIP_NOTE,
+        param_course:{
+            'page_no': 1,
+            'page_size': 10,
+            'type': 2
+        },
+        // 页面滚动距离
+        scrollTop:0,
+        tabBoxTop:null,  
+        tabBoxFixed:false, 
+        // 直播数据
+        liveData:[],
+        // 登录状态
+        isLoginSuccess:'',
+        //是否是ios系统
+        isIOS:false,
+        action:'1',
+        isVip:true,
+    }
+    computed = {
+        showIosLayer(){
+            return this.isIOS&&!this.isVip
+        }
+    }
+    methods={
+        // tab切换
+        swichNav(index){
+            this.activeTabIndex=index;
+            let currScroll = this.getCurrScroll();
+            var items = this.$invoke(currScroll,'getItems');
+            if(items.length <= 0){
+                this.$invoke(currScroll,'nextPage');
+            }
+        },
+        // 
+        setPloyData(data,type){   
+            if(type==0){
+                this.ployData=[]
+            }
+            this.ployData.push(...data)
+            this.$apply()
+            this.hideLoading()
+        },
+        // 
+        setNoteData(data,type){
+            if(type==0){
+                this.noteData=[]
+            }
+            this.formatNoteData(data)         
+            this.noteData.push(...data)
+            this.$apply()
+            this.hideLoading()
+        },
+        // 
+        setCourseData(data,type){
+            if(type==0){
+                this.courseData=[]
+            }
+            this.formatCourseData(data) 
+            this.courseData.push(...data)
+            this.$apply()
+            this.hideLoading()
+        },
+        // 链接跳转
+        toPloyDetail(id){
+            wx.navigateTo({
+                url: `/subPages/content/pages/detail/ployDetail?id=${id}`,
+            }) 
+        },
+        toNoteDetail(item){
+            if(!this.checkLogin())return
+            var action=item.content_action
+            action=action.replace('note?','noteDetail?')
+            if(action.includes('html')&&this.isIOS){
+                this.isVip=false
+                return
+            }
+            var param={
+                url:action,
+                fail:function(err){
+                    console.log('跳转tabBar')
+                    switchTab({url:action})
+                }
+            }
+            navigateTo(param)
+        },
+        toCourseDetail(item){
+            if(!this.checkLogin())return
+            var action=item.content_action
+            action=action.replace('course?','courseDetail?')
+            if(action.includes('html')&&this.isIOS){
+                this.isVip=false
+                return
+            }
+            var param={
+                url:action,
+                fail:function(err){
+                    console.log('跳转tabBar')
+                    switchTab({url:action})
+                }
+            }
+            navigateTo(param)
+        },
+        toLivePlace(action){
+            var param={
+                url:action,
+                fail:function(err){
+                    console.log('跳转tabBar')
+                    switchTab({url:action})
+                }
+            }
+            navigateTo(param)
+        },
+        // 监听图片加载错误
+        imgErr(index){
+            this.courseData[index].video_img=''
+        },
+        noteImgErr(index){
+            this.noteData[index].noteImages[0].imgUrl = '';
+        },
+    }
+    onLoad(){
+        this.showLoading()
+        this.$invoke(this.getCurrScroll(),'refresh')
+        var res = wx.getSystemInfoSync()
+        if(res.platform == "devtools" || res.platform == "ios"){
+            this.isIOS = true
+            return
+        }
+    }
+    onShow(){
+        this.isLoginSuccess = wx.getStorageSync('loginSuccess')
+    }
+    onHide(){
+    }
+    // 下拉刷新
+    onPullDownRefresh () {
+        this.$invoke(this.getCurrScroll(),'refresh');   
+    }
+    // 上拉加载
+    onReachBottom () {
+        this.$invoke(this.getCurrScroll(),'nextPage');
+    }
+    onPageScroll(object){
+        this.scrollTop = object.scrollTop;
+        if(this.scrollTop>=this.tabBoxTop&&!this.tabBoxFixed){
+            this.tabBoxFixed=true
+            this.$apply();
+        }else if(this.tabBoxFixed&&this.scrollTop<this.tabBoxTop){
+            this.tabBoxFixed=false
+            this.$apply();
+        }
+    }
+    // 获取直播信息
+    getLiveData(){
+        var indexSetData=utils.tools().getLocal('indexSetData')
+        if(!indexSetData){
+            this.loadLiveData()
+        }else{
+            this.liveData.push(indexSetData.live_place)
+            this.$apply()
+            this.queryMultipleNodes()
+        }   
+    }
+    // 加载直播室数据
+    loadLiveData(){
+        http
+        .getRequest(API_URL.INDEX_SET, {
+            position: 100104
+        })
+        .then(data => {
+            this.liveData=[]
+            this.liveData.push(data.live_place)
+            this.$apply()
+            this.queryMultipleNodes()
+            utils.tools().setLocal('indexSetData',data)
+        })
+        .catch(error => {});
+    }
+    // 节点信息
+    queryMultipleNodes(){
+        var self = this;
+        var query = wx.createSelectorQuery()
+        query.select('.tab-box').boundingClientRect()
+        query.exec(function(res){
+            self.tabBoxTop = res[0].top
+            self.$apply()
+        })
+    }
+    //获取当前激活的tab
+    getCurrScroll(){
+       return this.tabs[this.activeTabIndex]; 
+    }
+    // 显示加载层
+    showLoading(){
+        this.$invoke('lodingPage','show')
+    }
+    // 隐藏加载层
+    hideLoading(){
+        this.$invoke('lodingPage','hide')
+    }
+    // 时间戳
+    formatNoteData(data){
+        var list,time;
+        for(var i in data){
+            list = data[i];
+            time = list.create_time;
+            time = utils.formatTimeLocal(time);
+            data[i].create_time = time;
+        }
+    }
+    formatCourseData(data){
+        var list,time,video_img
+        for(var i in data){
+            list = data[i]
+            time = list.create_time
+            time = utils.formatTimeLocal(time)
+            video_img=list.video_img
+            if(!video_img.startsWith('http')){
+                video_img=''
+            }
+            data[i].create_time = time
+            // data[i].video_img = video_img
+        }
+    }
+    // 是否登录
+    checkLogin(){
+        if(!this.isLoginSuccess ){
+            userManager.triggerIntercept()
+            return false
+        }
+        return true
+    }
+}
+</script>

@@ -1,0 +1,259 @@
+.note {
+    background:#eee;  
+    height: 100%;  
+    // 推荐阅读
+    .recommend {
+        background: #fff;
+        // min-height:r(500);
+        border-bottom:#e6e6e6 1px solid;
+        margin-bottom:16rpx;
+        .rec-title {
+            display:flex;
+            align-items:center;   
+            padding: r(0) r(30); 
+            border-bottom:#e6e6e6 1px solid;      
+            height:90rpx;
+            line-height:90rpx;                  
+            image {
+                width: r(50);
+                height: r(50);
+            }
+            text{
+                font-size:r(32);
+                padding-left:r(14);          
+            }
+        }
+        .rec-box{
+            .content-box {
+                margin:r(30) r(30) r(0) r(30);
+                border-bottom:#e6e6e6 1px solid;
+                padding-bottom:r(24);                
+                .box-content {
+                    position: relative; 
+                    image {
+                        width:r(90);
+                        height:r(40);                            
+                    }
+                    .content-sign {  
+                        position:absolute;                                                  
+                        left: 0;
+                        line-height:r(40);
+                        width:r(90);
+                        height:r(40);
+                        font-size:r(30);     
+                        text-align:center;
+                        color:#fff;                             
+                    }
+                    .content-title {
+                        font-size:r(32);
+                        padding-left:r(24);  
+                        position:relative;
+                        top:r(-10);
+                        height:r(50);
+                        line-height:r(50);   
+                        font-weight: bold;                                          
+                    }
+                }
+                .box-msg {
+                    font-size:r(24);
+                    color:#999;                   
+                    .msg-time {
+
+                    }
+                    .msg-name {
+                        padding:0 r(10) 0 r(20);                        
+                    }
+                    .msg-title {
+                        
+                    }
+                }
+            }
+            .content-box:last-child{
+                border-bottom: none;
+            }
+        }
+    }
+    // tab切换
+    .note-tab {
+        background: #f5f5f5;
+        border-top:1rpx #e6e6e6 solid; 
+        min-height:70%;        
+        // tab栏
+        .tab-box {
+            display: flex;
+            width: 100%;
+            background: #fff;
+            z-index: 999;
+            position: unset;
+            top:0;
+            .default {
+                display: block;
+                width: 50%;
+                border-bottom: 1px solid #e6e6e6;
+                color: #000;
+                height:r(90);
+                line-height:r(90);
+                font-size:r(32);
+                text-align:center;                
+            }
+            .active {
+                border-bottom: 2px solid #e93030;
+                color: #e93030;
+            }
+        }
+        .fixed {
+            position: fixed;         
+        }
+        // 内容区
+        .content-box {
+            .contShow {
+                display: block;
+                background: #fff;
+            }
+            .contHid {
+                display: none;
+                background: #fff;
+            }
+            .time-line{
+                width:30rpx;
+                height:30rpx;
+                position:absolute;
+                left:-15rpx;
+                top:36rpx;                
+            }
+            .note-box {
+                margin:0px 30rpx 0px 45rpx;
+                position:relative;
+                border-left:#e6e6e6 1px solid;
+                padding-left:30rpx;
+                padding-top:30rpx; 
+                .box-top {
+                    .top-time {
+                        font-size: r(26);
+                        color: #999;
+                    }
+                }
+                .box-mid {
+                    margin: r(10) 0;
+                    .mid-msg {
+                        display: flex;
+                        margin-bottom:r(15);
+                        align-content:center;                        
+                        .icon{
+                            width:70rpx;
+                            height:70rpx;
+                            border-radius:50%;
+                        }
+                        .msg{
+                            text-align:left;
+                            margin-left:r(20);
+                            max-width:r(520);
+                            .msg-top{
+                                white-space: nowrap;
+                                overflow: hidden;
+                                text-overflow: ellipsis;
+                                .msg-name{
+                                    font-size:r(30);
+                                    font-weight:bold;
+                                    padding-right:r(10); 
+                                }
+                                .msg-title{
+                                    font-size:r(26);
+                                    color: #e93030;
+                                }
+                            }
+                            .msg-pro{
+                                font-size:r(26);
+                                color: #999;
+                                white-space:nowrap;
+                                overflow:hidden;
+                                text-overflow:ellipsis;                                
+                            }
+                        }
+                    }
+                    .mid-title{
+                        margin-bottom:15rpx;
+                        font-size:32rpx;
+                        font-weight:bold;  
+                        overflow:hidden;
+                        text-overflow: ellipsis;
+                        display: -webkit-box;
+                        -webkit-line-clamp: 1;
+                        -webkit-box-orient: vertical;                      
+                    }
+                    .mid-int{
+                        position: relative;
+                        .int-sign{
+                            width:65rpx;
+                            height:38rpx;
+                            position:absolute;
+                            background:#e83030;
+                            color:#fff;
+                            text-align:center;
+                            line-height:38rpx;
+                            font-size:26rpx;                                
+                            border-radius:5rpx;
+                            top:5rpx;
+                        }
+                        .int-sign:before,.int-sign:after{ 
+                            content: ""; 
+                            width: 0; 
+                            height: 0; 
+                            position: absolute;
+                            display: block; 
+                            border-width:r(10); 
+                            border-style: solid;  
+                        }
+                        .int-sign:before{
+                            left: r(65); 
+                            top: r(10); 
+                            border-color: transparent transparent transparent #e83030;
+                        }
+                        .int-sign:after{
+                            left: r(65); 
+                            top: r(10); 
+                            border-color: transparent transparent transparent #e83030;
+                        }
+                        .int-title {                       
+                            font-size: r(32);
+                            overflow: hidden;
+                            text-overflow: ellipsis;
+                            display: -webkit-box;
+                            -webkit-line-clamp: 3;
+                            -webkit-box-orient: vertical;
+                            letter-spacing:2rpx;                                                 
+                        }  
+                        .title-indent {
+                            text-indent:r(90);
+                        }
+                    }
+                    .mid-img {
+                        width:450rpx;
+                        height:250rpx;
+                        display: block;
+                    }
+                }
+                .box-bom {
+                    display:flex;
+                    font-size:26rpx;
+                    color:#999;
+                    margin-top:15rpx;
+                    padding-bottom:30rpx;
+                    border-bottom:#e6e6e6 1px solid;
+                    .bom-value{
+                        padding-right:r(20);
+                    }
+                    .bom-scan {
+
+                    }
+                    .bom-finger {
+                        padding-left:r(20);
+                    }
+                }
+            }
+            .note-box:last-child{
+                margin-bottom: 0;
+            }
+        }
+    }
+}

@@ -1,0 +1,149 @@
+<style lang="scss">
+@import '../../../../sass/pages/historyDetail';
+</style>
+<template>
+<view class="his-detail">
+    <lodingPage></lodingPage>
+    <!--  -->
+    <view class="his-blank"></view>
+    <view class="his-head">
+        <view class="name">名称代码</view>
+        <view class="price">入选价</view>
+        <view class="wave">最高涨幅</view>
+    </view>
+    <!--  -->
+    <scrollView :url.sync="url" :param.sync="param" :pageNoName.sync="pageNoName" :pageSizeName.sync="pageSizeName" @dataLoad.user="setHisDetailData">
+        <view class="his-list" slot="content">
+            <repeat for="{{historyDetail}}" item="item" index="index">
+                <view class="list-box">
+                    <view class="box-date" @tap.stop="togContent({{index}})">
+                        <view class="date-time">{{item.date}}</view>
+                        <image class="date-arrow" src="/static/images/arrow-down.png" wx:if="{{item.showContent}}"/>
+                        <image class="date-arrow" src="/static/images/arrow-right.png" wx:else/>
+                    </view>
+                    <view class="box-content" wx:if="{{item.showContent}}">
+                        <repeat for="{{item.vipDetail}}" item="value" index="u">
+                            <view class="cont-box">
+                                <view class="cont-msg">
+                                    <view class="msg-name">{{value.secshortName}}</view>
+                                    <view class="msg-code">{{value.stockCode}}</view>
+                                </view>
+                                <view class="cont-price">{{value.joinPrice}}</view>
+                                <view class="cont-wave">{{value.maxchgpct}}%</view>
+                            </view>
+                        </repeat>
+                    </view>
+                </view>
+            </repeat>
+        </view>
+    </scrollView>
+
+    <!--  -->
+    <view class="up-blank" wx:if="{{_authority==0}}"></view>
+    <view class="up-btn" wx:if="{{_authority==0}}" >
+        <view class="vip-btn" @tap.stop="toAction()">立即开通获取更多优质股</view>
+    </view>
+    <!--  -->
+
+</view>
+</template>
+<script>
+import wepy from 'wepy'
+import http from '@/utils/http-util'
+import utils from '@/utils/common-util'
+import { API_URL } from '@/const'
+import LodingPage from '@/components/lodingPage'
+import ScrollView from '@/components/scrollView'
+import {navigateTo, switchTab } from '@/utils/route'
+export default class HistoryDetail extends wepy.page {
+    config = {
+        navigationBarTitleText: '历史战绩',
+        enablePullDownRefresh: false ,
+    }
+    components = {
+        lodingPage:LodingPage,
+        scrollView:ScrollView,
+    }
+    data={
+        // 组合id
+        _id:'',
+        _name:'',
+        _authority:1,
+        _action:'',
+        //历史战绩详情
+        historyDetail:[],
+        // 历史战绩url及参数
+        url:API_URL.VIP_DETAIL_INFO,
+        param:{
+            id:'',
+            pageNo:1,
+            pageSize:10
+        },
+        pageNoName:'pageNo',
+        pageSizeName:'pageSize'
+    }
+    methods={
+        // 获取接口数据
+        setHisDetailData(data,type){
+            this.formatDateilList(data)
+            this.historyDetail.push(...data) 
+            this.hideLoading()
+            this.$apply()
+        },
+        // 切换下拉显示
+        togContent(index){
+            var showContent
+            showContent=this.historyDetail[index].showContent
+            this.historyDetail[index].showContent=showContent?false:true
+            this.$apply()
+        },
+        // 开通vip
+        toAction(){
+            var param={
+                url:this._action,
+            }
+            navigateTo(param)
+        },
+    }
+    onLoad(option){
+        this.showLoading()
+        this._id=option.id
+        this._name=option.name
+        this._authority=option.authority
+        this._action=decodeURIComponent(option.action)
+        this.param.id=option.id
+        this.setPageTitle()
+        this.$invoke('scrollView','refresh')
+    }
+    // 上拉加载
+    onReachBottom () {
+        this.$invoke('scrollView','nextPage');
+    }
+    // 显示加载层
+    showLoading(){
+        this.$invoke('lodingPage','show')
+    }
+    // 隐藏加载层
+    hideLoading(){
+        this.$invoke('lodingPage','hide')
+    }
+    setPageTitle(){
+        wx.setNavigationBarTitle({
+            title: this._name
+        })
+    }
+    // 时间戳
+    formatDateilList(data){
+        var vipDetail,list,per
+        for(var i in data){
+            data[i].showContent=true
+            vipDetail=data[i].vipDetail
+            for(var j in vipDetail){
+                list=vipDetail[j]
+                per=(list.maxchgpct*100).toFixed(2)
+                data[i].vipDetail[j].maxchgpct = per
+            }  
+        }
+    }
+}
+</script>

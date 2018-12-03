@@ -1,0 +1,118 @@
+.payment{
+    height:100%;
+    width: 100%;
+    position:fixed;
+    bottom:0;
+    z-index:999;
+    background:rgba(77,77,77,0.5);   
+    .pay-box {
+        position:fixed;
+        bottom:0;  
+        background:rgba(255,255,255,1);
+        width:100%;         
+        .pay-top{
+            display:flex;  
+            align-items:center; 
+            padding:20rpx 30rpx;
+            border-bottom:#e6e6e6 1px solid;                   
+            .top-close{
+                width:100rpx;
+                height:50rpx;             
+                .close-img{
+                    width:50rpx;
+                    height:50rpx;  
+                    display:block;  
+                }              
+            }
+            .top-title{
+                width:100%;
+                text-align:center;
+                font-size:32rpx; 
+                margin-left:-50rpx;
+                font-weight:bold;                
+            }
+        }
+        .pay-mid{
+            font-size:32rpx;  
+            padding:0 30rpx;          
+            .mid-cont{
+                display:flex;
+                white-space:nowrap;     
+                padding:20rpx 0;
+                border-bottom:#e6e6e6 1px solid;                          
+                .cont-title{
+                    width:20%;   
+                    padding-right:20rpx;                    
+                }
+                .cont-sum{
+                    width:75%;
+                    text-overflow:ellipsis;
+                    overflow:hidden; 
+                    text-align: right;
+                    .wxParse-inline{
+                        overflow:hidden;
+                        text-overflow:ellipsis;
+                        display:block;                        
+                    }                   
+                }
+            }
+            .mid-price{
+                display:flex;
+                align-items:center;
+                white-space:nowrap;    
+                padding:20rpx 0;
+                border-bottom:#e6e6e6 1px solid;            
+                .price-title{
+                    .title-black{
+
+                    }
+                    .title-red{
+                        color:#e83030;
+                    }
+                }
+                .price-sum{
+                    width:100%;
+                    text-align:right; 
+                    padding-right:50rpx;                    
+                    .balance{
+                        color:#999;
+                        font-size:28rpx;                        
+                        .bal-word{
+
+                        }
+                        .bal-num{
+
+                        }
+                    }
+                }
+                .price-radio{
+
+                }
+            }
+        }
+        .pay-bom{
+            padding:30rpx;
+            padding-top:20rpx;               
+            text-align:center;            
+            .bom-text{
+                font-size:28rpx;
+                color:#999;
+                padding-bottom:100rpx;                
+            }
+            .bom-submit{
+                height:80rpx;
+                line-height:80rpx;
+                background:#c1c1c1;
+                text-align:center;
+                font-size:32rpx; 
+                border-radius:10rpx;                
+                color:#fff;    
+                position: relative;            
+            }
+            .active{
+                background: #e83030;
+                color: #fff;
+            }
+        }
+    }
+}

@@ -1,0 +1,445 @@
+<style lang="scss">
+  @import '../../../../sass/base/reset';
+  @import '../../../../sass/commons/function';
+  @import "../../../../wxParse/wxParse";
+  @import '../../../../sass/pages/noteDetail';
+  .common-form-btn{
+    position: absolute;
+    width:100%;
+    height:100%;
+    padding:0;
+    margin:0;
+    top:0;
+    left:0;
+    z-index:9;
+  }
+  .common-form-btn[plain]{
+    border:none;
+  }
+</style>
+
+<template>
+<import src="../../../../wxParse/wxParse.wxml"/>
+<view class="note-detail">
+    <lodingPage></lodingPage>
+    <!-- 作者信息 -->
+    <view class="detail-man" @tap.stop="toBigManDetail({{noteDetailData.note_authorid}})">
+        <view class="li-lef">
+            <image src="{{noteDetailData.author_ico}}" wx:if="{{noteDetailData.author_ico}}"></image>
+            <image src="/static/images/person.png" wx:else></image>
+        </view>
+        <view class="li-btw">
+            <view>
+                <text class="man-name">{{noteDetailData.note_author_name}}</text>
+                <text class="man-title"> | {{noteDetailData.user_title}}</text>
+            </view>
+            <view class="man-int">{{noteDetailData.author_profiles}}</view>
+        </view>
+        <view class="li-rig" @tap.stop='preventTap'>
+            <view wx:if="{{noteDetailData.mynoticed ==1}}" class="man-atten atten-cancle">
+                <form bindsubmit="cancelNotice({{noteDetailData.note_authorid}})" report-submit='true'>
+                    <button class="common-form-btn" formType="submit" plain="{{true}}"></button>
+                </form>
+                取消关注
+            </view>
+            <view wx:if="{{!noteDetailData.mynoticed}}" class="man-atten atten-add">
+                <form bindsubmit="notice({{noteDetailData.note_authorid}})" report-submit='true'>
+                    <button class="common-form-btn" formType="submit" plain="{{true}}"></button>
+                </form>
+                加关注
+            </view>
+        </view>
+    </view>
+    <!-- 笔记内容 -->
+    <view class="note-content">
+        <!-- 付费内容 -->
+        <view class="pay-content" wx:if="{{noteDetailData.authority==0}}">
+            <view class="cont-summry" wx:if="{{noteDetailData.note_summry&&noteDetailData.note_type==3}}"><text>{{noteDetailData.note_summry}}</text></view>
+            <view class="cont-free" wx:if="{{noteDetailData.free_note_content&&noteDetailData.pay_type!=2}}">
+                <template is="wxParse" data="{{wxParseData:tmData_freeNoteCont.nodes}}"/>
+            </view> 
+            <view class="cont-pay-guide" wx:if="{{noteDetailData.pay_guide}}">{{noteDetailData.pay_guide}}</view>
+            <view class="cont-pay-text">
+                <form bindsubmit="payment({{noteDetailData.noteid}})" report-submit='true'>
+                    <button class="common-form-btn" formType="submit" plain="{{true}}"></button>
+                </form>
+                {{noteDetailData.payText}}
+            </view>
+        </view>
+        <!-- 免费内容 -->
+        <view class="free-content" wx:if="{{noteDetailData.authority==1}}">
+            <view class="cont-summry" wx:if="{{noteDetailData.note_summry&&noteDetailData.note_type==3}}"><text>{{noteDetailData.note_summry}}</text></view>
+            <view class="cont-free" wx:if="{{noteDetailData.free_note_content}}">
+                <template is="wxParse" data="{{wxParseData:tmData_freeNoteCont.nodes}}"/>
+            </view>     
+            <view class="cont-pay-guide" wx:if="{{noteDetailData.pay_guide}}">{{noteDetailData.pay_guide}}</view>
+            <view class="cont-note" wx:if="{{noteDetailData.note_content}}">
+                <template is="wxParse" data="{{wxParseData:tmData_noteCont.nodes}}"/>
+            </view> 
+            <view class="cont-declar">{{noteDetailData.declare_content}}</view>
+        </view>
+        <!-- bottom -->
+        <view class="cont-bom">
+            <view class="finger">
+                <form bindsubmit="noteSatisfy({{noteDetailData.noteid}})" report-submit='true'>
+                    <button class="finger-btn" formType="submit" plain="{{true}}">
+                        <image wx:if="{{!noteDetailData.mysatisfied}}" src="/static/images/finger.png"></image>
+                        <image wx:if="{{noteDetailData.mysatisfied==1}}"  src="/static/images/finger2.png"></image>
+                    </button>
+                </form>
+                <view>点赞</view>
+            </view>
+            <view class="bom-msg">
+                <text class="msg-time">{{noteDetailData.note_time}}</text>
+                <text class="msg-price">{{noteDetailDatanote_price}}</text>
+                <text class="msg-scan">{{noteDetailData.reader_nums}}人读过</text>
+                <text class="msg-finger">{{noteDetailData.satisfied_nums}}人点赞</text>
+            </view>
+        </view>
+    </view>
+    <!--热门评论 -->
+    <view class="comment">
+        <view class="comment-title">
+            热门评论
+        </view>
+        <view class="comment-list">
+            <scrollView :url.sync="url" :param.sync="param" @dataLoad.user="setCommentData">
+                <view slot="content">
+                    <repeat for="{{noteCommentsData}}" item="item" index="index">
+                        <view class="comment-box">
+                            <view class="box-top">
+                                <image class="top-icon" src="{{item.commenterIco}}" wx:if="{{item.commenterIco}}"></image>
+                                <image class="top-icon" src="/static/images/person.png" wx:else></image>
+                                <view class="top-msg">
+                                    <view class="msg-name">{{item.commenterName}}</view>
+                                    <view class="msg-time">{{item.createTime}}</view>
+                                </view>
+                                <view class="top-num">
+                                    <view class="num-finger" @tap.stop="commmentSatisfy({{item}},{{index}})">
+                                        <image src="/static/images/dz.png" wx:if="{{item.iBest==0}}"></image>
+                                        <image src="/static/images/dz-over.png" wx:if="{{item.iBest==1}}"></image>
+                                        <text>{{item.bestNum}}</text>
+                                    </view>
+                                    <view class="num-comment" @tap.stop="saveComment({{item.id}},{{item.commenterName}})">
+                                        <image src="/static/images/comment.png"></image>
+                                        <text>{{item.lastComments.length}}</text>
+                                    </view>
+                                </view>                    
+                            </view>
+                            <view class="box-mid">
+                                <view class="mid-com">{{item.commentContent}}</view>
+                                <!-- 二级评论 -->
+                                <view class="last-comment" wx:if="{{item.lastComments.length>0}}">
+                                    <repeat for="{{item.lastComments}}" item="lastItem">
+                                        <view class="last-box">
+                                            <text class="last-box-name">{{lastItem.commenterName}}:</text>
+                                            <text class="last-box-word">{{lastItem.commentContent}}</text>
+                                        </view>
+                                    </repeat>
+                                </view>
+                            </view>                           
+                        </view>
+                    </repeat>
+                </view>
+            </scrollView>
+        </view>
+    </view>
+    <notice></notice>
+    <payment :payUrl.sync="payUrl" 
+             :payParam.sync="payParam" 
+             :payDetailData.sync="noteDetailData" 
+             @payCallBack.user="payCallBack" 
+             @fxcpFinish.user='fxcpFinish'>
+        <view slot="payCont">
+            <!-- {{noteDetailData.free_note_content}} -->
+            <template is="wxParse" data="{{wxParseData:tmData_freeNoteCont.nodes}}"/>
+        </view>
+        <text slot="payNum">{{noteDetailData.note_price}}</text>
+        <text slot="payType_o">笔记</text>
+        <text slot="payType_t">笔记</text>
+        <text slot="vipPayNum">{{noteDetailData.enablePayModel[0].name}}</text>
+        <text slot="vipExpireNum">{{noteDetailData.enablePayModel[0].num}}</text>
+    </payment>
+    <!-- 评论组件 -->
+    <commentBtn :noteid.sync="_noteid"></commentBtn>
+    <commentInput :url.sync="commentUrl" :param.sync="commentParam"></commentInput>
+</view>
+</template>
+
+<script>
+import wepy from 'wepy'
+import http from '@/utils/http-util'
+import utils from '@/utils/common-util'
+import WxParse from '@/wxParse/wxParse'
+import { API_URL } from '@/const'
+import ScrollView from '@/components/scrollView'
+import BigManNotice from '@/components/bigManNotice'
+import Payment from '@/components/payment'
+import CommentBtn from '@/components/commentBtn'
+import CommentInput from '@/components/commentInput'
+import LodingPage from '@/components/lodingPage'
+import {navigateTo, switchTab } from '@/utils/route'
+export default class NoteDetailSec extends wepy.page {
+    config = {
+        navigationBarTitleText: '笔记详情',
+        enablePullDownRefresh: false
+    }
+    components = {
+        scrollView: ScrollView,
+        notice: BigManNotice,
+        payment: Payment,
+        commentBtn: CommentBtn,
+        commentInput: CommentInput,
+        lodingPage:LodingPage,
+    }
+    data = {
+        // 笔记获取评论url及参数
+        url: API_URL.NOTE_COMMENT, 
+        param: {
+            'page_no': 1,
+            'page_size': 10,
+            "noteid":'',
+        },
+        // 笔记详情
+        noteDetailData: {},
+        // 笔记评论
+        noteCommentsData: [],
+        // 笔记id
+        _noteid:'',
+        // 是否有权限
+        _authority:'',
+        // 笔记使用Url及参数
+        payUrl:API_URL.NOTE_PAY, 
+        payParam:{
+            noteid:'',
+            version:3.8,
+            type:1,
+        },
+        // 发表二级评论url及参数
+        commentUrl:API_URL.NOTE_SAVE_COMMENT, 
+        commentParam:{
+            noteid: '',
+            commentLev:'2',
+            parentCommentid:'',
+            commentContent:''
+        },
+    }
+    computed={
+    }
+    //事件处理函数
+    methods = {
+        // 关注
+        notice (userId,e) {
+            this.$invoke('notice', 'notice', userId)
+            var formId = e.detail.formId
+            this.$root.$parent.sendFormId(formId)
+        },
+        // 取消关注
+        cancelNotice (userId,e) {
+            this.$invoke('notice', 'cancel', userId)
+            var formId = e.detail.formId
+            this.$root.$parent.sendFormId(formId)
+        },
+        // 获取评论数据
+        setCommentData(data,type){
+            this.formatNoteCommentsData(data)
+            if(!type){
+                this.noteCommentsData=data
+            }else{
+                this.noteCommentsData.push(...data)
+            }
+            this.$apply()
+        },
+        // 点赞
+        noteSatisfy(noteid,e){
+            http.getRequest(API_URL.NOTE_SATISFY, {
+                noteid: noteid
+            }).then(data => {
+                this.noteDetailData.mysatisfied =1
+                this.noteDetailData.satisfied_nums++
+                this.$apply()
+            })
+            var formId = e.detail.formId
+            this.$root.$parent.sendFormId(formId)
+        },
+        // 使用
+        payment(noteid,e){
+            if(this.noteDetailData.pay_type==2){
+                wx.showModal({
+                    content: '你不是VIP用户，暂时无法查看VIP专享内容，是否立即升级VIP?',
+                    confirmColor:'#000000',
+                    success: function(res) {
+                        if (res.confirm) {
+                            navigateTo({url:'vipCenter'})
+                        } else if (res.cancel) {
+                        
+                        }
+                    }
+                })
+                return
+            }
+            this.payParam.type=this.noteDetailData.enablePayModel?this.noteDetailData.enablePayModel[0].type:this.payParam.type
+            let {note_price,note_authorid,cert_code} = this.noteDetailData;
+            this.$invoke('payment', 'show',note_price,note_authorid,cert_code);
+            var formId = e.detail.formId
+            this.$root.$parent.sendFormId(formId)
+        },
+        //评论点赞 
+        commmentSatisfy(item,index){
+             var commentid=item.id
+            http.getRequest(API_URL.NOTE_COMMENT_SATISFY, {
+                commentid: commentid
+            }).then(data => {
+                this.noteCommentsData[index].bestNum++
+                this.noteCommentsData[index].iBest=1  
+                this.$apply()
+            })
+        },
+        /**
+         * 发表二级评论
+         * commentLev--评论级别  1 一级评论、2二级评论;
+         * parentCommentid--上级评论id  只有2级评论有
+         */
+        saveComment(parentCommentid,commentName){
+            this.commentParam.noteid=this._noteid
+            this.commentParam.parentCommentid=parentCommentid
+            this.$invoke('commentInput', 'showInput',2,commentName,null,null)
+        },
+        // 使用成功回调
+        payCallBack(data){
+            this.noteDetailData.authority=1
+            this.noteDetailData.declare_content=data.declare_content
+            this.noteDetailData.note_content=data.note_content
+            this.$apply()
+            this.addRichText()
+        },
+        // 富文本中a标签跳转
+        wxParseTagATap(e){
+            var currentTarget=e.currentTarget
+            var src=currentTarget.dataset.src
+            src=src.replace('note?','noteDetail?')
+            var param={
+                url:src,
+                fail:function(err){
+                    switchTab({url:src})
+                }
+            }  
+            navigateTo(param)
+        },
+        // 跳转大咖主页
+        toBigManDetail(id){
+            wx.navigateTo({url: `/subPages/content/pages/detail/bigManDetail?id=${id}`})
+        },
+        // 
+        tapRichTextA(e){
+            console.log(e)
+        },
+        // 
+        preventTap(){
+            return false;
+        }
+    }
+    events = {
+      // 关注操作成功触发事件
+      noticeOptionSuccess (userId) {
+        let item = this.noteDetailData
+        item.mynoticed = (item.mynoticed==1?0:1)
+      },
+      //风险测评结束触发
+      fxcpFinish(){
+        wx.redirectTo({url:'/subPages/content/pages/detail/noteDetail?noteid='+this._noteid});
+     },
+    }
+    //页面生命周期函数
+    onLoad(option) {   
+        this.showLoading()    
+        
+        if(!option.id){
+           this._noteid=option.noteid
+            this.payParam.noteid=option.noteid;  //获取笔记id用于使用 
+        }else{
+            this._noteid=option.id
+             this.payParam.noteid=option.id;  //获取笔记id用于使用
+        }
+    }
+    onShow(){
+        this.loadNoteData(this._noteid); 
+    }
+    // 页面滚动
+    onPageScroll(object){
+    
+    }
+    // 下拉刷新
+    onPullDownRefresh () {
+        this.noteCommentsData=[];
+        this.$invoke('scrollView','refresh'); 
+    }
+    // 上拉加载
+    onReachBottom () {
+        this.$invoke('scrollView','nextPage');
+    }
+    // 加载笔记详情数据
+    loadNoteData (noteid) {
+      http.getRequest(API_URL.NOTE_DETAIL, {
+        noteid: noteid
+      }).then(data => {
+        this.noteDetailData = data  
+        this.formatNoteDetailData(this.noteDetailData)
+        this.$apply()  
+        this.hideLoading()
+        this.loadNoteCommentData(noteid)
+        this.addRichText()
+        this.$invoke('commentBtn', 'showBtton')
+      })
+    }
+    // 加载笔记评论
+    loadNoteCommentData(noteid) {
+        this.param.noteid = noteid
+        this.$invoke('scrollView','refresh')   
+    }
+    // 添加富文本
+    addRichText(){
+        this.noteDetailData.free_note_content=this.noteDetailData.free_note_content.replace(/\<img/gi,'<img style="width:100%;height:aotu"')
+        WxParse.wxParse('tmData_freeNoteCont', 'html', this.noteDetailData.free_note_content, this, 5)
+        WxParse.wxParse('tmData_noteCont', 'html', this.noteDetailData.note_content, this, 5)
+        this.$apply()
+    }
+    // 处理时间戳
+    formatNoteDetailData(data){
+        var list,time;
+        time = data.note_time;
+        time = utils.formatTimeLocal(time);
+        data.note_time = time;
+        data.payText=data.payText.replace('支付','使用')
+        this.$apply();
+    }
+    formatNoteCommentsData(data){
+        var list,time;
+        for(var i in data){
+            list = data[i];
+            time = list.createTime;
+            time = utils.formatTimeLocal(time);
+            data[i].createTime = time;
+            this.$apply();
+        }
+    }
+    // 显示加载层
+    showLoading(){
+        this.$invoke('lodingPage','show')
+    }
+    // 隐藏加载层
+    hideLoading(){
+        this.$invoke('lodingPage','hide')
+    }
+    onShareAppMessage(res) {
+        if (res.from === 'button') {
+            // 来自页面内转发按钮
+            console.log(res.target)
+        }
+        return {
+            title: '投顾说',
+            path: 'pages/tabBar/index?noteId=' + this.payParam.noteid
+        }
+    }
+}
+</script>

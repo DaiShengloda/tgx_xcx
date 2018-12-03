@@ -1,0 +1,385 @@
+.course-detail {
+    background:#fff;    
+    height:100%;
+    // .video-blank {
+    //     width:100%;
+    //     height: 456rpx;
+    // }
+    .video {
+        position:relative;
+        // top:0;
+        width:100%;          
+        video{
+            width: 100%;
+            // position:fixed;
+            top:0;            
+        }
+        .video-play{
+            position:absolute;
+            width:150rpx;
+            height:150rpx;
+            top:150rpx;
+            left:40%;
+            opacity:1;
+            z-index: 99;            
+        }
+        .pay-content{
+            position: absolute;
+            width:100%;
+            height:100%;
+            font-size:32rpx;
+            color:#fff;
+            text-align: center;
+            background: rgba(0,0,0,0.5);
+            top:0;  
+            z-index:99;        
+            .cont-pay-text{    
+                margin-top:18%;                
+            }
+            .cont-pay-btn{
+                width:r(200);
+                height:r(80);   
+                border-radius:r(80);
+                line-height:r(80);
+                margin:0rpx auto;
+                background:#e93030;
+                margin-top:20rpx;                
+            }
+        }
+    }
+    .course-content {
+        .video-msg {
+            padding:0rpx 30rpx;            
+            .msg-title {
+                font-size:30rpx;
+                height:90rpx;
+                /*line-height:90rpx;                */
+            }
+            .msg-summry {
+                font-size:26rpx;
+                color:#999;
+                letter-spacing:2rpx;
+                overflow: hidden;
+                // text-overflow: ellipsis;
+                display: -webkit-box;
+                // -webkit-line-clamp: 3;
+                -webkit-box-orient: vertical;
+            }
+        }
+        .cont-declare {
+            margin:20rpx 30rpx;
+            font-size:26rpx;           
+            color: #e93030;
+        }
+        .cont-bom {
+            padding:50rpx 30rpx 0 30rpx;            
+            background:#fff;            
+            .finger {
+                margin:0 r(50);
+                text-align:center;   
+                .finger-btn{
+                    width:160rpx;
+                    height:160rpx;
+                    margin:0 auto;
+                    padding:0;                    
+                }   
+                .finger-btn[plain]{
+                    border:none;
+                }              
+                image {
+                    width:150rpx;
+                    height:150rpx;                    
+                }
+                view {
+                    font-size:34rpx;
+                    font-weight: bold;
+                    color:#e93030;
+                }
+            }
+            .bom-msg {
+                border-bottom:#e6e6e6 1px solid;
+                padding:10rpx 0rpx;
+                margin-top:20rpx;
+                color:#999;   
+                font-size:26rpx;                
+                .msg-time {}
+                .msg-scan {padding-left:30rpx;}
+                .msg-finger {padding-left:15rpx;}
+            }
+        }
+        .detail-man {
+            background:#fff; 
+            padding: 0 r(30);
+            display: flex;
+            justify-content:center;
+            align-items: center;
+            height:r(180);
+            border-bottom:1px solid #e6e6e6; 
+            .li-lef {
+                width:20%;
+                text-align:center;        
+                image {
+                    width: r(110);
+                    height: r(110);
+                    border-radius: 50%;
+                }
+            }
+            .li-btw {
+                width: 65%;
+                .man-name {
+                    font-size: r(27); 
+                }
+                .man-title {
+                    color:#e93030;
+                    font-size:r(20);                
+                }
+                .man-int {
+                    color:#999; 
+                    font-size: r(25);
+                    margin:2rpx 0;
+                    overflow: hidden;
+                    text-overflow: ellipsis;
+                    display: -webkit-box;
+                    -webkit-line-clamp: 3;
+                    -webkit-box-orient: vertical;
+                }
+            }
+            .li-rig {
+                width:15%; 
+                .man-atten {
+                    width:r(90);      
+                    border-radius:6rpx;
+                    text-align:center;  
+                    height:r(47);
+                    line-height:r(47); 
+                    font-size:20rpx;  
+                    position: relative;
+                } 
+                .atten-add {
+                    border:1px solid #e93030;
+                    color:#e93030;
+                }  
+                .atten-cancle {
+                    border:1px solid #999;
+                    color:#999;
+                }               
+            }
+        }
+        // 课程PPT
+        .cont-ppt{
+            border-top:16rpx #eee solid;
+            padding:0 30rpx;
+            background:#fff; 
+            padding-bottom:20rpx;            
+            .ppt-title{
+                font-size:30rpx;
+                border-bottom:1px #e6e6e6 solid;
+                height:90rpx;
+                line-height:90rpx;                
+            }
+            .ppt-scroll{
+                .scroll-tab{
+                    font-size:30rpx; 
+                    height:60rpx;
+                    line-height:60rpx;   
+                    display:flex;                                   
+                    .tab-lef{
+                        width:10%;
+                        text-align:left;   
+                        color:#999;
+                        font-size:50rpx;                                             
+                    }
+                    .tab-mid{
+                        width:80%;
+                        text-align:center;                        
+                    }
+                    .tab-rig{
+                        width:10%;
+                        text-align:right;  
+                        color:#999;
+                        font-size:50rpx;                                              
+                    }
+                }
+                swiper{
+                    height:460rpx;                    
+                    swiper-item{
+                        .slide-image{
+                            width:100%;
+                        }
+                    }
+                }
+            }
+        }
+        // 系列
+        .cont-series {
+            height:370rpx;
+            border-top:16rpx #eee solid;
+            padding:0 30rpx;
+            background:#fff;            
+            .series-title{
+                font-size:30rpx;
+                border-bottom:1px #e6e6e6 solid;
+                height:90rpx;
+                line-height:90rpx;                               
+            }
+            .series-box{
+                // height:100%;
+                margin-top:20rpx;                
+                .series-li{
+                    height:250rpx;                    
+                    .li{
+                        float:left;
+                        width:300rpx;
+                        position:relative;
+                       .li-img{
+                        width:280rpx;
+                        height:150rpx;  
+                        display: block;                      
+                       } 
+                       .li-title {
+                        width:280rpx;
+                        font-size:30rpx;
+                        white-space:nowrap;
+                        overflow:hidden;
+                        text-overflow:ellipsis;
+                       }
+                       .li-msg{
+                        width:280rpx;
+                        font-size:26rpx;
+                        color:#999;                        
+                       }
+                       .li-try{
+                            position:absolute;                                        
+                            width:60rpx;
+                            height:36rpx;  
+                            top:10rpx;
+                            right:30rpx;                          
+                            font-size:24rpx;
+                            background: #e93030;
+                            color:#fff;
+                            text-align: center;
+                            border-radius:8rpx;
+                       }
+                    }
+                }
+            }
+        }
+    }
+    .comment {
+        background:#fff; 
+        border-top:20rpx #eee solid;   
+        padding:0 30rpx;    
+        .comment-title {
+            font-size:30rpx;
+            border-bottom:1px #e6e6e6 solid;
+            height:90rpx;
+            line-height:90rpx;
+                        
+        }
+        .comment-list {
+            .comment-box {
+                margin:0 20rpx;
+                border-bottom:#e6e6e6 1px solid;
+                padding:20rpx 0;                
+                .box-top {
+                    display:flex;
+                    align-items:center;  
+                    position:relative;                    
+                    .top-icon {
+                        width:80rpx;
+                        height:80rpx;
+                        border-radius: 50%;
+                    }
+                    .top-msg {
+                        padding-left:15rpx;                        
+                        .msg-name {
+                            font-size:28rpx;                            
+                        }
+                        .msg-time {
+                            font-size:24rpx;
+                            color:#999;                            
+                        }
+                    }
+                    .top-num {
+                        font-size:28rpx;   
+                        position:absolute;
+                        right:0;  
+                        display: flex;                                           
+                        .num-finger {
+                            display:flex;
+                            align-items:center;
+                        }
+                        .num-comment {
+                            display:flex;
+                            align-items:center;
+                            padding:0 15rpx;                            
+                        }
+                        image {
+                            width:35rpx;
+                            height:35rpx; 
+                            padding-right:5rpx;                            
+                        }
+                    }
+                }
+                .box-mid {
+                    padding-left:95rpx;
+                    padding-top:20rpx;
+                    font-size:28rpx;                    
+                    .mid-com {
+                        overflow: hidden;
+                        text-overflow: ellipsis;
+                        display: -webkit-box;
+                        -webkit-line-clamp: 3;
+                        -webkit-box-orient: vertical; 
+                    }
+                }
+                .last-comment {
+                    margin-top:20rpx;
+                    background:#f7f7f7;
+                    padding:15rpx;                    
+                    .last-box {
+                        padding:5rpx 0;
+                        .last-box-name {
+                            color:#507daf;
+                            padding-right:10rpx;                            
+                        }
+                        .last-box-word {
+
+                        }
+                    }
+                }
+            }
+        }
+    }
+    // 
+    .series-blank{
+        height:80rpx;
+    }
+    .series-pay{
+        display:flex;
+        font-size:26rpx;
+        background:red;
+        color:#fff;
+        height:80rpx;
+        line-height:80rpx;     
+        position:fixed;
+        bottom:110rpx;
+        width:100%;         
+        .pay-text{
+            width:72%;
+            text-align:center;            
+        }
+        .pay-btn{
+            width:20%;
+            background:#fff;
+            color:red;
+            text-align:center;
+            margin-left:4%;
+            height:60rpx;
+            margin-top:10rpx;
+            line-height:60rpx;
+            border-radius:8rpx;
+            
+        }
+    }
+}

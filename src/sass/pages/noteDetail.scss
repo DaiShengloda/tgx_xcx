@@ -1,0 +1,240 @@
+.note-detail {  
+    height: 100%;
+    background:#fff; 
+    .detail-man {
+        background:#fff; 
+        padding: 0 r(30);
+        display: flex;
+        justify-content:center;
+        align-items: center;
+        height:r(180);
+        border-bottom:1px solid #e6e6e6; 
+        .li-lef {
+            width:20%;
+            text-align:center;        
+            image {
+                width: r(110);
+                height: r(110);
+                border-radius: 50%;
+            }
+        }
+        .li-btw {
+            width: 65%;
+            .man-name {
+                font-size: r(27); 
+            }
+            .man-title {
+                color:#e93030;
+                font-size:r(20);                
+            }
+            .man-int {
+                color:#999; 
+                font-size: r(25);
+                margin:2rpx 0;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                display: -webkit-box;
+                -webkit-line-clamp: 2;
+                -webkit-box-orient: vertical;
+            }
+        }
+        .li-rig {
+            width:15%; 
+            padding:0 15rpx;            
+            .man-atten {
+                width:r(90);      
+                border-radius:6rpx;
+                text-align:center;  
+                height:r(47);
+                line-height:r(47); 
+                font-size:20rpx;  
+                position:relative;                
+            } 
+            .atten-add {
+                border:1px solid #e93030;
+                color:#e93030;
+            }  
+            .atten-cancle {
+                border:1px solid #999;
+                color:#999;
+            }               
+        }
+    }
+    .note-content {
+        background:#fff; 
+        font-size:30rpx;   
+        overflow-x:hidden; 
+        -webkit-overflow-scrolling: touch;     
+        overflow-y: auto;     
+        .pay-content {
+            margin:0 r(30);
+            margin-top:20rpx;            
+        }
+        .free-content {
+            padding:20rpx 30rpx 0 30rpx;            
+        }
+        .cont-summry{
+            background:#e8f5fe;
+            padding:15rpx;
+            font-size:28rpx;
+            margin-bottom:20rpx;            
+        }
+        .cont-free{
+            font-size:34rpx;
+            line-height:1.5rem;            
+        }
+        .cont-guide {
+            text-indent:2rem;            
+        }
+        .cont-pay-guide {
+            text-align:center;
+            color:#e93030;
+            margin:r(20) 0;            
+        }
+        .cont-note{
+            font-size:34rpx;
+            line-height:1.5rem;            
+        }
+        .cont-pay-text {
+            width:r(450);
+            height:r(80);
+            line-height:r(80);
+            border-radius:r(15);
+            margin:0 auto;
+            margin-top:r(20); 
+            background:#e93030;
+            text-align:center;
+            color:#fff;     
+            position:relative;            
+        }
+        .cont-declar {
+            margin-top: r(50);
+            font-size:r(28); 
+            color: #e93030;
+        }
+
+
+        .cont-bom {
+            margin-top:80rpx;            
+            .finger {
+                margin:0 r(30);
+                text-align:center;  
+                .finger-btn{
+                    width:150rpx;
+                    height:135rpx;
+                    margin:0 auto;
+                    padding:0;                    
+                }   
+                .finger-btn[plain]{
+                    border:none;
+                }           
+                image {
+                    width:130rpx;
+                    height:130rpx;                    
+                }
+                view {
+                    font-size:34rpx;
+                    font-weight: bold;
+                    color:#e93030;
+                }
+            }
+            .bom-msg {
+                border-top:#e6e6e6 1px solid;
+                padding:10rpx 30rpx;
+                margin-top:20rpx;
+                color:#999;   
+                font-size:26rpx;                
+                .msg-time {}
+                .msg-price {padding-left:15rpx;}
+                .msg-scan {padding-left:30rpx;}
+                .msg-finger {padding-left:15rpx;}
+            }
+        }
+    }
+    .comment {
+        background:#fff; 
+        border-top:20rpx solid #eee;       
+        .comment-title {
+            font-size:30rpx;
+            border-bottom:1px #e6e6e6 solid;  
+            height:90rpx;
+            line-height: 90rpx;
+            padding-left:30rpx;          
+        }
+        .comment-list {
+            .comment-box {
+                margin:0 30rpx;
+                border-bottom:#e6e6e6 1px solid;
+                padding:20rpx 0;                
+                .box-top {
+                    display:flex;
+                    align-items:center;  
+                    position:relative;                    
+                    .top-icon {
+                        width:80rpx;
+                        height:80rpx;
+                        border-radius: 50%;
+                    }
+                    .top-msg {
+                        padding-left:15rpx;                        
+                        .msg-name {
+                            font-size:28rpx;                            
+                        }
+                        .msg-time {
+                            font-size:24rpx;
+                            color:#999;                            
+                        }
+                    }
+                    .top-num {
+                        font-size:23rpx;   
+                        position:absolute;
+                        right:0;  
+                        display: flex; 
+                        color:#999;                                          
+                        .num-finger {
+                            display:flex;
+                            align-items:center;
+                        }
+                        .num-comment {
+                            display:flex;
+                            align-items:center;
+                            padding:0 15rpx;                            
+                        }
+                        image {
+                            width:35rpx;
+                            height:35rpx; 
+                            padding-right:5rpx;                            
+                        }
+                    }
+                }
+                .box-mid {
+                    padding-left:95rpx;
+                    padding-top:20rpx;
+                    font-size:28rpx;                    
+                    .mid-com {
+                        overflow: hidden;
+                        text-overflow: ellipsis;
+                        display: -webkit-box;
+                        -webkit-line-clamp: 3;
+                        -webkit-box-orient: vertical; 
+                    }
+                }
+                .last-comment {
+                    margin-top:20rpx;
+                    background:#f7f7f7;
+                    padding:15rpx;                    
+                    .last-box {
+                        padding:5rpx 0;
+                        .last-box-name {
+                            color:#507daf;
+                            padding-right:10rpx;                            
+                        }
+                        .last-box-word {
+
+                        }
+                    }
+                }
+            }
+        }
+    }
+}

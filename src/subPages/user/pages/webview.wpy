@@ -1,0 +1,50 @@
+<template>
+  <web-view src='{{src}}'/>
+</template>
+
+<script>
+import wepy from "wepy";
+export default class WebView extends wepy.page{
+  data={
+    src:null,
+    sessionId:null,
+    token:null,
+  }
+  onLoad(options){
+    this.src = options.src;
+    if(!this.src){
+      this.src = options.url;
+    }
+    this.src = decodeURIComponent(this.src);
+    this.sessionId=wx.getStorageSync('sessionId')
+    this.token=wx.getStorageSync('auth')
+    if(!this.src.includes('.html')&&
+       !this.src.includes('.htm')&&
+       !this.src.includes('Html')){
+      this.src+='.html'
+    }
+    if(this.src.includes('?')){
+      this.src += '&r=3.8&sessionId='+this.sessionId+'&token='+this.token;
+    } else {
+      this.src += '?r=3.8&sessionId='+this.sessionId+'&token='+this.token;
+    }
+    this.$apply()
+  }
+  onUnload(){
+    this.src=null
+    this.sessionId=null
+    this.$apply()
+  }
+  onShareAppMessage(res) {
+    if (res.from === 'button') {
+        // 来自页面内转发按钮
+        console.log(res.target)
+    }
+    // console.log('pages/tabBar/index?webView=' + this.src)
+    return {
+        title: '投顾说',
+        path: 'pages/tabBar/index?webView=' + this.src
+    }
+  }
+}
+</script>

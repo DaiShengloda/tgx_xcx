@@ -1,0 +1,313 @@
+<style lang="scss">
+@import '../sass/base/reset';
+@import '../sass/commons/function';
+@import '../sass/components/payment';
+.common-form-btn{
+    position: absolute;
+    width:100%;
+    height:100%;
+    padding:0;
+    margin:0;
+    top:0;
+    left:0;
+    z-index:9;
+    background: unset;
+  }
+  .common-form-btn[plain]{
+    border:none;
+  }
+</style>
+<template>
+<view class="payment"  wx:if="{{show&&!showIosLayer}}" @tap.stop="hide">
+    <view class="pay-box" @tap.stop="preventHide">
+        <view class="pay-top">
+            <view class="top-close" @tap.stop="hide">
+                <image class="close-img" src="/static/images/close.png"/>
+            </view>
+            <view class="top-title">确认信息</view>
+        </view>
+        <view class="pay-mid">
+            <view class="mid-cont">
+                <view class="cont-title">使用内容:</view>
+                <view class="cont-sum">
+                    <slot name="payCont"></slot>
+                </view>
+            </view>  
+            <view class="mid-price" wx:if="{{isVip==2}}">
+                <view class="price-title">
+                    <text class="title-black">
+                      <slot name="vipPayNum"></slot>使用:
+                    </text>
+                </view>
+                <view class="price-sum">
+                    免费
+                    <view class="balance">
+                        <text class="bal-word">
+                          <slot name="vipExpireNum"></slot>
+                        </text>
+                        <text class="bal-num">天后过期</text>
+                    </view>
+                </view>
+                <radio-group bindchange="radioChange">
+                    <radio class="price-radio" 
+                           value="checked" 
+                           color="#e83030" 
+                           disabled="{{false}}" 
+                           checked="{{checked&&payParam.type==2}}" 
+                           @tap.stop="togCheck(2)"/>
+                </radio-group>
+            </view>
+            <view class="payModel" wx:else>
+              <repeat for="{{payDetailData.enablePayModel}}" item='item'>
+                <view class="mid-price">
+                    <view class="price-title">
+                        <text class="title-black">{{item.name}}使用:</text>
+                        <view class="title-red" @tap.stop="toCoinRecharge" wx:if="{{!enough&&item.type==1}}">大咖币剩余不足去补充></view>
+                    </view>
+                    <view class="price-sum" wx:if="{{item.type==1}}">
+                        <slot name="payNum"></slot>大咖币
+                        <view class="balance">
+                            <text class="bal-word">剩余:</text>
+                            <text class="bal-num">{{balance}}</text>
+                        </view>
+                    </view>
+                    <view class="price-sum" wx:else>
+                        <text>免费</text>
+                        <view class="balance">
+                            <text class="bal-word">{{item.num}}张可用</text>
+                        </view>
+                    </view>
+                    <radio-group bindchange="radioChange">
+                        <radio class="price-radio" 
+                               value="checked" 
+                               color="#e83030" 
+                               disabled="{{!enough&&item.type==1}}" 
+                               checked="{{checked&&item.type==payParam.type}}" 
+                               @tap.stop="togCheck({{item.type}})"/>
+                    </radio-group>
+                </view>
+              </repeat>
+            </view>    
+        </view>
+        <view class="pay-bom">
+            <view class="bom-text">
+                <!-- 注:已购买的<slot name="payType_o"></slot>及免费<slot name="payType_t"></slot>，不会重复扣费 -->
+                <text wx:if="{{!isIOS}}">注:已付费的产品和内容，不会重复扣费</text>
+            </view>
+            <view wx:if="{{isVip==2}}" class="bom-submit {{checked?'active':''}}">
+              <form bindsubmit="pay" report-submit='true'>
+                <button class="common-form-btn" formType="submit" plain="{{true}}"></button>
+              </form>
+              确定
+            </view>
+            <view wx:elif="{{enough&&payParam.type==1}}" class="bom-submit {{checked?'active':''}}">
+              <form bindsubmit="pay" report-submit='true'>
+                <button class="common-form-btn" formType="submit" plain="{{true}}"></button>
+              </form>
+              确定
+            </view>
+            <view wx:elif="{{!enough&&payParam.type==1}}" class="bom-submit ">
+              <form bindsubmit="recharge" report-submit='true'>
+                <button class="common-form-btn" formType="submit" plain="{{true}}"></button>
+              </form>
+              剩余不足，请先补充
+            </view>
+            <view wx:else class="bom-submit {{checked?'active':''}}">
+              <form bindsubmit="pay" report-submit='true'>
+                <button class="common-form-btn" formType="submit" plain="{{true}}"></button>
+              </form>
+              确定
+            </view>
+        </view>   
+    </view>
+</view>
+<hegui @finish.user='finishHeGui' @agreeRuleFinish.user='agreeRule'/> 
+<!-- ios -->
+<iosLayer :isIOS.sync="showIosLayer" :action.sync="action"></iosLayer>
+</template>
+<script>
+import wepy from 'wepy';
+import http from '@/utils/http-util';
+import window from '@/utils/window-util';
+import utils from '@/utils/common-util';
+import { API_URL } from '@/const';
+import userManager from '@/utils/user-manager';
+import HeGui from '@/components/hegui';
+import IosLayer from '@/components/iosLayer';
+export default class Payment extends wepy.component {
+  data = {
+    show: false,
+    //用户剩余
+    balance: 0,
+    // 使用按钮状态
+    checked: false,
+    //是否足够使用
+    enough: true,
+    //需要使用金额
+    payNum:null,
+    certCode:null,
+    // 用户是否是vip
+    isVip:1,
+    vip_expire_date:null,
+    //是否是ios系统
+    isIOS:false,
+    action:'1',
+  };
+  components = {
+    hegui: HeGui,
+    iosLayer:IosLayer,
+  };
+  props = {
+    // 使用接口
+    payUrl: String,
+    // 参数
+    payParam: {},
+    // 支付数据
+    payDetailData:{},
+  };
+  computed = {
+    showIosLayer(){
+      return this.isIOS&&!this.enough&&this.isVip!=2
+    }
+  };
+  methods = {
+    // 确认使用
+    pay(e) {
+      if (!this.checked) return;
+      wx.showLoading({
+        title: '正在使用...',
+        mask: true
+      });
+      http
+        .getRequest(this.payUrl, this.payParam)
+        .then(data => {
+          //关闭加载框
+          wx.hideLoading();
+          //提示成功
+          wx.showToast({
+            title: '使用成功',
+            icon: 'success',
+            duration: 2000
+          });
+          //将返回数据传个父页面
+          let s = wx.getStorageSync('hg_cert_code');
+          if (s) {
+            s = s + ',' + this.certCode;
+          }else{
+            s = this.certCode;
+          }
+          wx.setStorageSync('hg_cert_code', s);
+          this.$emit('payCallBack', data);
+          this.show = false;
+          this.checked = false;
+          this.$apply();
+        })
+        .catch(error => {
+          wx.hideLoading();
+          wx.showToast({
+            title: '使用失败',
+            icon: 'none',
+            duration: 1000
+          });
+          this.show = false;
+          this.checked = false;
+          this.$apply();
+        });
+        var formId = e.detail.formId
+        this.$root.$parent.sendFormId(formId)
+    },
+    //跳转补充
+    recharge(e) {
+      wx.navigateTo({ url: '/subPages/user/pages/coinRecharge' });
+      var formId = e.detail.formId
+      this.$root.$parent.sendFormId(formId)
+    },
+    /**
+     * paySum 使用金额
+     * dkId 大咖id
+     * certCode 大咖证书编号
+     */
+    show(paySum, dkId, certCode,callback) {
+      this.payNum = paySum;
+      this.certCode=certCode;
+      this.checkUserVip();
+      this.$invoke('hegui', 'startHeguiForDaka', dkId, certCode);
+    },
+    // 隐藏组件
+    hide() {
+      this.show = false;
+      this.checked = false;
+      this.$apply();
+    },
+    // 阻止向上冒泡
+    preventHide() {
+      return false;
+    },
+    // 单选框切换状态
+    togCheck(type) {
+      var n = this.checked;
+      this.checked = n ? false : true;
+      this.payParam.type=type;
+      this.$apply();
+    },
+    // 补充
+    toCoinRecharge() {
+      if(this.isIOS){
+        wx.showModal({
+          title: '提示',
+          showCancel:false,
+          content: '小程序暂不支持',
+          success: function(res) {
+            if (res.confirm) {
+            }
+          }
+        })
+      }
+      wx.navigateTo({ url: `/subPages/user/pages/coinRecharge` });
+    },
+    //合规结束
+    finishHeGui(data) {
+      this.queryCoin(this.payNum);
+    },
+    //同意使用
+    agreeRule(){
+      wx.navigateBack({});
+      this.queryCoin(this.payNum);
+    }
+  };
+  onLoad(){
+    var res = wx.getSystemInfoSync()
+    if(res.platform == "devtools" || res.platform == "ios"){
+      this.isIOS = true
+      return
+    }
+  }
+  queryCoin(paySum) {
+    window.showLoading();
+    // 获取用户大咖币剩余
+    http
+      .getRequest(API_URL.QUERY_COIN, {})
+      .then(data => {
+        window.hideLoading();
+        //剩余不足 提示补充
+        if (paySum > data) {
+          this.enough = false;
+        }else{
+          this.enough = true;
+        }
+        if(this.isVip==2){
+        }
+        this.show = true;
+        this.balance = data;
+        this.$apply();
+      })
+      .catch(err => {
+        window.hideLoading();
+      });
+  }
+  checkUserVip(){
+    this.isVip=this.payParam.type
+    this.$apply();
+  }
+}
+</script>

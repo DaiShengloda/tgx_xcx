@@ -1,0 +1,245 @@
+<!--收支记录-->
+<style lang='scss'>
+@import '../../../sass/base/reset';
+@import '../../../sass/commons/function';
+.incomeLog {
+  height: 100%;
+  overflow: hidden;
+}
+.header {
+  height: 126rpx;
+  display: flex;
+  display: -webkit-flex;
+  align-items: center;
+  justify-content: space-between;
+  background: #e93030;
+  color: #ffffff;
+  font-size: 15px;
+  padding: 0 20px;
+  .left {
+    display: flex;
+    align-items: center;
+  }
+  .left image {
+    height: 40rpx;
+    width: 40rpx;
+    margin-right: 10rpx;
+  }
+  image {
+    height: 40rpx;
+    width: 40rpx;
+  }
+}
+.tab {
+  font-size: 15px;
+  display: flex;
+  height: 90rpx;
+  line-height: 90rpx;
+  color: #000;
+  .tab-h {
+    width: 50%;
+    text-align: center;
+  }
+  .active {
+    color: #e93030;
+    border-bottom: 1px solid #e93030;
+  }
+}
+.tab-c {
+  width: 100%;
+  height: 80%;
+  overflow: scroll;
+  .list-item {
+    padding: 0 30rpx;
+    height: 140rpx;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid #ccc;
+    .f {
+      display: block;
+      color: #000;
+      font-size: 15px;
+    }
+    .l {
+      font-size: 12px;
+      color: #999;
+    }
+    .left {
+      width: 70%;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    .right {
+      text-align: right;
+    }
+  }
+}
+</style>
+<template>
+  <view class='incomeLog'>
+    <view class='header'>
+        <view class='left'>
+          <image src='/static/images/my_spent_money.png'/>
+          <text>大咖币剩余:  {{coin}}</text> 
+        </view>
+        <image src='/static/images/my_spent_unknow.png' @tap='toSm'/>
+    </view>
+    <view class='tab'>
+      <view 
+        class="tab-h {{curScroll=='scrollViewB'?'active':''}}"
+        @tap.stop='switchTab(2)'
+      >支出</view>
+      <view 
+        class="tab-h {{curScroll=='scrollViewA'?'active':''}}"
+        @tap.stop='switchTab(1)'
+      >收入</view>
+    </view>
+    <view class='tab-c' >
+      <scroll-view 
+        scroll-y='true' 
+        @scrolltolower='scrolltolower' 
+        style='height:100%'
+        hidden="{{curScroll != 'scrollViewA'}}"
+      >
+      <scrollViewA 
+        :url='incomeLogUrl' 
+        @dataLoad.user='setIncomeLog'
+      >
+        <view slot='content'>
+          <repeat for='{{incomeLog}}'>
+            <view class='list-item'>
+              <view class='left'>
+                <text class='f'>{{item.title}}</text>
+                <text class='l'>{{item.content}}</text>
+              </view>
+              <view class='right'>
+                <text class='f'>+ {{item.coin}}</text>
+                <text class='l'>{{item.createTime }}</text>
+              </view>
+            </view>
+          </repeat>
+        </view>
+      </scrollViewA>
+      </scroll-view>
+      <scroll-view 
+        scroll-y='true' 
+        @scrolltolower='scrolltolower' 
+        style='height:100%'
+        hidden="{{curScroll != 'scrollViewB'}}"
+      >
+      <scrollViewB 
+        :url='consumeLogUrl' 
+        @dataLoad.user='setConsumeLog'
+      >
+        <view slot='content'>
+            <repeat for='{{consumeLog}}'>
+            <view class='list-item'>
+              <view class='left'>
+                <text class='f'>{{item.title}}</text>
+                <text class='l'>{{item.content}}</text>
+              </view>
+              <view class='right'>
+                <text class='f'>- {{item.coin}}</text>
+                <text class='l'>{{item.createTime }}</text>
+              </view>
+            </view>
+          </repeat>
+        </view>
+      </scrollViewB>
+      </scroll-view>
+    </view>
+  </view>
+</template>
+
+<script>
+import wepy from 'wepy';
+import ScrollView from '@/components/scrollView';
+import { domain, API_URL } from '@/const';
+import util from '@/utils/common-util';
+import http from '@/utils/http-util';
+export default class IncomeLog extends wepy.page {
+  config = {
+    navigationBarTitleText: '收支记录'
+  };
+  data = {
+    //大咖币剩余
+    coin: 0,
+    //收入记录
+    incomeLog: [],
+    //消费记录
+    consumeLog: [],
+    incomeLogUrl: API_URL.INCOME_LOG,
+    consumeLogUrl: API_URL.CONSUME_LOG,
+    //当前tab
+    curScroll: 'scrollViewB',
+    //是否是上拉刷新
+    isRefresh: false
+  };
+  components = {
+    scrollViewA: ScrollView,
+    scrollViewB: ScrollView
+  };
+  onLoad() {
+    this.$invoke(this.curScroll, 'nextPage');
+    http.getRequest(API_URL.QUERY_COIN).then(data => {
+      this.coin = data;
+      this.$apply();
+    });
+  }
+  methods = {
+    setIncomeLog(data) {
+      if (this.isRefresh) {
+        this.incomeLog = [];
+      }
+      data.forEach(v => {
+        v.createTime = util.formatTimeLocal(v.createTime);
+        v.content = v.content.replace(/[\r\n]+/g, '');
+        this.incomeLog.push(v);
+      });
+      this.$apply();
+    },
+    setConsumeLog(data) {
+      if (this.isRefresh) {
+        this.consumeLog = [];
+      }
+      data.forEach(v => {
+        v.createTime = util.formatTimeLocal(v.createTime);
+        v.content = v.content.replace(/[\r\n]+/g, '');
+        this.consumeLog.push(v);
+      });
+      this.$apply();
+    },
+    switchTab(index) {
+      let curScroll = index == 1 ? 'scrollViewA' : 'scrollViewB';
+      if (curScroll != this.curScroll) {
+        this.curScroll = curScroll;
+      }
+      if (
+        (curScroll == 'scrollViewA' && this.incomeLog.length == 0) ||
+        (curScroll == 'scrollViewB' && this.consumeLog.length == 0)
+      ) {
+        this.isRefresh = true;
+        this.$invoke(this.curScroll, 'refresh');
+      }
+    },
+    toSm() {
+      let src = encodeURIComponent(
+        `${domain}/api/stock/info/page.htm?name=gydkb`
+      );
+      wx.navigateTo({ url: `webview?src=${src}` });
+    },
+    scrolltolower() {
+      console.log('scroll-lower');
+      this.isRefresh = false;
+      this.$invoke(this.curScroll, 'nextPage');
+    }
+  };
+  onPullDownRefresh() {
+    this.isRefresh = true;
+    this.$invoke(this.curScroll, 'refresh');
+  }
+}
+</script>
+

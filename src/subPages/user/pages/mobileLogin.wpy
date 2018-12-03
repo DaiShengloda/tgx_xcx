@@ -1,0 +1,204 @@
+<style lang='scss'>
+@import '../../../sass/base/reset';
+@import '../../../sass/commons/function';
+$red-color: #e93030;
+.mobileLogin {
+  width: 100%;
+  padding: 30rpx 0;
+}
+.form {
+  width: 100%;
+  .border-top {
+    border-top: 1px solid #ccc;
+  }
+  .border-bottom {
+    border-bottom: 1px solid #ccc;
+  }
+  .form-item {
+    height: 120rpx;
+    display: flex;
+    align-items: center;
+    .icon {
+      width: 50rpx;
+      height: 50rpx;
+      margin: 0 20rpx;
+    }
+    input {
+      height: 90%;
+      width: 90%;
+      font-size: 16px;
+      :-moz-placeholder {
+        color: #cdcdcd;
+      }
+      :-ms-input-placeholder {
+        color: #cdcdcd;
+      }
+      ::-webkit-input-placeholder {
+        color: #cdcdcd;
+      }
+    }
+  }
+  .forget_text {
+    text-align: right;
+    margin: 40rpx;
+    color: $red-color;
+    font-size: 14px;
+  }
+  .submit_btn {
+    width: 90%;
+    background: $red-color;
+    color: #fff;
+    font-size: 16px;
+  }
+}
+.to_register {
+  text-align: center;
+  font-size: 14px;
+  text-decoration: underline;
+  margin: 80rpx 0;
+  color: $red-color;
+}
+.wx_login {
+  text-align: center;
+  color: #a9a9a9;
+  font-size: 28rpx;
+  .line {
+    height: 0;
+    width: 100%;
+    border-top: 1px solid #ccc;
+    z-index: 1;
+  }
+  .title {
+    position: relative;
+    font-size: 28rpx;
+    top: -13px;
+    padding: 0 10px;
+    background: #f5f5f5;
+    display: inline;
+  }
+  .wx_icon {
+    width: 120rpx;
+    height: 120rpx;
+    display: block;
+    margin: 20px auto;
+    background-image: url('https://dakaname.oss-cn-hangzhou.aliyuncs.com/img/wxdenglu%403x.png');
+    background-size: cover;
+  }
+}
+</style>
+<template>
+  <view class='mobileLogin'>
+    <form class='form' @submit='submit'>
+       <view class='form-item border-top'>
+          <image class='icon' src='/static/images/username@3x.png'/>
+          <input class='border-bottom'
+            name='mobile' 
+            type='number' 
+            maxlength='11' 
+            placeholder='请输入手机号'
+            adjust-position='true'
+          />
+       </view>
+       <view class='form-item border-bottom'>
+          <image class='icon' src='/static/images/password@3x.png'/>
+          <input 
+            name='password' 
+            type='text' 
+            maxlength='20'
+            placeholder='请输入密码'
+            password='true'
+            adjust-position='true'
+          />
+       </view>
+       <view class='forget_text'><text  @tap='forgetPwd'>忘记密码?</text></view>
+       <button class='submit_btn' form-type='submit'>登录</button>
+    </form>
+    <view class='to_register'><text></text></view>
+    <view class='wx_login'>
+      <view class='line'></view>
+      <text class='title'>推荐用以下方式一键登录</text>
+      <button class='wx_icon' 
+        open-type='getUserInfo' 
+        @getuserinfo='weixinLogin' 
+        withCredentials='true'>
+      </button>
+      <text>点击微信图标自动登录</text>
+    </view>
+  </view>
+</template>
+<script>
+import wepy from 'wepy';
+import userManager from '@/utils/user-manager';
+import { regular } from '@/utils/common-util';
+import windowUtil from '@/utils/window-util';
+import { subjects } from '@/const';
+export default class MobileLogin extends wepy.page {
+  data = {
+    //登录成功后跳转页面
+    callback: null
+  };
+  methods = {
+    submit(e) {
+      let { mobile, password } = e.detail.value;
+      if (!regular().isPhone(mobile)) {
+        windowUtil.alert('请填写合法的手机号');
+        return false;
+      }
+      if (!password || password.length < 6) {
+        windowUtil.alert('密码请至少填写6位');
+        return false;
+      }
+      if (/[\u4e00-\u9fa5]+|\s+/.test(password)) {
+        windowUtil.alert('密码不合法,请填写数字、字母、下划线');
+        return false;
+      }
+      windowUtil.showLoading();
+      userManager
+        .loginByMobile(mobile, password)
+        .then(data => {
+          let observer = this.$parent.observer;
+          observer.broadcast(subjects.loginSuccess);
+        })
+        .catch(err => {
+          if(err.errcode == 4001){
+            wx.navigateTo({
+              url:
+              `/subPages/user/pages/setPassword?mobile=${mobile}`
+            })
+          }
+          windowUtil.alert(err.errmessage);
+        });
+    },
+    forgetPwd() {
+      wx.navigateTo({
+        url:
+          '/subPages/user/pages/mobileRegister?register=false&callback=' +
+          this.callback
+      });
+    },
+    toRegister() {
+      wx.navigateTo({
+        url:
+          '/subPages/user/pages/mobileRegister?register=true&callback=' +
+          this.callback
+      });
+    },
+    weixinLogin(e) {
+      windowUtil.showLoading();
+      userManager
+        .loginByWeChat(e.detail)
+        .then(data => {
+          let observer = this.$parent.observer;
+          observer.broadcast(subjects.loginSuccess);
+        })
+        .catch(err => {
+          windowUtil.alert('登录异常,请稍后重试');
+        });
+    }
+  };
+  onShow() {
+    userManager.checkSession();
+  }
+}
+</script>
+

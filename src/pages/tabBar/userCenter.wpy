@@ -1,0 +1,445 @@
+<style lang="scss">
+@import '../../sass/base/reset';
+@import '../../sass/commons/function';
+.userCenter {
+  background-color: #efeff5;
+}
+button {
+  margin: 0 auto;
+  padding: 0;
+  line-height: 0;
+}
+.userCenter .header {
+  height: 278rpx;
+  background-image: url('https://dakaname.oss-cn-hangzhou.aliyuncs.com/mini_app_icons/grzxbg%403x.png');
+  background-size: cover;
+  display: flex;
+  display: -webkit-flex;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  .ico {
+    width: 142rpx;
+    height: 142rpx;
+    border-radius: 50%;
+  }
+  .btns {
+    font-size: 18px;
+    color: #ffffff;
+    letter-spacing: 4rpx;
+    margin-top: 10rpx;
+  }
+  .time{
+    font-size: 15px;
+    color: #ffffff;
+    letter-spacing: 4rpx;
+  }
+}
+.userCenter .delivider {
+  width: 100%;
+  height: 20rpx;
+  background-color: #eeeeee;
+}
+
+#exitBtn {
+  width: 80%;
+  text-align: center;
+  color: red;
+  font-size: 16px;
+  border: 1px solid red;
+  //   margin: 20px auto;
+  border-radius: 0;
+  background: #fff;
+  padding: 38rpx 0;
+}
+.recharge {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 16px;
+  color: #000000;
+  padding: 24rpx 30rpx;
+  background: #fff;
+}
+#recharge_btn {
+  background:#e93030;
+  color:#fff;
+  text-align:center;
+  padding:0 30rpx;
+  font-size:32rpx;
+  border-radius:5px;
+  height:50rpx;
+  line-height:50rpx
+}
+.userCenter .item-list {
+  display: flex;
+  display: -webkit-flex;
+  padding: 24rpx 30rpx;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 16px;
+  color: #000000;
+  background: #fff;
+  position:relative;
+  .left {
+    font-size: 16px;
+    color: #000000;
+    display: flex;
+    align-items: center;
+  }
+  .icon {
+    height: 52rpx;
+    width: 52rpx;
+    margin-right: 20rpx;
+  }
+  .jt {
+    width: 20rpx;
+    height: 40rpx;
+    margin-left: 20rpx;
+  }
+  .right {
+    display: flex;
+    display: -webkit-flex;
+    align-items: center;
+    text {
+      font-size: 13px;
+      color: #999;
+    }
+  }
+}
+.border-b {
+  border-bottom: 1px solid #cdcdcd;
+}
+.userCenter .bottom {
+  width: 100%;
+  padding: 70rpx 0;
+}
+.common-form{
+  position: absolute;
+  width:100%;
+  height:100%;
+  top:0;
+  left:0;
+  z-index:9;
+  .common-form-btn{  
+    width:100%;
+    height:100%;
+    padding:0;
+    margin:0; 
+  }
+  .common-form-btn[plain]{
+    border:none;
+  }
+}
+
+</style>
+
+<template>
+<view class='userCenter'>
+    <!--顶部-->
+    <view class='header'>
+        <view wx:if='{{hasUser}}'>
+            <image class='ico' src="{{user.user_ico || 'http://dakaname.oss-cn-hangzhou.aliyuncs.com/pubimages/headImg.png'}}"/>
+            <view class='btns'>{{user.user_name}}</view>
+            <view class='time' wx:if="{{user.vip==1}}">VIP有效期至{{user.vip_expire_date}}</view>
+        </view>
+        <view wx:else>
+            <image class='ico' src='https://dakaname.oss-cn-hangzhou.aliyuncs.com/mini_app_icons/dltx3x.png' @tap='toLogin(2)' />
+            <view class='btns'>
+                <text @tap='toLogin(1)'>注册</text> |
+                <text @tap='toLogin(2)'>登录</text>
+            </view>
+        </view>
+    </view>
+    <!--分割线-->
+    <view class='delivider'></view>
+    <view wx:if='{{hasUser}}' class='recharge'>
+        <text>大咖币剩余:{{user.coin}}</text>
+        <form bindsubmit="toRecharge" report-submit='true' wx:if="{{!isIOS}}">
+          <button id='recharge_btn' formType="submit">充值</button>
+        </form>
+    </view>
+    <view class='delivider'></view>
+    <view class='item'>
+        <view wx:if='{{hasUser}}'>
+            <view class='item-list border-b' wx:if="{{!isIOS}}">
+                <form class="common-form" bindsubmit="btnSendForm('/subPages/user/pages/vipCenter?vipType={{user.vip}}')" report-submit='true'>
+                  <button class="common-form-btn" formType="submit" plain="{{true}}"></button>
+                </form>
+                <view class='left'>
+                  <image src='/static/images/userCenter/vip.png' class='icon'/>
+                  <text>VIP用户中心</text>
+                </view>
+                <view class='right'>
+                  <text>VIP专属特权</text>
+                  <image src='/static/images/youjiantou@3x.png' class='jt'/>
+                </view>
+            </view>
+            <view class='item-list border-b'>
+                <form class="common-form" bindsubmit="btnSendForm('/subPages/user/pages/myNotice')" report-submit='true'>
+                  <button class="common-form-btn" formType="submit" plain="{{true}}"></button>
+                </form>
+                <view class='left'>
+                    <image src='/static/images/userCenter/wdgz.png' class='icon'/>
+                    <text>我的关注</text>
+                </view>
+                <view class='right'>
+                    <image src='/static/images/youjiantou@3x.png' class='jt'/>
+                </view> 
+            </view>
+            <view class='item-list border-b'>
+                <form class="common-form" bindsubmit="btnSendForm('/subPages/user/pages/myCard')" report-submit='true'>
+                  <button class="common-form-btn" formType="submit" plain="{{true}}"></button>
+                </form>
+                <view class='left'>
+                    <image src='/static/images/userCenter/card.png' class='icon'/>
+                    <text>我的券包</text>
+                </view>
+                <view class='right'>
+                    <image src='/static/images/youjiantou@3x.png' class='jt'/>
+                </view> 
+            </view>
+            <view class='item-list' wx:if="{{!isIOS}}">
+                <form class="common-form" bindsubmit="btnSendForm('/subPages/user/pages/incomeLog')" report-submit='true'>
+                    <button class="common-form-btn" formType="submit" plain="{{true}}"></button>
+                </form>
+                <view class='left'>
+                    <image src='/static/images/userCenter/xfjl3x.png' class='icon'/>
+                    <text>收支记录</text>
+                </view>
+                <view class='right'>
+                    <image src='/static/images/youjiantou@3x.png' class='jt'/>
+                </view>
+            </view>
+            <view class='delivider'></view>
+            <form bindsubmit="toCheckIn" report-submit='true'>
+              <button class='item-list border-b' formType="submit">
+                  <view class='left'>
+                      <image src='/static/images/userCenter/xxdj.png' class='icon'/>
+                      <text>用户登记信息</text>
+                  </view>
+                  <view class='right'>
+                      <text wx:if='{{user.registration == 1}}'>已登记</text>
+                      <text wx:else>未登记</text>
+                      <image src='/static/images/youjiantou@3x.png' class='jt'/>
+                  </view>
+              </button>
+            </form>
+            <form bindsubmit="toFxcp" report-submit='true'>
+              <button class='item-list border-b' formType="submit">
+                  <view class='left'>
+                      <image src='/static/images/userCenter/fxcp.png' class='icon'/>
+                      <text>风险测评</text>
+                  </view>
+                  <view class='right'>
+                      <text wx:if='{{answerResult.answer_result}}'>{{answerResult.answer_result.levelName}}</text>
+                      <text wx:else>未测评</text>
+                      <image src='/static/images/youjiantou@3x.png' class='jt'/>
+                  </view>
+              </button>
+            </form>
+            <!-- <view class='item-list' wx:if='{{loginType==3}}'>
+                <form class="common-form" bindsubmit="btnSendForm({{user.bindMobile == 1?'/subPages/user/pages/bindPhone?type=2':'/subPages/user/pages/bindPhone?type=1'}})" report-submit='true'>
+                  <button class="common-form-btn" formType="submit" plain="{{true}}"></button>
+                </form>
+                <view class='left'>
+                    <image src='/static/images/userCenter/zhaq.png' class='icon'/>
+                    <text>账号安全</text>
+                </view>
+                <view class='right'>
+                    <text wx:if='{{user.bindMobile == 1}}'>已绑定</text>
+                    <text wx:else>未绑定手机号</text>
+                    <image src='/static/images/youjiantou@3x.png' class='jt'/>
+                </view>
+            </view> -->
+            <view class='delivider'></view>
+        </view>
+          <button class='item-list  border-b' open-type='share'>
+              <form class="common-form" bindsubmit="btnSendForm(null)" report-submit='true'>
+                  <button class="common-form-btn" formType="submit" plain="{{true}}"></button>
+              </form>
+              <view class='left'>
+                  <image src='/static/images/userCenter/wyfx.png' class='icon'/>
+                  <text>分享小程序</text>
+              </view>
+              <view class='right'>
+                  <image src='/static/images/youjiantou@3x.png' class='jt'/>
+              </view>
+          </button>
+        <view class='item-list border-b'>
+            <form class="common-form" bindsubmit="btnSendForm('/subPages/user/pages/aboutApp')" report-submit='true'>
+                <button class="common-form-btn" formType="submit" plain="{{true}}"></button>
+            </form>
+            <view class='left'>
+                <image src='/static/images/userCenter/gywm.png'  class='icon'/>
+                <text>关于我们</text>
+            </view>
+            <view class='right'>
+                <image src='/static/images/youjiantou@3x.png' class='jt'/>
+            </view>
+        </view>
+        <button class='item-list' open-type="contact">
+            <form class="common-form" bindsubmit="btnSendForm(null)" report-submit='true'>
+                <button class="common-form-btn" formType="submit" plain="{{true}}"></button>
+            </form>
+            <view class='left'>
+                <image src='/static/images/userCenter/lxkf.png'  class='icon'/>
+                <text>联系客服</text>
+            </view>
+            <view class='right'>
+                <image src='/static/images/youjiantou@3x.png' class='jt'/>
+            </view>
+        </button>
+    </view>
+    <view class='bottom' wx:if='{{hasUser}}'>
+        <button id='exitBtn' plain='true' @tap='logout'>退出登录</button>
+    </view>
+    <comLayer :imgSrc.sync="imgSrc" :imgStyle.sync="imgStyle"></comLayer>
+</view>
+</template>
+<script>
+import wepy from 'wepy';
+import userManager from '@/utils/user-manager';
+import windowUtil from '@/utils/window-util';
+import { navigateTo, switchTab } from '@/utils/route';
+import { subjects, formIdUrl} from '@/const';
+import utils from '@/utils/common-util';
+import ComLayer from '@/components/comLayer';
+export default class UserCenter extends wepy.page {
+  config = {
+    navigationBarTitleText: '个人中心',
+    enablePullDownRefresh: false
+  };
+  data = {
+    hasUser: false,
+    user: {},
+    loginType: 1,
+    answerResult: {},
+    //是否是ios系统
+    isIOS:false,
+    imgSrc:'https://dakaname.oss-cn-hangzhou.aliyuncs.com/mini_app_icons/addxcx.png',
+    imgStyle:'width:750rpx;height:1220rpx'
+  };
+  components = {
+    comLayer:ComLayer
+  };
+  methods = {
+    toLogin(type) {
+      navigateTo({ url: `login?type=${type}` });
+    },
+    //退出登录
+    logout() {
+      wx.showModal({
+        title: '提示',
+        content: '确定退出登录?',
+        showCancel: true,
+        success: function(result) {
+          if (result.confirm) {
+            userManager.logout(() => {
+              this.hasUser = false;
+              this.$apply();
+            });
+          }
+        }.bind(this)
+      });
+    },
+    //点击补充按钮
+    toRecharge(e) { 
+      var formId = e.detail.formId
+      this.sendFormId(formId)
+      navigateTo({ url: `coinRecharge` });
+    },
+    //跳转风险测评
+    toFxcp(e) {
+      let app = this.$parent;
+      let o = app.observer;
+      o.subscription(subjects.fxcp, this.fxcpFinish.bind(this));
+      navigateTo({ url: 'fxcp' });
+      var formId = e.detail.formId
+      this.$root.$parent.sendFormId(formId)
+    },
+    //跳转用户登记
+    toCheckIn(e) {
+      let app = this.$parent;
+      let o = app.observer;
+      o.subscription(subjects.userCheckIn, this.checkInFinish.bind(this));
+      navigateTo({ url: 'userCheckIn' });
+      var formId = e.detail.formId
+      this.$root.$parent.sendFormId(formId)
+    },
+    // 
+    btnSendForm(url,e){
+      var formId = e.detail.formId
+      this.$root.$parent.sendFormId(formId)
+      if(url=='null')return
+       wx.navigateTo({url:url})
+    },
+  };
+  onLoad() {
+    if(!wx.getStorageSync("showAddXcx")){
+      this.$invoke('comLayer', 'show')
+      wx.setStorageSync('showAddXcx',true)
+    } 
+  }
+  onShow() {
+    this.getDetail();
+    this.loginType = userManager.getLoginType();
+    var res = wx.getSystemInfoSync()
+    if(res.platform == "devtools" || res.platform == "ios"){
+      this.isIOS = true
+      return
+    }
+  }
+  getDetail() {
+    if (!this.hasUser) {
+      windowUtil.showLoading();
+    }
+    userManager
+      .getUserDetail()
+      .then(data => {
+        this.user = data;
+        this.formatData(this.user)
+        this.hasUser = true;
+        if (this.user.answer) {
+          this.answerResult = JSON.parse(this.user.answer);
+        }
+        this.$apply();
+        windowUtil.hideLoading();
+      })
+      .catch(err => {
+        this.hasUser = false;
+        this.$apply();
+        windowUtil.hideLoading();
+      });
+  }
+  onShareAppMessage() {
+    return {
+      title: '投顾说—您的炒股好帮手',
+      path: '/pages/tabBar/index',
+      imageUrl: 'https://tgs.gp58.com/static/adXcx/index_share.jpg'
+    };
+  }
+  //登记结束回调
+  checkInFinish() {
+    switchTab({ url: 'userCenter' });
+  }
+  //风险测评结束回调
+  fxcpFinish() {
+    switchTab({ url: 'userCenter' });
+  }
+  // 时间戳
+  formatData(data){
+      var time;
+      time=data.vip_expire_date;
+      if(!time)return
+      time=utils.formatTimestamp(time)
+      time=time.split(' ')[0]
+      data.vip_expire_date = time
+  }
+  // 提交formId数据
+  sendFormId(formId){
+      this.$root.$parent.sendFormId(formId)
+  }
+}
+</script>
+

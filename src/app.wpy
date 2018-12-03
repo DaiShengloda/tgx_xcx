@@ -1,0 +1,254 @@
+<style lang="less">
+.container {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  box-sizing: border-box;
+  background-color: #a9a9a9;
+}
+</style>
+<script>
+import wepy from 'wepy';
+import 'wepy-async-function';
+import userManager from '@/utils/user-manager';
+import responseParser from '@/utils/response-parser';
+import { Observer } from '@/utils/observer';
+import windowUtil from '@/utils/window-util';
+import http from '@/utils/http-util';
+import { API_URL,subjects, formIdUrl } from '@/const';
+export default class extends wepy.app {
+  config = {
+    pages: [
+      'pages/tabBar/index',
+      'pages/tabBar/bigMan',
+      'pages/tabBar/note',
+      'pages/tabBar/consult',
+      'pages/tabBar/userCenter',
+      'pages/urlLink/urlLink',
+      
+    ],
+    window: {
+      backgroundTextStyle: 'dark',
+      navigationBarBackgroundColor: '#e93030',
+      navigationBarTitleText: 'A股摩院',
+      navigationBarTextStyle: '#ffffff',
+      navigationStyle: 'default',
+      enablePullDownRefresh: true,
+      onReachBottomDistance: 50
+    },
+    tabBar: {
+      list: [
+        {
+          pagePath: 'pages/tabBar/index',
+          text: '首页',
+          iconPath: './static/images/home2.png',
+          selectedIconPath: './static/images/home1.png'
+        },
+        {
+          pagePath: 'pages/tabBar/bigMan',
+          text: '大咖',
+          iconPath: './static/images/bigMan2.png',
+          selectedIconPath: './static/images/bigMan1.png'
+        },
+        {
+          pagePath: 'pages/tabBar/note',
+          text: '笔记',
+          iconPath: './static/images/note2.png',
+          selectedIconPath: './static/images/note1.png'
+        },
+        {
+          pagePath: 'pages/tabBar/consult',
+          text: '问股',
+          iconPath: './static/images/ask2.png',
+          selectedIconPath: './static/images/ask1.png'
+        },
+        {
+          pagePath: 'pages/tabBar/userCenter',
+          text: '我的',
+          iconPath: './static/images/user2.png',
+          selectedIconPath: './static/images/user1.png'
+        }
+      ],
+      color: '#000',
+      borderStyle: 'white',
+      selectedColor: '#e93039',
+      backgroundColor: '#ffffff'
+    },
+    "subPackages": [
+      {
+          "root": "subPages/user/",
+          "pages": [
+            'pages/aboutApp',
+            'pages/login',
+            "pages/mobileLogin",
+            'pages/mobileRegister',
+            'pages/identifyCode',
+            'pages/coinRecharge',
+            'pages/coinRechargeLog',
+            'pages/myNotice',
+            'pages/userCheckIn', 
+            'pages/webview',
+            'pages/incomeLog',
+            'pages/fxcp',
+            'pages/payConfirmBook',
+            'pages/bindPhone',
+            'pages/vipCenter',
+            'pages/vipPayDetail',
+            'pages/myCard',
+            'pages/myCardUsed',
+            'pages/setPassword',
+          ]
+      },
+      {
+          "root": "subPages/content/",
+          "pages": [
+            'pages/detail/quesDetail',
+            'pages/detail/courseDetail',
+            'pages/detail/bigManDetail',
+            'pages/detail/noteDetail',
+            'pages/detail/seriesDetail',
+            'pages/detail/reportDetail',
+            'pages/detail/hotReportDetail',
+            'pages/detail/ployDetail',
+            'pages/detail/historyDetail',
+            'pages/bigManCourse',
+            'pages/ask',
+            'pages/report',
+            'pages/vip',      
+            'pages/contact',
+            'pages/share',
+            'pages/detail/noteDetailSec',
+          ]
+      },
+      {
+          "root": "subPages/activity/",
+          "pages": [
+              'pages/sign',
+              'pages/guess',
+              'pages/live',
+              'pages/adOne',
+              'pages/adTwo',
+              'pages/adThree',
+              'pages/adFour',
+              'pages/adFive',
+              'pages/userAction', 
+              'pages/activityOne',           
+          ]
+      }
+    ]
+  };
+  globalData = {
+    userInfo: null,
+    appInitData: null,
+    openId: null,
+  };
+
+  constructor() {
+    super();
+    this.use('requestfix');
+    this.use('promisify');
+    //请求统一拦截
+    this.intercept('request', {
+      config(p) {
+        return p;
+      },
+      success(response) {
+        return responseParser(response);
+      },
+      fail(e) {
+        windowUtil.error('网络异常');
+        return Promise.reject('网络异常');
+      },
+      complete(e) {}
+    });
+  }
+
+  onLaunch() {
+    // this.versionFn(); //版本更新
+    userManager.loginByAuth();
+    this.observer = new Observer();
+    //默认注册登录成功,跳转用户中心
+    this.observer.subscription(subjects.loginSuccess,function(){
+      wx.switchTab({url:'/pages/tabBar/userCenter'});
+    });
+    this.loadAppData();
+    this.getOpenId();
+  }
+  versionFn() {
+    const updateManager = wx.getUpdateManager();
+    console.log(updateManager);
+    updateManager.onCheckForUpdate(function(res) {
+      // 请求完新版本信息的回调
+      console.log(res.hasUpdate);
+      if (res.hasUpdate) {
+        tips.loading('正在更新');
+      }
+    });
+    updateManager.onUpdateReady(function() {
+      // 新的版本已经下载好，调用 applyUpdate 应用新版本并重启
+      tips.loaded();
+      updateManager.applyUpdate();
+    });
+    updateManager.onUpdateFailed(function() {
+      // 新的版本下载失败
+    });
+  }
+  loadAppData() {
+    http
+      .getRequest(API_URL.APP_INIT, {})
+      .then(data => {
+        this.globalData.appInitData = data;
+        wx.setStorageSync('appconf',data.appconf);
+        this.$apply();
+      })
+      .catch(error => {});
+  }
+  getOpenId(){
+    var self=this
+    wx.login({
+      success: function(res) {
+        if (res.code) {
+          http
+            .getRequest(API_URL.CODE_TO_OPENID, {code: res.code})
+              .then(data=>{
+                wx.setStorageSync('openId',data);
+                self.globalData.openId = data;
+              })
+              .catch(err=>{
+                console.err('获取openId')
+              })
+      .catch(error => {});
+        } else {
+          console.log('登录失败！' + res.errMsg)
+        }
+      }
+    })
+  }
+  // 提交formId数据
+  sendFormId(formId){
+      var openId=wx.getStorageSync('openId')
+      if(!openId){
+        openId=this.globalData.openId
+      }
+      if(!openId||formId=='the formId is a mock one'||!formId){
+        return
+      }
+      console.log('openId: '+openId)
+      console.log('formId: '+formId)
+      // return;
+      wx.request({
+          url: formIdUrl, //仅为示例，并非真实的接口地址
+          data: {
+              formId: formId,
+              openId: openId,
+              type: '1'
+          },
+          success: function(res) {
+              console.log(res)
+          }
+      })
+  }
+}
+</script>

@@ -1,0 +1,268 @@
+<style lang="scss">
+    @import '../../../../sass/base/reset';
+    @import '../../../../sass/commons/function';
+    @import "../../../../wxParse/wxParse";
+    @import '../../../../sass/pages/reportDetail';
+</style>
+<template>
+<import src="../../../../wxParse/wxParse.wxml"/>
+<view class="report-detail">
+    <lodingPage></lodingPage>
+
+    <!--  -->
+    <view class="detail-cont">
+        <view class="cont-title">{{reportDetail.title}}</view>
+        <view class="cont-msg">
+            <view class="msg-lef">
+                <text class="msg-name">{{reportDetail.author}}</text>
+                <text class="msg-com">{{reportDetail.company}}</text>
+            </view>   
+            <view class="msg-time">{{reportDetail.createTime}}</view>
+        </view>
+        <view class="cont-guide">{{reportDetail.guide}}</view>
+
+        <view class="cont-btn" wx:if="{{reportDetail.authority==0}}" @tap.stop="toAction({{reportDetail.remindAction}})">{{reportDetail.remindTxt}}</view>
+        <view class="cont-sum" wx:else>
+            <template is="wxParse" data="{{wxParseData:tmData_reportCont.nodes}}"/>
+        </view>
+
+        <view class="cont-dec">{{reportDetail.contentDeclare}}</view>
+    </view>
+
+    <!--热门评论 -->
+    <view class="comment">
+        <view class="comment-title">
+            热门评论<text wx:if="{{commentsData.count>0}}">({{commentsData.count}})</text>
+        </view>
+        <view class="comment-list">
+            <scrollView :url.sync="url" :param.sync="param" :objArryField.sync="objArryField" @dataLoad.user="setCommentData">
+                <view slot="content">
+                    <repeat for="{{commentsData.list}}" item="item" index="index">
+                        <view class="comment-box">
+                            <view class="box-top">
+                                <image class="top-icon" src="{{item.commenterIco}}" wx:if="{{item.commenterIco}}"></image>
+                                <image class="top-icon" src="/static/images/person.png" wx:else></image>
+                                <view class="top-msg">
+                                    <view class="msg-name">{{item.commenterName}}</view>
+                                    <view class="msg-time">{{item.createTime}}</view>
+                                </view>
+                                <view class="top-num">
+                                    <view class="num-finger" @tap.stop="commmentSatisfy({{item}},{{index}})">
+                                        <image src="/static/images/dz.png" wx:if="{{!item.isBest}}"></image>
+                                        <image src="/static/images/dz-over.png" wx:else></image>
+                                        <text>{{item.bestNum}}</text>
+                                    </view>
+                                    <view class="num-comment" @tap.stop="saveComment({{item.id}},{{item.commenterName}})">
+                                        <image src="/static/images/comment.png"></image>
+                                        <text>{{item.lastComments.length}}</text>
+                                    </view>
+                                </view>                    
+                            </view>
+                            <view class="box-mid">
+                                <view class="mid-com">{{item.commentContent}}</view>
+                                <!-- 二级评论 -->
+                                <view class="last-comment" wx:if="{{item.lastComments.length>0}}">
+                                    <repeat for="{{item.lastComments}}" item="lastItem">
+                                        <view class="last-box">
+                                            <text class="last-box-name">{{lastItem.commenterName}}:</text>
+                                            <text class="last-box-word">{{lastItem.commentContent}}</text>
+                                        </view>
+                                    </repeat>
+                                </view>
+                            </view>                           
+                        </view>
+                    </repeat>
+                </view>
+            </scrollView>
+        </view>
+    </view>
+
+    <!-- 评论组件 -->
+    <commentBtn :noteid.sync="_id" :Btnparam.sync="Btnparam"></commentBtn>
+    <commentInput :url.sync="commentUrl" :param.sync="commentParam"></commentInput>
+
+</view>
+</template>
+<script>
+import wepy from 'wepy'
+import http from '@/utils/http-util'
+import utils from '@/utils/common-util'
+import { API_URL } from '@/const'
+import WxParse from '@/wxParse/wxParse'
+import ScrollView from '@/components/scrollView'
+import LodingPage from '@/components/lodingPage'
+import CommentBtn from '@/components/commentBtn'
+import CommentInput from '@/components/commentInput'
+import {navigateTo, switchTab } from '@/utils/route'
+export default class ReportDeatil extends wepy.page {
+    config = {
+        navigationBarTitleText: '研报详情'
+    }
+    components = {
+        scrollView:ScrollView,
+        lodingPage:LodingPage,
+        commentBtn: CommentBtn,
+        commentInput: CommentInput,
+    }
+    data={
+        // 研报详情
+        reportDetail:'',
+        // 研报id
+        _id:'',
+        // 评论url及参数
+        url:API_URL.REPORT_COMMENT_LIST,
+        param:{
+            reportId:'',
+            page_no:1,
+            page_size:10,
+        },
+        objArryField:'list',
+        // 评论列表
+        commentsData:'',
+        // 发表二级评论url及参数
+        commentUrl:API_URL.REPORT_COMMENT_POST, 
+        commentParam:{
+            reportId: '',
+            level:'2',
+            parentCommentId:'',
+            content:''
+        },
+        // 发表一级评论参数
+        Btnparam: {
+            serviceType: '2',
+        },
+        // 缓存研报评论点赞数据
+        reportAgreeData:{},
+        curReportAgreeData:{},
+    }
+    methods={
+        // 获取评论数据
+        setCommentData(data,type){
+            this.formatCommentsData(data.list)
+            if(type==0){
+                this.commentsData = data
+            }else{
+                this.commentsData.list.push(...data.list)
+            }      
+            this.$apply()
+            this.hideLoading()
+        },
+        //评论点赞 
+        commmentSatisfy(item,index){
+            var isBest=item.isBest
+            var commentid=item.id
+            if(isBest==1)return
+            http.getRequest(API_URL.REPORT_COMMENT_AGREE, {
+                id: commentid
+            }).then(data => {
+                this.commentsData.list[index].bestNum++
+                this.commentsData.list[index].isBest=1  
+                this.curReportAgreeData[commentid]=1
+                this.$apply()
+            })
+        },
+         // 发表二级评论
+        saveComment(parentCommentid,commentName){
+            this.commentParam.reportId=this._id
+            this.commentParam.parentCommentId=parentCommentid
+            this.$invoke('commentInput', 'showInput',2,commentName,null,null)
+        },
+        // 开通权限按钮
+        toAction(action){
+            var param={
+                url:action,
+                fail:function(err){
+                    switchTab({url:action})
+                }
+            }
+            navigateTo(param)
+        },
+    }
+    onLoad(option){
+        this._id=option.id
+        this.param.reportId=this._id
+        this.showLoading()
+        this.loadReportDetail(this._id)
+        
+    }
+    onShow(){
+        this.reportAgreeData=wx.getStorageSync('reportAgreeData');
+        if(!this.reportAgreeData){
+            this.reportAgreeData={}
+            this.reportAgreeData[this._id]={}
+        }
+        if(this.reportAgreeData[this._id]){
+            this.curReportAgreeData=this.reportAgreeData[this._id]
+        }
+    }
+    onUnload(){
+        this.reportAgreeData[this._id]=this.curReportAgreeData
+        wx.setStorageSync('reportAgreeData',this.reportAgreeData);
+    }
+    // 下拉刷新
+    onPullDownRefresh () {
+        this.loadReportDetail(this._id)
+        this.$invoke('scrollView','refresh');
+    }
+    // 上拉加载
+    onReachBottom () {
+        this.$invoke('scrollView','nextPage');
+    }
+    // 分享
+    onShareAppMessage(res) {
+        if (res.from === 'button') {
+            // 来自页面内转发按钮
+            console.log(res.target)
+        }
+        return {
+            title: '投顾说',
+            path: 'pages/tabBar/index?reportDetail='+this._id
+        }
+    }
+    loadReportDetail(id){
+        http.getRequest(API_URL.REPORT_DETAIL, {
+            id: id
+        }).then(data => {
+            this.reportDetail=data
+            this.formatData(this.reportDetail)
+            this.addRichText()     
+            this.$invoke('commentBtn', 'showBtton')
+            this.$apply()
+            this.$invoke('scrollView','refresh')
+            this.hideLoading()
+        }).catch(err=>{
+            this.$invoke('scrollView','refresh')
+            this.hideLoading()
+        })
+    }
+    // 处理时间戳
+    formatData(data){
+        var time = data.createTime
+        time = utils.formatTimeLocal(time)
+        data.createTime = time
+    }
+    formatCommentsData(data){
+        var list,time,isBest,id;
+        for(var i in data){
+            list=data[i]
+            time=list.createTime
+            id=list.id
+            time=utils.formatTimeLocal(time)
+            data[i].createTime=time
+            data[i].isBest=this.curReportAgreeData[id]
+        }
+    }
+    // 添加富文本
+    addRichText(){
+        WxParse.wxParse('tmData_reportCont', 'html', this.reportDetail.summary, this, 5)
+    }
+    // 显示加载层
+    showLoading(){
+        this.$invoke('lodingPage','show')
+    }
+    // 隐藏加载层
+    hideLoading(){
+        this.$invoke('lodingPage','hide')
+    }
+}
+</script>

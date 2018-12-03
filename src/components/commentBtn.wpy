@@ -1,0 +1,194 @@
+<style lang="scss">
+@import '../sass/base/reset';
+@import '../sass/commons/function';
+@import '../sass/components/commentBtn';
+</style>
+<template>
+<block  wx:if="{{showBtn}}">
+    <view class="poe-blank"></view>
+    <view class="poe-comment">
+        <view class="com-box">
+            <view wx:if="{{Btnparam.serviceType==1}}" class="com-text" @tap.stop="checkCoin()">{{Btnparam.placeholder}}大咖币提问</view>
+            <view wx:elif="{{Btnparam.serviceType==3}}" class="com-text" @tap.stop="showInput()">写下你的涨跌理由...</view>
+            <view wx:elif="{{Btnparam.serviceType==2&&report_comment_status==1}}" class="com-text" @tap.stop="showInput()">发表精彩评论免费获取{{report_comment_award}}大咖币</view>
+            <view wx:elif="{{Btnparam.serviceType==2&&report_comment_status!=1}}" class="com-text" @tap.stop="showInput()">发表精彩评论</view>
+            <view wx:elif="{{comment_status==1}}" class="com-text" @tap.stop="showInput()">发表精彩评论免费获取{{comment_award}}大咖币</view>
+            <view wx:else class="com-text" @tap.stop="showInput()">发表精彩评论</view>  
+            <view class="com-share">
+                <form bindsubmit="sendFormId" report-submit='true'>
+                    <button class="share-btn" open-type="share" formType="submit">
+                        <image class="btn-img" src="../static/images/share2.png"/>
+                        <view class="btn-text">分享</view>
+                    </button> 
+                </form>  
+            </view>   
+        </view> 
+    </view>
+    <commentInput :url.sync="url" :param.sync="param"></commentInput>
+    <hegui @finish.user='finishHeGui' @agreeRuleFinish.user='agreeRule'/>
+</block>
+</template>
+<script>
+import wepy from 'wepy'
+import http from '@/utils/http-util'
+import window from '@/utils/window-util'
+import utils from '@/utils/common-util'
+import { API_URL } from '@/const'
+import HeGui from '@/components/hegui'
+import CommentInput from '@/components/commentInput'
+export default class CommentBtn extends wepy.component {
+    components = {
+        commentInput: CommentInput,
+        hegui: HeGui
+    }
+    data={
+        showBtn:false,
+        // 默认评论url及参数--笔记、课程
+        url:API_URL.NOTE_SAVE_COMMENT, 
+        param:{
+            noteid: '',
+            commentLev:1,
+            commentContent:''
+        },
+        // 问股url及参数
+        questionUrl:API_URL.QUESTION_ASK,
+        questionParam:{
+            answer_userid:'',
+            question_content:'',
+            formId:''
+        },
+        certCode:null,
+        answerUserid:null,
+        // 研报评论url及参数
+        reportUrl:API_URL.REPORT_COMMENT_POST,
+        reportParam:{
+            reportId: '',
+            level:1,
+            content:''
+        },
+        // 竞猜评论url及参数
+        foreCastUrl:API_URL.FORECAST_COMMENT,
+        foreCastParam:{
+            level:1,
+            parentId:'',
+            content:''
+        },
+        // app配置项
+        appconf:{
+            comment_award:2,
+            comment_status:1,
+            report_comment_award:3,
+            report_comment_status:1,
+        },
+    }
+    computed={
+        // 评论配置
+        comment_status(){
+            return this.appconf.comment_status
+        },
+        comment_award(){
+            return this.appconf.comment_award
+        },
+        // 研报评论配置
+        report_comment_award(){
+            return this.appconf.report_comment_award
+        },
+        report_comment_status(){
+            return this.appconf.report_comment_status
+        },
+    }
+    props={
+        // 评论笔记、课程id、大咖的id
+        noteid:String,
+        // btn类型: 默认笔记；1--问股；2-研报；3--竞猜
+        Btnparam:{
+            default:{}
+        }
+    }
+    methods={
+        // 显示评论输入框组件
+        showInput(){    
+            if(this.Btnparam.serviceType == 2) {
+                this.param.reportId=this.noteid
+            }else if(this.Btnparam.serviceType == 3){
+                this.$invoke('commentInput', 'showInput',4,null,null,null) 
+                return
+            }else{
+                this.param.noteid=this.noteid
+            }        
+            this.$invoke('commentInput', 'showInput',1,null,null,null)         
+        },
+        showBtton(){
+            this.showBtn = true;
+        },
+         //合规结束
+        finishHeGui() {
+            this.param.answer_userid=this.noteid
+            this.$invoke('commentInput', 'showInput',3,null,this.Btnparam.placeholder,this.Btnparam.userName)
+        },
+        //同意使用
+        agreeRule(){
+         wx.navigateBack({});
+            this.param.answer_userid=this.noteid
+           this.$invoke('commentInput', 'showInput',3,null,this.Btnparam.placeholder,this.Btnparam.userName)
+        },
+        checkCoin(){
+            var that = this;
+             window.showLoading();
+              http.getRequest(API_URL.QUERY_COIN, {})
+                .then(data => {
+                    window.hideLoading();
+                       if(this.Btnparam.placeholder > data){
+                            wx.showModal({
+                                title: '剩余不足',
+                                content: '您当前拥有'+data+'大咖币,本次消费需要'+this.Btnparam.placeholder+'大咖币，剩余不足，是否立即补充？',
+                                success: function(res) {
+                                    if (res.confirm) {
+                                        wx.navigateTo({url: '/subPages/user/pages/coinRecharge'});
+                                    }
+                                }
+                            })
+                        }else{
+                             this.$invoke('hegui', 'startHeguiForDaka', this.Btnparam.note_authorid, this.Btnparam.cert_code);
+                        }
+                }).catch(error=>{
+                    window.hideLoading();
+                });
+        },
+        // sendFormId
+        sendFormId(e){
+            var formId = e.detail.formId
+            this.$root.$parent.sendFormId(formId)
+        }
+    }
+     onLoad(){
+        this.appconf=wx.getStorageSync('appconf');
+        if(!this.appconf){
+            this.loadAppData()
+        }
+        if(this.Btnparam.serviceType == 1){
+            this.url = this.questionUrl;
+            this.param = this.questionParam;
+            this.$apply();
+        }else if(this.Btnparam.serviceType == 2){
+            this.url = this.reportUrl;
+            this.param = this.reportParam;
+            this.$apply();
+        }else if(this.Btnparam.serviceType == 3){
+            this.url = this.foreCastUrl;
+            this.param = this.foreCastParam;
+            this.$apply();
+        }
+    }
+    loadAppData() {
+        http
+        .getRequest(API_URL.APP_INIT, {})
+        .then(data => {
+            wx.setStorageSync('appconf',data.appconf);
+            this.appconf=data.appconf;
+            this.$apply();
+        })
+        .catch(error => {});
+  }
+}
+</script>

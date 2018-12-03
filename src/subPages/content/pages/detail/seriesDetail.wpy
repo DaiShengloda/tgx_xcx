@@ -1,0 +1,438 @@
+<style lang="scss">
+    @import '../../../../sass/base/reset';
+    @import '../../../../sass/commons/function';
+    @import '../../../../sass/pages/seriesDetail';
+    @import "../../../../wxParse/wxParse";
+</style>
+<template>
+<import src="../../../../wxParse/wxParse.wxml"/>
+<view class="series-detail">
+    <lodingPage></lodingPage>
+    <!-- <label for="share-button"><view>分享</view></label> -->
+    <image class="series-img" src="{{seriesDetailData.adsImage}}" wx:if="{{seriesDetailData.adsImage}}" @tap="bannerEvt({{seriesDetailData.adsLink}})"></image>
+    <!-- tab切换 -->
+    <view class="tab-box {{tabBoxFixed ?'fixed':''}}">
+        <view class="default {{activeTabIndex==0 ?'active':''}}" @tap.stop="swichNav(0,0,0)">课程介绍</view>
+        <view class="default {{activeTabIndex==1 ?'active':''}}" @tap.stop="swichNav(1,{{listTop}},1)">课程目录</view>
+    </view>
+    <!-- 课程介绍 -->
+    <view class="series-intro">
+        <view class="int-msg">
+            <view class="msg-title">{{seriesDetailData.title}}</view>
+            <view class="msg-num">
+                <text class="num-lesson">共{{seriesDetailData.lesson}}课时</text>
+                <text class="num-play">{{seriesDetailData.playNum}}人看过</text>
+            </view>
+        </view>
+        <view class="int-cont">
+            <view class="cont-title">
+                <text class="title-lef">课程内容</text>
+                <text class="title-detail" wx:if="{{seriesDetailData.profileLink}}" @tap.stop="bannerEvt({{seriesDetailData.profileLink}})">详细介绍></text>
+            </view>
+            <!-- <view class="cont-pro">{{seriesDetailData.profile}}</view> -->
+            <template is="wxParse" data="{{wxParseData:tmData_profileHtml.nodes}}"/>
+        </view>
+    </view>
+    <!-- 课程目录 -->
+    <view class="series-list">
+        <view class="list-title">
+            <text class="title-lef">全部课时</text>
+            <text class="title-status" wx:if="{{seriesDetailData.lesson==seriesDetailData.items.length}}">已完结</text>
+            <text class="title-status" wx:if="{{seriesDetailData.lesson>seriesDetailData.items.length}}">更新中</text>
+        </view>
+        <view class="list-content">
+            <repeat for="{{seriesDetailData.items}}" item="item" index="index">
+                <view class="list-box" @tap="toCourseDetail({{item}})">
+                    <image class="box-img-play" src="/static/images/play.png"></image>
+                    <image class="box-img" src="{{item.coverImage}}" wx:if="{{item.coverImage}}"></image>
+                    <image class="box-img" mode="center" src="/static/images/zw1-2.png" wx:else></image>
+                    <view class="box-msg">
+                        <text class="msg-title">{{item.title}}</text>
+                        <text class="msg-try" wx:if="{{item.isTryPlay&&seriesDetailData.payType==2}}">试看</text>
+                        <text class="msg-try" wx:if="{{!item.isTryPlay&&item.sign}}">{{item.sign}}</text>
+                        <view class="msg-detail">
+                            <image class="msg-icon" src="{{item.authorIco}}" wx:if="{{item.authorIco}}"></image>
+                            <image class="msg-icon" src="/static/images/person.png" wx:else></image>
+                            <text class="msg-name">{{item.authorName}}</text>
+                            <text class="msg-time">{{item.createTime}}</text>
+                            <text class="msg-num">{{item.playNum}}人看过</text>
+                        </view>
+                    </view>              
+                </view>
+            </repeat>
+        </view>
+    </view>
+    <!--老师介绍 -->
+    <view class="detail-man">
+        <view class="li-lef">
+            <image src="{{seriesDetailData.authorIco}}" wx:if="{{seriesDetailData.authorIco}}"></image>
+            <image src="/static/images/person.png" wx:else></image>
+        </view>
+        <view class="li-btw">
+            <view>
+                <text class="man-name">{{seriesDetailData.authorName}}</text>
+                <text class="man-title"> | {{seriesDetailData.authorTitle}}</text>
+            </view>
+            <view class="man-int">关注：{{seriesDetailData.authorNoticeNum}}</view>
+        </view>
+        <view class="li-rig">
+            <view wx:if="{{seriesDetailData.isNoticeAuthor ==1}}" class="man-atten atten-cancle" @tap.stop="cancelNotice({{seriesDetailData.authorId}})">取消关注</view>
+            <view wx:if="{{seriesDetailData.isNoticeAuthor ==0}}" class="man-atten atten-add" @tap.stop="notice({{seriesDetailData.authorId}})">加关注</view>
+        </view>
+    </view>
+    <!-- 填补系列空白 -->
+    <view class="series-list-blank" style="height:{{200*(5-seriesDetailData.items.length)}}rpx" wx:if="{{seriesDetailData.items.length<5&&seriesDetailData.items.length>0}}"></view>
+    <!-- 课程状态--> 
+    <view class="series-blank" wx:if="{{(seriesDetailData.payType&&!seriesDetailData.authority)||seriesDetailData.payType==1}}"></view> 
+    <view class="series-type" wx:if="{{(seriesDetailData.payType&&!seriesDetailData.authority)||seriesDetailData.payType==1}}"> 
+        <view class="type-pay" wx:if="{{seriesDetailData.payType==2}}">
+            <view class="pay-free" @tap.stop="freeScan()" wx:if="{{freeScanId}}">免费试看</view>
+            <view class="pay-box {{!freeScanId?'pay-box-len':''}}" @tap.stop="pay({{seriesDetailData.id}})">
+                <text class="box-num">{{seriesDetailData.price}}</text>
+                <text class="box-text">大咖币/系列</text>
+            </view>
+        </view>
+        <view class="type-share" wx:if="{{seriesDetailData.payType==1}}">
+            <button id="share-button" open-type="share" class="share-btn" @tap.stop="share({{seriesDetailData.id}})">分享后可观看</button>
+        </view>
+    </view>
+    <payment :payUrl.sync="payUrl" 
+             :payParam.sync="payParam" 
+             :payDetailData.sync="payDetailData"
+             @payCallBack.user="payCallBackSeries" 
+             @fxcpFinish.user='fxcpFinish'>
+        <text slot="payCont">{{seriesDetailData.title}}</text>
+        <text slot="payNum">{{seriesDetailData.price}}</text>
+        <text slot="payType_o">系列</text>
+        <text slot="payType_t">系列</text>
+    </payment>
+    <notice></notice>
+</view>
+</template>
+<script>
+import wepy from 'wepy'
+import http from '@/utils/http-util'
+import utils from '@/utils/common-util'
+import { API_URL } from '@/const'
+import BigManNotice from '@/components/bigManNotice'
+import Payment from '@/components/payment'
+import LodingPage from '@/components/lodingPage'
+import WxParse from '@/wxParse/wxParse'
+// import events from 'events'
+export default class CourseDetail extends wepy.page {
+    config = {
+        navigationBarTitleText: '',
+        enablePullDownRefresh: false,
+    }
+    components = {
+        notice: BigManNotice,
+        payment: Payment,
+        lodingPage:LodingPage,
+    }
+    data = {
+        // 支付类型
+        payDetailData:{
+            enablePayModel:[{
+                name:"大咖币",
+                type:1
+            }]
+        },
+        // 系列id
+        _seriesId:'',
+        // tab栏
+        activeTabIndex:0,
+        // tab滚动
+        scrollTop:0,
+        tabBoxTop:null,
+        tabBoxFixed:false,
+        // 全部课程位置
+        listTop:0,
+        // 系列详情
+        seriesDetailData: {},
+        // 使用url及参数
+        payUrl:API_URL.SERIES_PAY,
+        payParam:{
+            courseid:''
+        },
+        // 试看课程id
+        freeScanId:'',
+        // 跳转协议匹配
+        actionData:{
+            "web?url":'/pages/urlLink/urlLink?action=',
+        },
+        // 计算动画
+        interAnimate:null,
+    }
+    computed={
+    }
+    //事件处理函数
+    methods = {
+        // 广告页跳转\课程内容跳转
+        bannerEvt(action){
+            var pageUrl,url
+            for(var i in this.actionData){
+                if(action.indexOf(i)>-1){
+                    pageUrl=this.actionData[i]
+                    url=action.split('=')[1]
+                    wx.navigateTo({url: pageUrl+url})
+                    return
+                }
+            }
+        },
+        // 
+        swichNav(index,top,type){
+            this.activeTabIndex=index
+            if(type==1){
+                this.queryListTitle()
+            }else{
+                this.tabBoxFixed=false
+                this.$apply()
+                wx.pageScrollTo({
+                    scrollTop: top,
+                    duration: 300
+                })          
+            }  
+        },
+        // 关注
+        notice (userId) {
+            this.$invoke('notice', 'notice', userId)
+        },
+        // 取消关注
+        cancelNotice (userId) {
+            this.$invoke('notice', 'cancel', userId)
+        },
+        // 系列课程详情
+        toCourseDetail(item,index){
+            var self=this
+            var itemAuthority,isTryPlay,id;
+            itemAuthority=item.authority;
+            isTryPlay=item.isTryPlay;
+            id=item.id;
+            if(this.seriesDetailData.authority==1&&this.seriesDetailData.payType!=1){
+                wx.navigateTo({url: `/subPages/content/pages/detail/courseDetail?id=${id}`})
+            }else if(itemAuthority&&isTryPlay&&this.seriesDetailData.payType==2){
+                wx.navigateTo({url: `/subPages/content/pages/detail/courseDetail?id=${id}`})
+            }else if(this.seriesDetailData.payType==1){
+                wx.showToast({
+                    title: '分享后免费查看系列课程。',
+                    icon: 'none',
+                    duration: 2000
+                })
+            }else if(this.seriesDetailData.payType==2){
+                wx.showModal({
+                    // title: '提示',
+                    content: '添加系列后即可畅观全部课程，是否立即添加?',
+                    confirmColor:'#000000',
+                    success: function(res) {
+                        if (res.confirm) {
+                            self.payParam.courseid=self._seriesId
+                            let {price,authorId,authorCertCode} = self.seriesDetailData
+                            self.$invoke('payment', 'show', price,authorId,authorCertCode)
+                        } else if (res.cancel) {
+                            console.log('用户点击取消')
+                        }
+                    }
+                })
+            }      
+        },
+        // 免费试看
+        freeScan(){
+            var id=this.freeScanId
+            wx.navigateTo({url: `/subPages/content/pages/detail/courseDetail?id=${id}`})
+        },
+        // 使用
+        pay(id){
+            this.payParam.courseid=id
+            let {price,authorId,authorCertCode} = this.seriesDetailData;
+            this.$invoke('payment', 'show',price,authorId,authorCertCode);
+        },
+        // 分享
+        share(seriesId){
+            console.log(seriesId)
+        },
+        // 使用成功回调
+        payCallBackSeries(data){
+            this.seriesDetailData.authority=1
+            this.$apply()
+        }
+    }
+    events = {
+      // 关注操作成功触发事件
+      noticeOptionSuccess (userId) {
+        let item = this.seriesDetailData
+        item.isNoticeAuthor = (item.isNoticeAuthor==1?0:1)
+      },
+        //风险测评结束触发
+        fxcpFinish(){
+            wx.redirectTo({url:'/subPages/content/pages/detail/seriesDetail?id='+this._seriesId});
+        },
+    }
+    //页面生命周期函数
+    onLoad(option) {
+        this.payParam.courseid=option.id
+        this._seriesId=option.id
+        // this.setEventMaxListeners()
+    }
+    onShow(){
+        if(this.loadStorageData(this._seriesId))return
+        this.loadSeriesData(this._seriesId)
+    }
+    onReady(){ 
+        console.log('ready')
+    }
+     // 页面滚动
+    onPageScroll(object){
+        this.scrollTop = object.scrollTop;
+        if(this.scrollTop>=this.tabBoxTop&&!this.tabBoxFixed){
+            this.tabBoxFixed=true
+            this.$apply();
+        }else if(this.tabBoxFixed&&this.scrollTop<this.tabBoxTop){
+            this.tabBoxFixed=false
+            this.$apply();
+        }
+    }
+    //下拉刷新
+    onPullDownRefresh(){
+        wx.stopPullDownRefresh(); 
+    }
+    // 页面分享
+    onShareAppMessage(options){
+    　　var that = this
+    　　var shareObj = {
+    　　　title:that.seriesDetailData.title,       
+        path: 'pages/tabBar/index?seriesId=' + that.seriesDetailData.id,  
+    　　　imgUrl: that.seriesDetailData.adsImage,     
+    　　　success: function(res){
+            console.log('...res...')
+            console.log(res)
+            console.log('...res...')
+    　　　　　　if(res.errMsg == 'shareAppMessage:ok'){
+                console.log('share success')
+                if(that.seriesDetailData.payType==1){
+                    that.seriesDetailData.payType=0
+                    utils.tools().setLocal(that.seriesDetailData.id,that.seriesDetailData)
+                    that.$apply()
+                }          
+    　　　　　　}
+    　　　},
+    　　　fail: function(res){
+    　　　    console.log(res)
+    　　　},
+    　　　complete: function(res){
+    　　　    console.log(res)
+    　　　}
+    　　}
+    　　// 来自页面内的按钮的转发
+    　　if(options.from == 'button' ){
+    　　　　var eData = options.target.dataset;
+    　　　　console.log( eData.name );     
+    　　　　//此处可以修改 shareObj 中的内容
+            //shareObj.path = '/pages/btnname/btnname?btn_name='+eData.name;
+    　　}
+    　　return shareObj;
+    }
+    // 加载缓存数据
+    loadStorageData(id){
+        var seriesStorage=utils.tools().getLocal(id)
+        if(seriesStorage){
+           this.seriesDetailData=seriesStorage 
+           this.setPageTitle()
+           this.addRichText()
+           this.$apply()
+           this.hideLoading()
+           this.queryMultipleNodes()     
+           return true
+        }
+        return false
+    }
+    // 加载课程详情数据
+    loadSeriesData (id) {
+      this.showLoading()
+      http.getRequest(API_URL.SERIES_DETAIL, {
+        id: id
+      }).then(data => {
+        this.seriesDetailData = data                
+        this.formatData(this.seriesDetailData.items)
+        this.getFreeScanId()   
+        this.setPageTitle()
+        this.addRichText()
+        this.$apply() 
+        this.hideLoading()
+        this.queryMultipleNodes()
+      })
+    }
+    // 处理时间戳
+    formatData(data){
+        var list,time;
+        for(var i in data){
+            list = data[i];
+            time = list.createTime;
+            time = utils.formatTimeLocal(time);
+            data[i].createTime = time;
+        }
+    }
+    // 节点信息
+    queryMultipleNodes(){
+        var self = this;
+        var query = wx.createSelectorQuery()
+        query.select('.tab-box').boundingClientRect()
+        query.exec(function(res){
+            self.tabBoxTop = res[0].top+1
+            self.$apply()
+        })    
+    }
+    queryListTitle(){
+        var self=this
+        var query_s = wx.createSelectorQuery()
+        var lastTop
+        query_s.select('.list-title').boundingClientRect()
+        query_s.exec(function(res){
+            lastTop=res[0].top+self.scrollTop
+            if(lastTop<0)return
+            self.listTop = self.tabBoxFixed?lastTop:lastTop-45
+            self.tabBoxFixed=true
+            wx.pageScrollTo({
+                scrollTop: self.listTop,
+                duration: 300
+            })
+            self.$apply()
+        })   
+    }
+    // 动态设置页面title
+    setPageTitle(){
+        wx.setNavigationBarTitle({
+            title: this.seriesDetailData.title
+        })
+    }  
+    // 获取试看课程id
+    getFreeScanId(){
+        var list,itemAuthority,isTryPlay;
+        for(var i in this.seriesDetailData.items){
+            list = this.seriesDetailData.items[i];
+            itemAuthority = list.authority;
+            isTryPlay = list.isTryPlay;
+            if(isTryPlay&&itemAuthority){
+                this.freeScanId=list.id
+                return
+            }   
+        }
+    }
+    // 显示加载层
+    showLoading(){
+        this.$invoke('lodingPage','show')
+    }
+    // 隐藏加载层
+    hideLoading(){
+        this.$invoke('lodingPage','hide')
+    }
+    // 添加富文本
+    addRichText(){
+        WxParse.wxParse('tmData_profileHtml', 'html', this.seriesDetailData.profileHtml, this, 5)
+        this.$apply() 
+    }
+    // setEventMaxListeners(){
+    //     var eventEmitter = new events.EventEmitter();
+    //     eventEmitter.setMaxListeners(100)
+    // }
+}
+</script>

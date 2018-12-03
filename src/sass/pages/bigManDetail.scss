@@ -1,0 +1,606 @@
+.bigDetail {
+    width:100%;
+    height:100%; 
+    background:#eee;    
+    //大咖介绍
+    .detail-intro {
+        background:#f24935;  
+        border-bottom:#e6e6e6 1px solid;        
+        // 基本信息
+        .man-msg {
+            padding: r(20) r(30);
+            display: flex;
+            justify-content:center;
+            align-items: center;
+            .li-lef {
+                width:20%;
+                text-align:left;        
+                image {
+                    width: r(120);
+                    height: r(120);
+                    vertical-align: middle;
+                    border-radius:50%;                    
+                }
+            }
+            .li-btw {
+                width: 50%;
+                padding-left: r(20);
+                color: #fff;
+                .btw-top{
+                    white-space:nowrap;
+                    overflow:hidden;
+                    text-overflow:ellipsis;                
+                    .man-name {
+                        font-size: r(36); 
+                    }
+                    .man-tg {
+                        font-size:r(28);                
+                    }     
+                }
+                .btw-good{
+                    margin-top:10rpx; 
+                    white-space:nowrap;
+                    overflow:hidden;
+                    text-overflow:ellipsis;                                       
+                    .good{
+                        color:#f6dc93;
+                        border:#f6dc93 1px solid;
+                        border-radius: 8rpx;
+                        font-size:26rpx;
+                        padding:0 5rpx; 
+                        margin-right:10rpx;                        
+                    }
+                }
+            }
+            .li-rig {
+                width:30%; 
+                text-align: right;
+                .man-atten {        
+                    border-radius:8rpx;
+                    text-align:center;
+                    height:r(45);
+                    line-height:r(45);  
+                    font-size:r(28);
+                    float:right;
+                    width:130rpx;
+                    position: relative;
+                } 
+                .atten-cancle {
+                    color:#fff;
+                    background:#f24935;
+                    border: #fff 1px solid;
+                }
+                .atten-add {
+                    color:#e93030;
+                    background:#fdff9c;
+                    border:none;
+                }
+                .man-num {
+                    color:#fff;
+                    font-size:26rpx;
+                    margin-top:15rpx;
+                    float:right;
+                    width: 100%;
+                }                 
+            }
+        }
+        // 擅长领域
+        .man-skill {
+            padding:0 r(50) r(30) r(50);
+            color:#fff;
+            font-size:r(30); 
+            // letter-spacing: 2rpx; 
+            text-indent:2em;            
+        }
+    }
+
+    // tab切换
+    .detail-tab {
+        background: #fff;
+        border-top:1rpx #e6e6e6 solid;
+        margin-top:16rpx; 
+        min-height:110%;        
+        // tab栏
+        .tab-box-blank{
+            height:r(90);
+            display: none;
+        }
+        .box-block{
+            display:block;
+        }
+        .tab-box {
+            display: flex;
+            width: 100%;
+            background: #fff;
+            z-index: 999;
+            position: unset;
+            top:0;
+            .default {
+                display: block;
+                width: 33.33%;
+                border-bottom: 1px solid #e6e6e6;
+                color: #000;
+                height:r(90);
+                line-height:r(90);
+                font-size:r(32);
+                text-align:center;                
+            }
+            .active {
+                border-bottom: 2px solid #e93030;
+                color: #e93030;
+            }
+        }
+        .fixed {
+            position: fixed;         
+        }
+        // 内容区
+        .content-box {
+            .contShow {
+                display: block;
+            }
+            .contHid {
+                display: none;
+            }
+            .time-line{
+                width:30rpx;
+                height:30rpx;
+                position:absolute;
+                left:-15rpx;
+                top:36rpx;                
+            }
+            // 笔记
+            .note {
+                .note-box {
+                    margin:0px 30rpx 0px 45rpx;
+                    position:relative;
+                    border-left:#e6e6e6 1px solid;
+                    padding-left:30rpx;
+                    padding-top:30rpx; 
+                    .box-top {
+                        .top-time {
+                            font-size: r(26);
+                            color: #999;
+                        }
+                    }
+                    .box-mid {
+                        margin: r(10) 0;
+                        .mid-msg {
+                            display: flex;
+                            margin-bottom:r(15);
+                            align-content:center;                        
+                            .icon{
+                                width:70rpx;
+                                height:70rpx;
+                                border-radius:50%;
+                            }
+                            .msg{
+                                text-align:left;
+                                margin-left:r(20);
+                                max-width:r(520);
+                                display:flex;
+                                align-items:center;                                
+                                .msg-top{
+                                    white-space: nowrap;
+                                    overflow: hidden;
+                                    text-overflow: ellipsis;
+                                    .msg-name{
+                                        font-size:r(30);
+                                        font-weight:bold;
+                                        padding-right:r(10); 
+                                    }
+                                    .msg-title{
+                                        font-size:r(26);
+                                        color: #e93030;
+                                    }
+                                }     
+                                .msg-pro{
+                                    font-size:r(26);
+                                    color: #999;
+                                    white-space:nowrap;
+                                    overflow:hidden;
+                                    text-overflow:ellipsis;  
+                                    display:none;                              
+                                }
+                            }
+                        }
+                        .mid-title{
+                            margin-bottom:15rpx;
+                            font-size:34rpx;
+                            font-weight:bold;  
+                            overflow:hidden;
+                            text-overflow: ellipsis;
+                            display: -webkit-box;
+                            -webkit-line-clamp: 1;
+                            -webkit-box-orient: vertical;                      
+                        }
+                        .mid-int{
+                            position: relative;
+                            .int-sign{
+                                width:65rpx;
+                                height:38rpx;
+                                position:absolute;
+                                background:#e83030;
+                                color:#fff;
+                                text-align:center;
+                                line-height:38rpx;
+                                font-size:26rpx;                                
+                                border-radius:5rpx;
+                                top:5rpx;
+                            }
+                            .int-sign:before,.int-sign:after{ 
+                                content: ""; 
+                                width: 0; 
+                                height: 0; 
+                                position: absolute;
+                                display: block; 
+                                border-width:r(10); 
+                                border-style: solid;  
+                            }
+                            .int-sign:before{
+                                left: r(65); 
+                                top: r(10); 
+                                border-color: transparent transparent transparent #e83030;
+                            }
+                            .int-sign:after{
+                                left: r(65); 
+                                top: r(10); 
+                                border-color: transparent transparent transparent #e83030;
+                            }
+                            .int-title {                       
+                                font-size: r(32);
+                                overflow: hidden;
+                                text-overflow: ellipsis;
+                                display: -webkit-box;
+                                -webkit-line-clamp: 3;
+                                -webkit-box-orient: vertical;
+                                letter-spacing:2rpx;                                                 
+                            }  
+                            .title-indent {
+                                text-indent:r(90);
+                            }
+                        }
+                        .mid-img {
+                            width:450rpx;
+                            height:250rpx;
+                            display: block;
+                        }
+                    }
+                    .box-bom {
+                        display:flex;
+                        font-size:26rpx;
+                        color:#999;
+                        margin-top:15rpx;
+                        padding-bottom:30rpx;
+                        border-bottom:#e6e6e6 1px solid;
+                        .bom-value{
+                            padding-right:r(20);
+                        }
+                        .bom-scan {
+    
+                        }
+                        .bom-finger {
+                            padding-left:r(20);
+                        }
+                    }
+                }
+                .note-box:last-child{
+                    margin-bottom: 0;
+                }
+            }
+            // 问股
+            .share {
+                .share-box {
+                    margin:0px 20rpx 0px 45rpx;
+                    position:relative;
+                    border-left:#e6e6e6 1px solid;
+                    padding-left:30rpx;
+                    padding-top:30rpx; 
+                    .box-top {
+                        .top-time {
+                            font-size: r(24);
+                            color: #999;
+                        }
+                    }
+                    .box-mid {
+                        margin: r(-10) 0 r(0) 0;
+                        .mid-msg {
+                            display: flex;
+                            align-content:center;
+                            margin-top: r(10);   
+                            .icon{
+                                width: r(80);
+                                height: r(80);
+                                border-radius: 50%;
+                            }
+                            .wengu{
+                                width: 64%;
+                                height: r(80);
+                                background-size: cover;
+                            }
+                            .audio{
+                               display:block;
+                               color:#fff;
+                               font-size: r(26);
+                               margin-left: r(80);
+                               margin-top: r(20);
+                            }
+                            .time{
+                                margin:auto r(10);
+                                font-size:r(30);
+                                color: #999;
+                            }
+                            .msg{
+                                margin-top: r(10);
+                                text-align:left;
+                                max-width:r(560);
+                                .msg-top{
+                                    white-space: nowrap;
+                                    overflow: hidden;
+                                    text-overflow: ellipsis;
+                                    .msg-name{
+                                        font-size:r(30);
+                                        font-weight:bold;
+                                        padding-right:r(10); 
+                                    }
+                                    .msg-title{
+                                        font-size:r(26);
+                                        color: #e93030;
+                                    }
+                                }
+                                .msg-pro{
+                                    font-size:r(24);
+                                    color: #999;
+                                    white-space:nowrap;
+                                    overflow:hidden;
+                                    text-overflow:ellipsis;                                
+                                }
+                            }
+                        }
+                        .mid-mymsg {
+                            display: flex;
+                            align-content:center;
+                            .mymsg{
+                                width: 100%;
+                                height: r(100);
+                                line-height: r(100);
+                                display: flex;
+                                .msg-myname{
+                                    font-size:r(30);
+                                   margin-left: r(20);
+                                }
+                                .icon{
+                                    width: r(80);
+                                    height: r(80);
+                                    border-radius: 50%;
+                                }
+                                .time{
+                                    position:absolute;
+                                    right: r(30);
+                                    font-size:r(30);
+                                    color: #999;
+                                }
+                                
+                            }
+                        }
+                        .mid-int{
+                            margin:r(20) 0;                        
+                            font-size: r(32);
+                            overflow: hidden;
+                            text-overflow: ellipsis;
+                            display: -webkit-box;
+                            -webkit-line-clamp: 3;
+                            -webkit-box-orient: vertical;
+                            letter-spacing:2rpx;
+                        }
+                        .mid-img {
+                            height: r(320); 
+                            display: block;
+                        }
+                    }
+                    .box-bom {
+                        display: flex;
+                        font-size: r(26);
+                        color: #999;
+                        margin-top:r(26);
+                        padding-bottom: r(26);
+                        border-bottom:#e6e6e6 1px solid;
+                        .bom-scan {
+    
+                        }
+                        .bom-finger {
+                            padding-left:r(20);
+                        }
+                    }
+
+                }
+                .share-box:last-child{
+                    margin-bottom: 0;
+                }
+            }
+            // 课程
+            .course {
+                .cont-series {
+                    font-size:34rpx; 
+                    border-bottom:#e6e6e6 1px solid;
+                    height:90rpx;
+                    line-height:90rpx;
+                    padding-left:30rpx;      
+                }
+                .series-box {
+                    margin:0 30rpx;
+                    border-bottom:#e6e6e6 1px solid;
+                    display:flex;
+                    padding:30rpx 0; 
+                    position: relative;
+                    .box-img-play{
+                        position: absolute;
+                        width:100rpx;
+                        height:100rpx;
+                        top:30%;
+                        left:7%;                        
+                    }                   
+                    .box-img{
+                        width:30%;
+                        height:260rpx;  
+                        min-width:30%;                    
+                    }
+                    .box-lesson{
+                        position: absolute;
+                        width:30%;
+                        background:rgba(0, 0, 0, 0.3);
+                        text-align:center;
+                        height:50rpx;
+                        line-height:50rpx;
+                        bottom:30rpx;
+                        color:#fff;
+                        font-size:28rpx;      
+                    }
+                    .box-msg {
+                        margin-left:30rpx;    
+                        position:relative;   
+                        width:69%;                        
+                        .msg-title{
+                            font-size:32rpx;
+                            white-space:nowrap;
+                            overflow:hidden;
+                            text-overflow:ellipsis;
+                        }
+                        .msg-summry {
+                            font-size:26rpx;
+                            color:#999;  
+                            margin:15rpx 0; 
+                            // word-space:pre-wrap;
+                            word-break:break-all;
+                            word-wrap:break-word;
+                            overflow: hidden;
+                            text-overflow: ellipsis;
+                            display: -webkit-box;
+                            -webkit-line-clamp: 2;
+                            -webkit-box-orient: vertical;                                                       
+                        }
+                        .msg-label{
+                            font-size:26rpx;                            
+                            .label-txt{
+                                color:#e93030;
+                                border:#e83030 1px solid;
+                                border-radius:7rpx;
+                                padding:2rpx 5rpx;
+                                margin-right:15rpx;                        
+                            }
+                        }
+                        .msg-man {
+                            position:absolute;
+                            bottom:0;      
+                            display:flex;
+                            align-items:center;  
+                            width:100%;                            
+                            .man-pic{
+                                width:50rpx;
+                                height:50rpx;
+                                border-radius:50%;                                                               
+                            }
+                            .man-name{
+                                font-size:26rpx;
+                                padding-left:15rpx;                                
+                            }
+                            .man-readNum{
+                                font-size:24rpx;
+                                color:#999;
+                                position:absolute;
+                                right:0rpx;                                
+                            }
+                        }
+                    }
+                }
+                .series-box:last-child{
+                    border-bottom: none;
+                }
+                .cont-hq {                
+                    font-size:34rpx; 
+                    border-bottom:#e6e6e6 1px solid;
+                    height:90rpx;
+                    line-height:90rpx;
+                    padding-left:30rpx; 
+                    border-top:#eee 16rpx solid;                    
+                }
+                .course-box {
+                    padding:r(20) r(30);
+                    border-bottom: #eee r(10) solid;
+                    .box-top {
+                        .top-title {
+                            font-size: r(32); 
+                        }
+                    }
+                    .box-mid {
+                        margin: r(10) 0;
+                        position:relative;
+                        .mid-img-play{
+                            position: absolute;
+                            width:100rpx;
+                            height:100rpx;
+                            top:110rpx;
+                            left:40%;                            
+                        }
+                        .mid-img {
+                            height: r(320);
+                            width:100%;
+                            display:block;                            
+                        }
+                        .mid-msg {
+                            display: flex;
+                            margin:r(15) 0;
+                            align-items:center; 
+                            .mid-man {
+                                display:block;
+                                text-align:center; 
+                                .icon {
+                                    width: r(50);
+                                    height: r(50);
+                                    border-radius: 50%;                                   
+                                }
+                                .name{
+                                    font-size:r(26);
+                                    white-space:nowrap;                                    
+                                }
+                            }
+                            .mid-int {
+                                padding-left:r(20);
+                                margin-left:r(20); 
+                                font-size: r(30);
+                                border-left:#333 1px solid;
+                                overflow: hidden;
+                                text-overflow: ellipsis;
+                                display: -webkit-box;
+                                -webkit-line-clamp: 2;
+                                -webkit-box-orient: vertical;
+                                // letter-spacing:1rpx;                                                  
+                            }
+                        }
+                    }
+                    .box-bom {
+                        display: flex;
+                        font-size: r(26);
+                        color: #999;
+                        .top-time {
+                            width: 30%;
+                            text-align:left;                            
+                        }
+                        .top-float {
+                            width: 70%;
+                            text-align:right;                            
+                            .bom-scan{
+                                
+                            }
+                            .bom-finger{
+                                padding-right: r(20);
+                            }
+                        }       
+                    }
+                }
+                .course-box:last-child{
+                    border-bottom: none;
+                }
+            }   
+        }
+    }
+}

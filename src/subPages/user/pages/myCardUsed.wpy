@@ -1,0 +1,184 @@
+<style lang="scss">
+.mycard-used{
+	background: #eee;
+	padding-bottom: 30rpx; 
+	.card-list{
+		.card-box{
+			display:flex;
+			align-items: center;
+			height:228rpx;
+			margin:0 30rpx;
+			margin-top:30rpx;
+			.box-lef{
+				position:relative;
+				width:78%;
+				color:#fff;
+				.lef-img{
+					width:100%;
+					display:block;
+				}
+				.lef-name{
+					position:absolute;
+					top:20rpx;
+					font-size:38rpx;
+					left:15rpx;
+				}
+				.lef-des{
+					position:absolute;
+					font-size:32rpx;
+					top:100rpx;
+					left:15rpx;
+					max-width:95%;
+					white-space:nowrap;
+					overflow:hidden;
+					text-overflow:ellipsis;
+				}
+				.lef-time{
+					position:absolute;
+					font-size:30rpx;
+					top:145rpx;
+					left:15rpx;
+					max-width:95%;
+					white-space:nowrap;
+					overflow:hidden;
+					text-overflow:ellipsis;
+				}
+			}
+			.box-rig{
+				position:relative;
+				width:22%;
+				height:100%;
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				.rig-img{
+					width:100%;
+					height:100%;
+					display:block;
+					position:absolute;
+					left:0;
+					top:0;
+				}
+				.rig-icon{
+					width:120rpx;
+					height:120rpx;
+					z-index: 999;
+					position:relative;
+					display: block;
+				}
+				.rig-btn{
+					width:82%;
+					height:70rpx;
+					background:#bcb9bc;
+					text-align:center;
+					line-height:70rpx;
+					font-size:34rpx;
+					color:#fff;
+					border-radius:15rpx;
+					z-index: 99;
+				}
+			}
+		}
+		.card-no{
+			font-size:38rpx;
+			width:100%;
+			text-align:center;
+			padding-top:50rpx;
+			color:#999;
+		}
+	}
+}
+</style>
+<template>
+<lodingPage></lodingPage>
+<view class="mycard-used">
+	<view class="card-list">
+		<repeat for="{{cardUsedData.list}}" item="item" index="index">
+			<view class="card-box" 
+				  @tap.stop="toAction({{item.action}})">
+				<view class="box-lef">
+					<image class="lef-img" mode="widthFix" src="/static/images/card-gray.png" />
+					<view class="lef-name">{{item.name}}</view>
+					<view class="lef-des">{{item.description}}</view>
+					<view class="lef-time">
+						有效期:{{item.effectiveDate}}-{{item.expiryDate}}
+					</view>
+				</view>
+				<view class="box-rig">
+					<image class="rig-img" mode="" src="/static/images/card-blank.png" />
+					<view class="rig-btn" wx:if="{{item.isEnable==0}}">已使用</view>
+					<image class="rig-icon" mode="" src="https://dakaname.oss-cn-hangzhou.aliyuncs.com/mini_app_icons/card1.png" wx:else/>	
+				</view>
+			</view>
+		</repeat>
+		<view class="card-no" wx:if="{{cardUsedData.list.length==0}}">暂无数据</view>
+	</view>
+</view>
+</template>
+<script>
+import wepy from 'wepy'
+import { API_URL } from '@/const'
+import http from '@/utils/http-util';
+import utils from '@/utils/common-util';
+import LodingPage from '@/components/lodingPage';
+import {navigateTo, switchTab } from '@/utils/route';
+export default class MyCardUsed extends wepy.page {
+	config = {
+		navigationBarTitleText: '已使用和已过期的券',
+		enablePullDownRefresh: false
+	}
+	components = {
+        lodingPage:LodingPage,
+    }
+    data = {
+        cardUsedData:'',
+    }
+    methods = {
+	    toAction(action){
+    		action=action.replace('note?id','noteDetail?id')
+    		var param={
+		        url:action,
+		        fail:function(err){
+		          switchTab({url:action})
+		        }
+		    }
+		    navigateTo(param)
+    	},
+    }
+    onLoad() {
+      this.showLoading()
+      this.loadCardUsedData()  
+    }
+    loadCardUsedData(){
+    	http.postRequest(API_URL.CARD_DISABLE, {}).then(data => {
+    		this.cardUsedData = data
+		    this.formatDate(this.cardUsedData)
+		    // this.filterData(this.cardUsedData)
+		    this.$apply()
+		    this.hideLoading()
+	    })
+    }
+    formatDate(data){
+     	data.list.forEach((v,index)=>{
+          data.list[index].effectiveDate = utils.formatTimestampCard(v.effectiveDate)
+          data.list[index].expiryDate = utils.formatTimestampCard(v.expiryDate)
+	     })
+    }
+    filterData(data){
+	    for (var i=0;i<data.list.length;i++){
+	    	if(data.list[i].type!=4){
+	    		data.list.splice(i,1) 
+				i=i-1
+	    	}	
+		}
+    }
+    // 显示加载层
+    showLoading(){
+        this.$invoke('lodingPage','show')
+    }
+    // 隐藏加载层
+    hideLoading(){
+        this.$invoke('lodingPage','hide')
+    }
+}
+</script>

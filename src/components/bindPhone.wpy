@@ -1,0 +1,152 @@
+<style lang="scss" scoped>
+/*手机号授权*/
+.wx-phone{
+    position:fixed;
+    width:100%;
+    height:100%;
+    top:0;
+    left:0;
+    background: rgba(0,0,0,0.5);
+    z-index:999;
+    .phone-layer{
+        background:#fff;
+        width:520rpx;
+        margin:0 auto;
+        position:relative;
+        top:30%;
+        border-top-left-radius:8rpx;
+        border-top-right-radius:8rpx;
+        .layer-box{
+            display:flex;
+            align-content: center;
+            flex-wrap: wrap;
+            border-bottom:#e6e6e6 1px solid;
+            height:160rpx;
+        }
+        .box-title{
+            display:flex;
+            align-items:center;
+            justify-content:center;
+            width:100%;
+            font-size:36rpx;
+            color:#000;
+        }
+        .box-content{
+            display:flex;
+            align-items:center;
+            justify-content:center;
+            width:100%;
+            font-size:28rpx;
+            color:#999;
+            margin-top:15rpx;
+            letter-spacing: 2rpx;
+        }
+        .btn-sure{
+            display:flex;
+            align-items:center;
+            justify-content:center;
+            margin:0rpx;
+            padding:0rpx;
+            width:100%;
+            height:90rpx;
+            background:#fff;
+            font-size:36rpx;
+            border-radius: 0;
+            border:none;
+            color:#3CC51F;
+            border-bottom-right-radius:8rpx;
+            border-bottom-left-radius:8rpx;
+        }
+    }
+}
+</style>
+<template>
+<!-- 手机号授权 -->
+<view class="wx-phone" wx:if="{{layerPhone}}" @tap.stop="preventClick">
+  <view class="phone-layer">
+    <view class="layer-box">
+      <view class="box-title">提示</view>
+      <view class="box-content">手机授权登录后享受更多免费服务</view>
+    </view>  
+    <button 
+      class="btn-sure" 
+      open-type="getPhoneNumber" 
+      @getphonenumber="getPhoneNumber"
+    >
+      确定
+    </button>
+  </view>
+</view>
+</template>
+<script>
+import wepy from 'wepy'
+import userManager from '@/utils/user-manager'
+import windowUtil from '@/utils/window-util'
+import http from '@/utils/http-util'
+import { API_URL } from '@/const'
+export default class BindPhone extends wepy.component {
+  data={
+    layerPhone:false,
+  }
+  props={
+ 
+  }
+  onLoad(){
+    this.checkUserBindphone()
+  }
+  methods={
+    preventClick(){
+      return false
+    },
+    getPhoneNumber(e){
+      var encryptedData=e.detail.encryptedData,
+          iv=e.detail.iv
+      if(encryptedData&&iv){
+        windowUtil.showLoading()
+        userManager.getPhoneNumber(e.detail).then(data => {
+          windowUtil.success('绑定成功')
+          this.hide()
+        }).catch(err => {
+          windowUtil.error('绑定失败')
+        })
+      }
+    }     
+  }
+  show(){
+    // wx.hideTabBar()
+    this.layerPhone=true
+    this.$apply()
+  }
+  hide(){
+    // wx.showTabBar()
+    this.layerPhone=false
+    this.$apply()
+  }
+  // 判断用户是否绑定手机号
+  checkUserBindphone(){
+    var self=this
+    wx.login({
+      success: function(res) {
+        if (res.code) {
+          http.getRequest(API_URL.CODE_TO_OPENID, {code: res.code}).then(data=>{
+            wx.setStorageSync('openId',data)
+            http.getRequest(API_URL.BIND_PHONE,{openId:data}).then(data=>{
+              if(data==0){
+                self.show()      
+              }else if(data==1){
+                self.hide() 
+              }
+            })
+          }).catch(err=>{
+            console.error('获取openId失败')
+          })
+        } else {
+          console.log('登录失败！' + res.errMsg)
+        }
+      }
+    })
+  }
+
+
+}
+</script>

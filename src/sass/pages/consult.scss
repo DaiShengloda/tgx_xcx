@@ -1,0 +1,241 @@
+.note {
+    background:#f2f2f2; 
+    overflow-x:hidden;   
+    // 推荐阅读
+    .recommend {
+        background: #fff;
+        margin-top: r(20);
+        .rec-title {
+            display:flex;
+            align-items:center;   
+            padding: r(20) r(30); 
+            border-bottom:#ccc 1px solid;            
+            .hot{
+                width: r(50);
+                height: r(50);
+            }
+            text{
+                font-size:16px;
+                padding-left:r(14);                
+            }
+        }
+        .rec-box{
+            .content-box {
+                margin:r(15) r(30) r(0) r(30);
+                border-bottom:#ccc 1px solid; 
+                padding-bottom: r(20);  
+                .box-content {
+                    position: relative;
+                    margin: r(25) 0; 
+                    image {
+                        width: 20px;
+                        height: 20px;
+                        position:absolute;
+                        top:8rpx;                                                    
+                    }
+                    .content-title {
+                        font-size:r(34);
+                        // padding-left:r(24);  
+                        // position:relative;
+
+                        // height:r(50);
+                        line-height:r(50);   
+                        font-weight: bold;   
+                        overflow: hidden;
+                        text-overflow: ellipsis;
+                        display: -webkit-box;
+                        -webkit-line-clamp: 2;
+                        -webkit-box-orient: vertical;  
+                        text-indent: 1.5em;                                    
+                    }
+                }
+                .box-msg {
+                    font-size:r(26);
+                    color:#999;  
+                    margin-top:r(-10); 
+                    .msg-time {
+
+                    }
+                    .msg-name {
+                        padding:0 r(10) 0 r(20);                        
+                    }
+                    .msg-title {
+                        
+                    }
+                }
+            }
+            .content-box:last-child{
+                border-bottom: none;
+            }
+        }
+    }
+    // tab切换
+    .note-tab {
+        margin-top: r(20);
+        background: #fff;
+        // tab栏
+        .tab-box {
+            display: flex;
+            width: 100%;
+            background: #fff;
+            z-index: 999;
+            position: unset;
+            top:0;
+            .default {
+                display: block;
+                width: 50%;
+                border-bottom: 2px solid #ccc;
+                color: #000;
+                height:r(80);
+                line-height:r(80);
+                font-size:r(30);
+                text-align:center;                
+            }
+            .active {
+                border-bottom: 2px solid red;
+                color: red;
+            }
+        }
+        .fixed {
+            position: fixed;         
+        }
+        // 内容区
+        .content-box {
+            .contShow {
+                display: block;
+                background: #fff;
+            }
+            .contHid {
+                display: none;
+                background: #fff;
+            }
+            .time-line{
+                width:30rpx;
+                height:30rpx;
+                position:absolute;
+                left:-15rpx;
+                top:36rpx;                
+            }
+            .note-box {
+                margin:0px 20rpx 0px 50rpx;
+                position:relative;
+                border-left:#e6e6e6 1px solid;
+                padding-left:30rpx;
+                padding-top:30rpx; 
+                .box-top {
+                    .top-time {
+                        font-size: r(24);
+                        color: #999;
+                    }
+                }
+                .box-mid {
+                    margin: r(-10) 0 r(0) 0;
+                    .mid-msg {
+                        display: flex;
+                        align-content:center;
+                        margin-top: r(10);   
+                        .icon{
+                            width: r(80);
+                            height: r(80);
+                            border-radius: 50%;
+                        }
+                        .wengu{
+                            width: 64%;
+                            height: r(80);
+                            background-size: cover;
+                        }
+                        .audio{
+                           display:block;
+                           color:#fff;
+                           font-size: r(26);
+                           margin-left: r(80);
+                           margin-top: r(20);
+                        }
+                        .time{
+                            margin:auto r(10);
+                            font-size:r(30);
+                            color: #999;
+                        }
+                        .msg{
+                            margin-top: r(10);
+                            text-align:left;
+                            max-width:r(560);
+                            .msg-name{
+                                font-size:r(30);
+                                padding-right:r(10); 
+                            }
+                            .msg-title{
+                                font-size:r(24);
+                                color: #e93030;
+                            }
+                            .msg-pro{
+                                font-size:r(24);
+                                color: #999;
+                                white-space:nowrap;
+                                overflow:hidden;
+                                text-overflow:ellipsis;                                
+                            }
+                        }
+                    }
+                    .mid-mymsg {
+                        display: flex;
+                        align-content:center;
+                        .mymsg{
+                            width: 100%;
+                            height: r(100);
+                            line-height: r(100);
+                            display: flex;
+                            .msg-myname{
+                                font-size:r(30);
+                               margin-left: r(20);
+                            }
+                            .icon{
+                                width: r(80);
+                                height: r(80);
+                                border-radius: 50%;
+                            }
+                            .time{
+                                position:absolute;
+                                right: r(30);
+                                font-size:r(30);
+                                color: #999;
+                            }
+                            
+                        }
+                    }
+                    .mid-int{
+                        margin:r(20) r(10);                        
+                        font-size: r(32);
+                        overflow: hidden;
+                        text-overflow: ellipsis;
+                        display: -webkit-box;
+                        -webkit-line-clamp: 3;
+                        -webkit-box-orient: vertical;
+                        letter-spacing:2rpx;
+                    }
+                    .mid-img {
+                        height: r(320); 
+                        display: block;
+                    }
+                }
+                .box-bom {
+                    display: flex;
+                    font-size: r(26);
+                    color: #999;
+                    margin-top:r(30);
+                    padding-bottom: r(26);
+                    border-bottom:#e6e6e6 1px solid;
+                    .bom-scan {
+
+                    }
+                    .bom-finger {
+                        padding-left:r(20);
+                    }
+                }
+            }
+            .note-box:last-child{
+                margin-bottom: 0;
+            }
+        }
+    }
+}

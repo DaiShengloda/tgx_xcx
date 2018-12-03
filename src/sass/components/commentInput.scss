@@ -1,0 +1,58 @@
+.poe-input{
+    background:rgba(77,77,77,0.5); 
+    bottom:0;
+    width:100%;
+    position:fixed; 
+    height:100%; 
+    z-index: 10; 
+    .input-box{
+        background:rgba(255,255,255,1);
+        padding:20rpx 0rpx; 
+        font-size:28rpx;  
+        width:100%;
+        position:absolute;
+        bottom:0;        
+        .input-top{
+            padding:0 30rpx;            
+            padding-bottom:20rpx;        
+            .top-lef{}
+            .top-rig{
+                float:right;
+                padding:0rpx 10rpx;
+                border:#e6e6e6 1px solid;
+                border-radius:8rpx;                            
+            }
+        }
+        .input-mid{
+            padding:0 30rpx; 
+            margin-right:40rpx;            
+            textarea{
+                border:#e6e6e6 1px solid;
+                padding:20rpx;
+                font-size:28rpx;
+                height:200rpx;
+                width:100%;                
+            }
+        }
+        .input-bom{
+            padding:0 30rpx; 
+            margin-top:20rpx;
+            height:60rpx;        
+            .bom-btn{
+                float:right;
+                font-size: r(24);
+                height:60rpx;
+                background:#e83030;
+                width:110rpx;
+                text-align:center;
+                line-height:60rpx;
+                color:#fff;
+                border-radius:8rpx;            
+            }
+        }
+    }  
+    
+    .poe-active{
+        // margin-bottom:280rpx;   
+    }
+}

@@ -1,0 +1,67 @@
+.person-register{
+    .person-msg {
+        background:#fff;
+        width:100%;
+        height:100%;    
+        .msg{
+            display: flex;
+            border-bottom: #e6e6e6 1px solid;
+            padding:30rpx;
+            align-items:center;
+            font-size:32rpx;        
+            .msg-label{
+                padding-right:20rpx;  
+                white-space:nowrap;                
+            }
+            .msg-input {
+                width:100%;
+                text-align:right;
+                font-size:28rpx;                 
+            }
+            .msg-picker {
+                width:100%;
+                text-align:right;  
+                font-size:28rpx;                
+            }
+            .msg-img{
+                height:20rpx;
+                width:50rpx;                
+            }
+        }
+    }
+    .person-blank{
+        height:290rpx;
+    }
+    .submit-box{
+        position: fixed;
+        padding-bottom:30rpx;
+        bottom:0;
+        z-index:999;
+        background:#fff;           
+        .box-text{
+            display:flex;
+            padding:20rpx 30rpx 15rpx 30rpx;            
+            checkbox{
+                width:60rpx
+            }      
+            .text{
+                padding-left:10rpx;  
+                font-size:30rpx;                
+            }
+        }
+        .submit{
+            height:80rpx;
+            line-height:80rpx;
+            margin:15rpx 30px 0rpx 90rpx;
+            background:#c1c1c1;
+            color: #000;
+            text-align:center;
+            font-size:16px;    
+            border-radius:10rpx;         
+        }
+        .active{
+            background: #e83030;
+            color: #fff;
+        }
+    }
+}

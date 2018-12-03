@@ -1,0 +1,191 @@
+<style lang="scss">
+.user-action{
+    .action-token{
+        height: 80rpx;
+        line-height: 80rpx;
+        padding: 0 15rpx;
+        background: #e93030;
+        color:#fff;
+        font-size: 28rpx;
+        margin:50rpx;
+        text-align: center;
+    }
+    .action-set{
+        height: 80rpx;
+        line-height: 80rpx;
+        padding: 0 15rpx;
+        background: #e93030;
+        color:#fff;
+        font-size: 28rpx;
+        margin:50rpx;
+        text-align: center;
+    }
+}
+</style>
+<template>
+<view class="user-action">
+    <view @tap.stop="" class="action-token">获取access_token</view>
+    <view @tap.stop="addActionSetId" class="action-set">生成数据源ID</view>
+    <view @tap.stop="getActionSetId" class="action-set">数据源查询</view>
+    <view @tap.stop="passData" class="action-set">回传数据</view>
+    <button open-type="getPhoneNumber" bindgetphonenumber="getPhoneNumber" class="action-set">授权获取手机号</button>
+</view>
+</template>
+<script>
+import wepy from 'wepy'
+import http from '@/utils/http-util'
+import utils from '@/utils/common-util'
+import { API_URL, formIdUrl } from '@/const'
+import userManager from '@/utils/user-manager'
+export default class UserAction extends wepy.page{
+    config = {
+        navigationBarTitleText: '用户行为',  
+        enablePullDownRefresh: false,
+    }
+    components = {
+    }
+    data={
+        // 通用参数
+        timestamp:'',
+        nonce:'',
+        access_token:'12_CnnRXLCi99Zs-4NMEkGx0NheHsKv06W9OeuO5HywjdLAIwJVldyxa3sm2WhxLLm3Mwi9zBBoAWwNwvLdI_Q47kkh_cOSUXICQ1bKy_IVgoN2AX_s19ksHqqAAfob4boQqkrUoCwuPQZHL8qBNCDhAIACRS',
+        // click_id
+        click_id:'wx0nygfe5kqijkhy00',
+        // 1107781358   
+        user_action_set_id:'1107781358',
+    }
+    methods={
+        // 获取token
+        getToken(){
+            var self=this
+            wx.request({
+                url: "https://api.weixin.qq.com/cgi-bin/token?grant_type=client_credential&appid=wx14e06721e8717740&secret=645f2794e604cd37fd3f5066985aeab8", 
+                method: 'GET',
+                data: {},
+                success: function(res) {
+                    self.access_token=res.data.access_token
+                    wx.setStorageSync('access_token',res.data.access_token);
+                },
+                fail: function(err){
+                    console.log(err)
+                }
+            })
+        },
+        // 创建数据源
+        addActionSetId(){
+            var self=this
+            var data={
+                "type": "WEB",
+                "name": "wxad-WEB",
+                "description": "test-WEB",
+            }
+            wx.request({
+                url: "https://api.weixin.qq.com/marketing/user_action_sets/add?version=v1.0&access_token="+self.access_token, 
+                method: 'POST',
+                data: data,
+                header:{
+                    "Content-Type":"application/json"
+                },
+                success: function(res) {
+                    // console.log(res.data)
+                    // self.user_action_set_id=res.data.user_action_set_id
+                },
+                fail: function(err){
+                    console.log(err)
+                }
+            })
+        },
+        // 获取数据源id相关列表
+        getActionSetId(){
+            var self=this
+            wx.request({
+                url: "https://api.weixin.qq.com/marketing/user_action_sets/get?version=v1.0&access_token="+self.access_token, 
+                method: 'GET',
+                data: {
+                    "user_action_set_id":self.user_action_set_id
+                },
+                header:{
+                    "Content-Type":"application/json"
+                },
+                success: function(res) {
+                    console.log(res.data)
+                },
+                fail: function(err){
+                    console.log(err)
+                }
+            })
+        },
+        // 回传
+        passData(){
+            var self=this
+            wx.request({
+                url: "https://api.weixin.qq.com/marketing/user_actions/add?version=v1.0&access_token="+self.access_token, 
+                method: 'POSt',
+                data: {
+                    'actions':[
+                        {
+                            "user_action_set_id":self.user_action_set_id,
+                            "url":"http://weixin.wts9999.cn/t/wxbwjkzjjb.html?e=07&c=weixin&p=xt-et-04&wx_aid=1630728379&tid=1630728418&gdt_vid=wx0nygfe5kqijkhy00&wx_traceid=wx0nygfe5kqijkhy00",
+                            // "action_time":'',
+                            "action_type":"COMPLETE_ORDER",
+                            "trace":{
+                                "click_id":self.click_id
+                            },
+                            "action_param":{
+                                "value": 40
+                            }
+                        }
+                    ]
+                },
+                header:{
+                    "Content-Type":"application/json"
+                },
+                success: function(res) {
+                    console.log(res.data)
+                },
+                fail: function(err){
+                    console.log(err)
+                }
+            })
+        },
+        // 授权手机号
+        getPhoneNumber(e){
+            console.log(e)
+            console.log(e.detail.errMsg) 
+            console.log(e.detail.iv) 
+            console.log(e.detail.encryptedData)
+            userManager.getPhoneNumber(e.detail).then(data => {
+                console.log(data)
+            }).catch(err => {
+                console.error(err)
+            }); 
+        }
+    }
+    onLoad(option){  
+        var click_id=option.click_id
+        console.log('click_id: '+click_id)
+        // this.getToken()
+    }
+    onShow(){
+        // wx.navigateTo({url:'/subPages/activity/pages/adOne?user_action_set_id=1107781358&access_token=12_CnnRXLCi99Zs-4NMEkGx0NheHsKv06W9OeuO5HywjdLAIwJVldyxa3sm2WhxLLm3Mwi9zBBoAWwNwvLdI_Q47kkh_cOSUXICQ1bKy_IVgoN2AX_s19ksHqqAAfob4boQqkrUoCwuPQZHL8qBNCDhAIACRS'})
+    }
+    // 分享
+    onShareAppMessage(res) {
+        var click_id='99'
+        if (res.from === 'button') {
+            // 来自页面内转发按钮
+            console.log(res.target)
+        }
+        return {
+            title: '签到',
+            path: 'subPages/activity/pages/sign?click_id=' + click_id
+        }
+    } 
+    checkToken(){
+        this.access_token=wx.getStorageSync('access_token')
+        if(!this.access_token)return false
+        return true
+    }
+
+}
+</script>

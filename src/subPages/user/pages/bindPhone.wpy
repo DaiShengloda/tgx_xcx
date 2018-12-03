@@ -1,0 +1,193 @@
+<style lang='scss'>
+@import '../../../sass/base/reset';
+@import '../../../sass/commons/function';
+.bindPhone {
+  font-size: 15px;
+  background: #fff;
+  height: 100%;
+}
+.bindPhone .top {
+  background: #eeeeee;
+  padding: 10px 15px;
+  color: #a5a5a5;
+}
+.bindPhone form {
+  .input-g {
+    display: flex;
+    height: 50px;
+    width: 100%;
+    align-items: center;
+    border-bottom: 1px solid #ccc;
+    input {
+      height: 100%;
+      width: 100%;
+      padding-left: 15px;
+      line-height: normal;
+    }
+    .code-btn {
+      width: 50%;
+      border-left: 1px solid #ccc;
+      text-align: center;
+    }
+    .old_mobile {
+      width: 100%;
+      height: 100%;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 15px;
+    }
+  }
+  button {
+    width: 90%;
+    background: #e93030;
+    color: #fff;
+    margin-top: 50px;
+    font-size: 18px;
+  }
+  .notice {
+    width: 80%;
+    margin: 40px auto;
+    color: #b1b1b1;
+    font-size: 15px;
+    line-height: 25px;
+  }
+}
+</style>
+<template>
+  <view class='bindPhone'>
+    <view class='top'>
+      <text wx:if='{{type == 1}}'>为保障您的账户安全,请绑定手机号</text>
+      <text wx:if='{{type == 2}}'>为了账户安全,请先验证原手机号</text>
+    </view>
+    <form @submit='submit'>
+      <view class='input-g'>
+        <input wx:if='{{type == 1}}' name='mobile' type='number' maxlength='11' placeholder='请输入手机号' @input='onInputMobile'/>
+        <view wx:if='{{type == 2}}' class='old_mobile'>
+          <view>原手机号</view>
+          <view>{{oldMobile || ''}}</view>
+        </view>
+      </view>
+      <view class='input-g'>
+        <input name='code' type='number' maxlenght='4' placeholder='请输入手机验证码' @input='setCode'/>
+        <view wx:if='{{time <= 0}}' class='code-btn' @tap='getCode'>获取验证码</view>
+        <view wx:if='{{time > 0}}' class='code-btn'>{{time}}s重新获取</view>
+      </view>
+      <button wx:if='{{type == 1}}' form-type='submit'>完成绑定</button>
+      <button wx:if='{{type == 2}}' @tap='next'>下一步</button>
+      <view class='notice' wx:if='{{notice}}'>
+        <text>说明:\n{{notice}}</text>
+      </view>
+    </form>
+  </view>
+</template>
+
+<script>
+import wepy from 'wepy';
+import http from '@/utils/http-util';
+import { API_URL } from '@/const';
+import { regular } from '@/utils/common-util';
+import windowUtil from '@/utils/window-util';
+export default class BindPhone extends wepy.page {
+  config = {
+    navigationBarTitleText: '绑定手机号',
+    enablePullDownRefresh: false
+  };
+  data = {
+    mobile: null,
+    time: 0,
+    //类型 1绑定手机号/2更换手机号
+    type: 1,
+    //原手机号
+    oldMobile: null,
+    //说明文字
+    notice: '',
+    //输入的验证码
+    code: null
+  };
+  methods = {
+    onInputMobile(e) {
+      this.mobile = e.detail.value;
+    },
+    setCode(e) {
+      this.code = e.detail.value;
+    },
+    getCode() {
+      let mobile = null;
+      if (!regular().isPhone(this.mobile)) {
+        windowUtil.alert('手机号码不合法');
+        return false;
+      }
+      windowUtil.showLoading();
+      http
+        .getRequest(API_URL.GET_YZ_CODE, {
+          mobile: this.mobile
+        })
+        .then(data => {
+          windowUtil.hideLoading();
+          this.time = 60;
+          let timer = setInterval(() => {
+            if (this.time <= 0) {
+              clearInterval(timer);
+            }
+            this.time--;
+            this.$apply();
+          }, 1000);
+        })
+        .catch(err => windowUtil.alert(err.errmessage));
+    },
+    submit(e) {
+      let { mobile, code } = e.detail.value;
+      if (!regular().isPhone(this.mobile)) {
+        windowUtil.alert('手机号码不合法');
+        return false;
+      }
+      if (code.length < 4) {
+        windowUtil.alert('请输入4位验证码');
+        return false;
+      }
+      windowUtil.showLoading();
+      http
+        .getRequest(API_URL.BIND_MOBILE, {
+          mobile,
+          code
+        })
+        .then(data => wx.switchTab({ url: '/pages/tabBar/userCenter' }))
+        .catch(err => windowUtil.alert(err.errmessage));
+    },
+    next() {
+      if (!this.code || this.code.length < 4) {
+        windowUtil.alert('请输入4位验证码');
+        return false;
+      }
+      windowUtil.showLoading();
+      http
+        .getRequest(API_URL.CHECK_OLD_MOBILE, {
+          mobile: this.mobile,
+          code: this.code
+        })
+        .then(data => {
+          wx.navigateTo({ url: 'bindPhone?type=1' });
+        })
+        .catch(err => {
+          windowUtil.alert(err.errmessage);
+        });
+    }
+  };
+  onLoad(options) {
+    this.type = options.type || 1;
+    if (this.type == 1) {
+      wx.setNavigationBarTitle({ title: '绑定手机号' });
+    } else {
+      wx.setNavigationBarTitle({ title: '更换手机号' });
+      http.getRequest(API_URL.GET_OLD_MOBILE).then(data => {
+        this.oldMobile = data.mobile;
+        this.notice = data.explain.replace(/\s+/,'');
+        this.mobile = data.phone
+        this.$apply();
+      });
+    }
+  }
+}
+</script>
+

@@ -1,0 +1,116 @@
+<style lang="scss">
+page {
+  height: 100%;
+  .wx-contact {
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.9);
+    .contact-layer {
+      background: #fff;
+      width: 500rpx;
+      margin: 0 auto;
+      position: relative;
+      top: 300rpx;
+      border-top-left-radius: 8rpx;
+      border-top-right-radius: 8rpx;
+      .layer-content {
+        padding: 30rpx;
+        font-size: 38rpx;
+      }
+      .layer-buttons {
+        display: flex;
+        align-items: center;
+        height: 100rpx;
+        border-top: #e6e6e6 1px solid;
+        .btn-cancle {
+          width: 50%;
+          height: 100rpx;
+          line-height: 100rpx;
+          text-align: center;
+          font-size: 18px;
+          border-right: #e6e6e6 1px solid;
+        }
+        .btn-sure {
+          margin: 0rpx;
+          padding: 0rpx;
+          width: 50%;
+          height: 100rpx;
+          line-height: 100rpx;
+          background: #fff;
+          font-size: 18px;
+          border-radius: 0;
+          border: none;
+        }
+        .btn-sure::after {
+          border-radius: 0;
+          border: none;
+        }
+      }
+    }
+  }
+}
+</style>
+<template>
+<view class="wx-contact" wx:if="{{showShare}}">
+    <view class="contact-layer">
+        <view class="layer-content">点击确定按钮跳转到分享</view>
+        <view class="layer-buttons">
+            <view class="btn-cancle" @tap.stop="cancle">取消</view>
+            <button class="btn-sure" open-type="share">确定</button>
+        </view>
+    </view>
+</view>
+</template>
+<script>
+import wepy from 'wepy';
+import { navigateTo, switchTab } from '@/utils/route';
+export default class Contact extends wepy.page {
+  config = {
+    enablePullDownRefresh: false
+  };
+  data = {
+    showShare: false,
+    _options: null
+  };
+  methods = {
+    cancle() {
+      wx.navigateBack({
+        delta: 1
+      });
+    }
+  };
+  onLoad(options) {
+    this._options = options;
+  }
+  onShow() {
+    var type = this._options.type;
+    if (type == 'wxShare') {
+      this.showShare = true;
+    } else {
+      this.showShare = false;
+      wx.navigateBack({
+        delta: 1
+      });
+    }
+  }
+  onReady() {}
+  onHide() {
+    this._options.type = null;
+  }
+  onUnload() {}
+  
+  onShareAppMessage(res) {
+    // var url='https://tgs.gp58.com/static/html/tgs_zt_mobile/prize.html'
+    var url=this._options.shareUrl
+    if (res.from === 'button') {
+      // 来自页面内转发按钮
+      console.log(res.target);
+    }
+    return {
+      title: '免费抽奖',
+      imageUrl:"/static/images/page.jpg",
+      path: 'pages/tabBar/index?webView=' + url
+    };
+  }
+}
+</script>

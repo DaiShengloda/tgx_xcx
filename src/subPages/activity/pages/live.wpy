@@ -1,0 +1,1293 @@
+<!--视频直播-->
+<style lang='scss'>
+#player {
+  width: 100%;
+  position:fixed; 
+  z-index:9;
+  top:0px;
+  .load-box{
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    .box-img{
+      width:100rpx;
+      height:100rpx;
+    }
+  }
+}
+#player .cover {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+}
+#player .control {
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  box-sizing: border-box;
+  width: 100%;
+  padding: 10px;
+}
+#player .control .full-screen {
+  float: right;
+  width: 35px;
+  height: 35px;
+}
+
+/*弹窗部分定义*/
+.pop-bac {
+  width: 100%;
+  height: 100%;
+  position: fixed;
+  top: 0;
+  left: 0;
+  background: rgba($color: #000000, $alpha: 0.5);
+  z-index: 1000;
+}
+/*门票使用框*/
+.pop-bac .pop-ticket {
+  position: absolute;
+  width: 80%;
+  top: 50%;
+  left: 10%;
+  transform: translate(0, -50%);
+  background: rgba($color: #fff, $alpha: 1);
+  z-index: 1001;
+  box-sizing: border-box;
+  border-radius: 5px;
+}
+.pop-bac .pop-ticket .top-image {
+  position: relative;
+  .top {
+    width: 100%;
+    height: 150px;
+  }
+  .close {
+    position: absolute;
+    top: 0;
+    width: 20px;
+    height: 20px;
+    margin: 20rpx;
+  }
+}
+.pop-bac .pop-ticket .sm {
+  text-align: center;
+  margin: 10px 0;
+  font-size: 15px;
+  .sm-b {
+    // display: flex;
+    // justify-content: center;
+    .sm-b-lef{
+      float:left;
+      width:50%;
+      text-align:right;
+    }
+    .sm-b-rig{
+      text-align:left;
+      color:#ff0000;
+    }
+  }
+}
+.pop-bac .pop-ticket .ticket-info {
+  width: 80%;
+  text-align: center;
+  background: #efeff9;
+  margin: 0 auto;
+  border-radius: 5px;
+  line-height: 1.5;
+  padding: 5px 0;
+  font-size: 13px;
+}
+.pop-bac{
+  .pop-ticket{
+    .ticket-card{
+      display:flex;
+      align-items:center;
+      width:80%;
+      height:25px;
+      margin:0 auto;
+      justify-content:space-between;
+      margin-top:15px;
+      font-size:15px;
+      .card-text{
+
+      }
+      .card-radio{
+        width:40rpx;
+        height:40rpx;
+        border:1px solid #dcdcdc;
+        border-radius:50%
+      }
+      .card-img{
+        width:40rpx;
+        height:40rpx;
+      }
+    }
+  }
+}
+.pop-bac .pop-ticket .ticket-pay-btn {
+  border-radius: 5px;
+  background-color: #e93030;
+  color: #fff;
+  font-size: 13px;
+  width: 80%;
+  margin: 20px auto;
+  text-align: center;
+  height: 30px;
+  line-height: 30px;
+  position: relative;
+}
+/*聊天部分**/
+.chat {
+  position: relative;
+  box-sizing: border-box;
+}
+.chat .header {
+  display: flex;
+  align-items: center;
+  padding: 0 10px;
+  font-size: 14px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.chat .header .h-c {
+  height: 100%;
+  display: flex;
+  align-items: center;
+  width:100%;
+  .chat-title{
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+}
+.chat .header .icon {
+  width: 20px;
+  height: 20px;
+  margin-right: 10px;
+}
+.chat .header .online {
+  margin-right: 10px;
+  font-size: 12px;
+  background: #e93030;
+  color: #fff;
+  border-radius: 5px;
+  padding: 4px;
+}
+.chat .chat-container {
+  position: absolute;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: #eee;
+  font-size: 14px;
+  padding: 10px;
+  box-sizing: border-box;
+}
+.chat .chat-container .loading {
+  height: 20px;
+  font-size: 12px;
+  margin-bottom: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #999;
+  image {
+    width: 20px;
+    height: 20px;
+    margin-right: 10px;
+  }
+}
+.chat .chat-container {
+  .time {
+    text-align: center;
+    font-size: 12px;
+    margin: 10px;
+  }
+  .time text {
+    color: white;
+    background-color: #b9b7b7;
+    font-size: 12px;
+    padding: 2px 4px;
+    border-radius: 3px;
+  }
+}
+.chat .chat-container .chat-item {
+  width: 80%;
+  margin-bottom: 10px;
+  .user-icon {
+    image {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+    }
+    float: left;
+    width: 15%;
+  }
+  .msg-box {
+    .user-name {
+      color: #507daf;
+    }
+    .msg-content {
+      color: #000000;
+    }
+    background-color: #fff;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    box-sizing: border-box;
+    padding: 5px;
+    font-size: 15px;
+    float: left;
+    max-width: 85%;
+    overflow: hidden;
+    word-break: break-all;
+  }
+}
+.bottom {
+  position: fixed;
+  width: 100%;
+  left: 0;
+  bottom: 0;
+  background: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 10px;
+  box-sizing: border-box;
+}
+.bottom .send-input {
+  height: 60%;
+  width: 80%;
+  border: 1px solid #ccc;
+  margin-right: 10px;
+  font-size: 14px;
+  border-radius: 5px;
+  padding: 0 5px;
+  box-sizing: border-box;
+}
+.bottom .send-btn {
+  color: #fff;
+  font-size: 14px;
+  background-color: #e93030;
+  margin: 0;
+  height: 60%;
+  width: 100%;
+  line-height: 2;
+}
+.right-btns {
+  position: fixed;
+  width: 20%;
+  bottom: 70px;
+  right: 0;
+}
+.right-btns .dk-btn {
+  padding: 10px;
+}
+.right-btns .dk-btn image {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+}
+.right-btns .dk-btn .dk-logo {
+  position: relative;
+  font-size: 12px;
+  background: #ffbf00;
+  width: 40px;
+  color: #fff;
+  text-align: center;
+  border-radius: 5px;
+  top: -15px;
+}
+
+.pop-bac .pop-dkinfo-wrapper {
+  position: absolute;
+  left: 5%;
+  top: 50%;
+  transform: translate(0, -50%);
+  width: 90%;
+}
+.pop-bac .pop-dkinfo-wrapper .close {
+  color: #ccc;
+  width: 30px;
+  height: 30px;
+  text-align: center;
+  line-height: 30px;
+  position: absolute;
+  background: #fff;
+  top: -10px;
+  right: 0;
+  border-radius: 50%;
+  border: 1px solid #ccc;
+  top: 13px;
+  z-index: 1002;
+  font-size:32rpx;
+}
+
+.pop-bac .pop-dkinfo {
+  width: 90%;
+  background: rgba($color: #fff, $alpha: 1);
+  box-sizing: border-box;
+  border-radius: 10rpx;
+  padding: 26rpx;
+  margin: 20px auto;
+}
+.pop-bac .pop-dkinfo .top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin: 40rpx auto;
+  .top-lef{
+    display:flex;
+    align-items:center;
+    .icon {
+      width: 100rpx;
+      height: 100rpx;
+      border-radius: 50%;
+      float:left;
+      margin-right:9px;
+    }
+    .mid {
+      .info {
+        margin-bottom: 10rpx;
+        .user-name {
+          font-size: 36rpx;
+          float:left;
+          margin-right:10rpx;
+          height:40rpx;
+          line-height:40rpx;
+        }
+        .user-title {
+          font-size: 28rpx;
+          height:40rpx;
+          line-height:40rpx;
+        }
+      }
+      .gz-num {
+        font-size: 26rpx;
+        color: #999;
+      }
+    }
+  }
+}
+.pop-bac .pop-dkinfo .top .gz-btn {
+  display: block;
+  font-size: 28rpx;
+  background: #e93030;
+  color: #fff;
+  height: 54rpx;
+  line-height: 54rpx;
+  border-radius: 5px;
+  -webkit-border-radius: 5px;
+  -moz-border-radius: 5px;
+  width:4em;
+  text-align:center;
+}
+.pop-bac .pop-dkinfo .top .gz-btn-disable {
+  display: block;
+  font-size: 28rpx;
+  background: #ccc;
+  color: #fff;
+  height: 54rpx;
+  line-height: 54rpx;
+  border-radius: 5px;
+  -webkit-border-radius: 5px;
+  -moz-border-radius: 5px;
+  width:4em;
+  text-align:center;
+}
+.pop-bac .pop-dkinfo .profile {
+  background-color: #f7f7f7;
+  padding: 20rpx 16rpx;
+  border-radius: 10rpx;
+  font-size: 28rpx;
+  line-height: 1.5;
+  word-break: break-all;
+  word-wrap: break-word;
+  white-space: normal;
+}
+.live-layer-box{
+  z-index:99999;
+  background:rgba(0,0,0,0.3);
+  position:fixed;
+  width:100%;
+  height:100%;
+  top:0;
+  .live-layer{
+    background: #fff;
+    width:500rpx;
+    margin:0 auto;
+    margin-top:50%;
+    height:200rpx;
+    border-radius:10rpx;
+    .layer-title{
+      height:80rpx;
+      font-size:32rpx;
+      padding:15rpx 20rpx;
+    }
+    .layer-box{
+      display:flex;
+      align-items: center;
+      font-size:32rpx;
+      height:90rpx;
+      border-top:#e6e6e6 1px solid;
+      .box-cancle{
+        width:50%;
+        height:100rpx;
+        line-height:100rpx;
+        text-align:center;
+        border-right:#e6e6e6 1px solid;
+      }
+      .box-sure{
+        width:50%;
+        height:100rpx;
+        line-height:100rpx;
+        text-align:center;
+      }
+    }
+  }
+}
+</style>
+<template>
+  <view>
+    <!--播放器部分 liveRoomInfo.url  rmtp_live_stream-->
+    <view style='height:{{videoHeight}}px;width:{{videoWidth}}px'></view>
+    <live-player 
+      id='player'
+      style='height:{{videoHeight}}px;width:{{videoWidth}}px' 
+      src='{{liveRoomInfo.rmtp_live_stream}}'
+      mode='live'
+      object-fit='fillCrop'
+      max-cache='60'
+      @tap='showControl'
+      @statechange='playerStatechange'
+    >
+      <!--播放器控制区--> 
+      <cover-view class='control' hidden='{{!playerControlShow}}'>
+        <cover-image class='full-screen' wx:if='{{playerIsFullScreen}}'
+          src='/static/images/player_panel_zoomout.png' @tap='onFullScreen'/>
+        <cover-image class='full-screen' wx:else
+          src='/static/images/player_panel_zoomin.png' @tap='onFullScreen'/>
+      </cover-view>
+      <!--播放器覆盖图片-->
+      <cover-view class='cover' hidden='{{!showCover}}'>
+        <cover-image src='{{coverImage}}'
+          style='width:100%;height:{{videoHeight}}px'/>
+      </cover-view>
+      <!--播放器加载动画 -->
+      <!-- <cover-view class='load-box' style='width:100%;height:{{videoHeight}}px' wx:if='{{loadingAnimate}}'>
+        <cover-image class="box-img" style="transform:rotate({{loadingAngle}}deg);" src='/static/images/loading.png'/>
+      </cover-view> -->
+    </live-player>
+    <!--弹窗开始-->
+    <!---大咖信息弹窗-->
+    <cover-view class='pop-bac' hidden='{{!zhuBoInfoShow}}'>
+        <cover-view class='pop-dkinfo-wrapper'>      
+          <cover-view class='pop-dkinfo'>
+            <cover-view class='top'>
+              <cover-view class="top-lef">
+                <cover-image class='icon' src='{{zhuBoInfo.user_ico}}'/>
+                <cover-view class='mid'>
+                  <cover-view class='info'>
+                    <cover-view class='user-name'>{{zhuBoInfo.user_name}} |</cover-view>
+                    <cover-view class='user-title'>{{zhuBoInfo.user_title}}</cover-view>
+                  </cover-view>
+                  <cover-view class='gz-num'>关注:{{zhuBoInfo.user_noticer_nums}}</cover-view>
+                </cover-view>
+              </cover-view>
+              <cover-view class='gz-btn' wx:if='{{zhuBoInfo.mynoticed == 0}}' @tap='notice({{zhuBoInfo.userid}})'>
+                加关注
+              </cover-view>
+              <cover-view class='gz-btn-disable' wx:else>已关注</cover-view>
+            </cover-view>
+            <cover-view class='profile'>{{zhuBoInfo.bigname_detail}}</cover-view>
+          </cover-view>
+          <cover-view class='close' @tap='closeZhuBoInfo'>X</cover-view>
+        </cover-view>
+    </cover-view>
+    <!--使用弹窗-->
+    <cover-view class='pop-bac' wx:if='{{liveRoomInfo.needPay == 1}}'>
+        <!--使用弹窗-->
+        <cover-view class='pop-ticket'>
+            <!--顶部图片-->
+            <cover-view class='top-image'>
+              <cover-image class='top' 
+                src='https://dakaname.oss-cn-hangzhou.aliyuncs.com/mini_app_icons/zhiboshitc.png'/>
+              <cover-image class='close' src='/static/images/close.png' @tap.stop='closePay'/>
+            </cover-view>
+            <!--说明-->
+            <cover-view class='sm'>
+              <cover-view>因当前在线人数过多</cover-view>
+              <cover-view class='sm-b'>
+                <cover-view class="sm-b-lef">进入直播室</cover-view>
+                <cover-view class="sm-b-rig">需要入场券</cover-view>
+              </cover-view>
+            </cover-view>
+            <!--门票信息-->
+            <cover-view class='ticket-info'>
+              <cover-view>入场券价格: {{liveRoomInfo.ticketInfo.priceDesc}}</cover-view>
+              <cover-view>入场券有效期: {{liveRoomInfo.ticketInfo.expireDesc}}</cover-view>
+            </cover-view>
+            <!-- 券支付开关选择器 -->
+            <cover-view class="ticket-card"
+                        wx:if="{{liveRoomInfo.ticketInfo.other.payType}}">
+              <cover-view class="card-text">使用券观看</cover-view>
+              <cover-view class="card-radio" 
+                          @tap.stop='togSwitch(3)'
+                          wx:if="{{liveRoomInfo.ticketInfo.payType==1}}">
+              </cover-view>
+              <cover-image class='card-img' 
+                           src='/static/images/choosed.png' 
+                           @tap.stop='togSwitch(1)'
+                           wx:elif="{{liveRoomInfo.ticketInfo.payType==3}}"/>
+            </cover-view>
+            <!--底部按钮-->
+            <cover-view class='ticket-pay-btn' 
+                        @tap='onPayTicket'
+                        wx:if="{{liveRoomInfo.ticketInfo.other.payType&&liveRoomInfo.ticketInfo.other.payType==liveRoomInfo.ticketInfo.payType}}">
+              {{liveRoomInfo.ticketInfo.other.payText}}
+            </cover-view>
+            <cover-view class='ticket-pay-btn' 
+                        @tap='onPayTicket'
+                        wx:else>
+              {{liveRoomInfo.ticketInfo.payText}}
+            </cover-view>
+        </cover-view>
+    </cover-view>
+    <!--弹窗结束-->
+    <!--聊天区域-->
+    <view class='chat'>
+      <!--顶部信息-->
+      <view class='header' style='height:{{headerHeight}}px'>
+        <view wx:if='{{liveData.liveInfo.status == 1}}' class='h-c'>
+          <!-- <text class='online'>{{liveData.liveInfo.basenum}}人在线</text> -->
+          <text class='online'>直播主题</text>
+          <text class="chat-title">{{liveData.liveInfo.startTitle}}</text>
+        </view>
+        <view wx:else class='h-c'>
+          <image class='icon' src='/static/images/live-stop.png'/>
+          <text>{{liveData.liveInfo.stopTitle || liveData.liveInfo.name}}</text>
+        </view>
+      </view>
+      <!--消息区域-->
+      <scroll-view
+        class='chat-container'
+        scroll-y = 'true'
+        style='height:{{chatHeight}}px;top:{{headerHeight}}px'
+        scroll-into-view='{{scrollIntoView}}'
+        scroll-with-animation='false'
+        @scrolltoupper='scrolltoupper'
+        upper-threshold='30'
+      >
+        <!--加载提示-->
+        <view class='loading' wx:if='{{isLoading}}'>
+          <image src='/static/images/loading.gif'/>
+          <text class='loading-txt'>正在加载</text>
+        </view>
+        <view class='loading' wx:if='{{hasNoMore}}'>
+          <text class='loading-txt'>数据加载完毕</text>
+        </view>
+        <repeat for='{{liveData.msglist}}'>
+          <view wx:if='{{item.time}}' class='time'>
+            <text>{{item.time}}</text>
+          </view>
+          <view class='chat-item' id='id-{{item.id}}'>
+            <view class='user-icon'>
+              <image src='{{item.userIco}}' wx:if="{{item.userIco}}"/>
+              <image src='/static/images/person.png' wx:else/>
+            </view>
+            <view class='msg-box'>
+              <text class='user-name'>{{item.userName}}:</text>{{item.content}}
+            </view>
+            <view style='clear:both'></view>
+          </view>
+        </repeat>
+      </scroll-view>
+    </view>
+    <!--底部发言按钮-->
+    <view class="bottom" style='height:{{bottomHeight}}px;bottom:{{keyboardHeight}}px'>
+      <input 
+        class='send-input' 
+        type='text' maxlength='30' 
+        placeholder='提个问或者说两句吧'
+        @input='onInputMsg'
+        value='{{msg}}'
+        adjust-position='{{false}}'
+        cursor-spacing="135"
+        cursor='135'
+        bindfocus="inputFocus"
+        bindblur="inputBlur"
+      />
+      <form bindsubmit="sendMsg" report-submit='true'>
+          <button class="send-btn" formType="submit">发送</button>
+      </form>
+    </view>
+    <!--右侧按钮区-->
+    <view class='right-btns'>
+      <!--大咖按钮-->
+      <view class='dk-btn' @tap='showZhuBoInfo'>
+        <image src="{{liveData.dkInfo.userIco}}"/>
+        <view class='dk-logo'><text>主播</text></view>
+      </view>
+    </view>
+    <!-- 公用彈窗 -->
+    <cover-view class="live-layer-box" wx:if="{{showLayer}}">
+      <cover-view class="live-layer" wx:if="{{showLayer}}">
+        <cover-view class="layer-title" wx:if="{{!isIOS}}">{{layerData.msg}}</cover-view>
+        <cover-view class="layer-title" wx:else>小程序暂不支持</cover-view>
+        <cover-view class="layer-box">
+          <cover-view class="box-cancle" @tap.stop="layerCancle()">取消</cover-view>
+          <cover-view class="box-sure" @tap.stop="layerSure({{layerData.action}})" wx:if="{{!isIOS}}">确定</cover-view>
+          <cover-view class="box-sure" @tap.stop="layerSure('')" wx:else>确定</cover-view>
+        </cover-view>
+      </cover-view>
+    </cover-view>
+    <hegui @fxcpFinish.user='fxcpFinish' 
+      @finish.user='heguiFinish' 
+      @agreeRuleFinish.user='agreeRule'/>
+    <!--关注组件-->
+    <notice></notice>
+  </view>
+</template>
+<script>
+import wepy from 'wepy';
+import http from '@/utils/http-util';
+import { API_URL, domain } from '@/const';
+import util from '@/utils/common-util';
+import windowUtil from '@/utils/window-util';
+import HeGui from '@/components/hegui';
+import BigManNotice from '@/components/bigManNotice';
+import {navigateTo, switchTab } from '@/utils/route';
+//直播室信息url
+let infoUrl = domain + '/live/liveroomv2/info.do';
+//使用门票地址
+let payUrl = domain + '/live/liveroomv2/payticket.do';
+//初始化数据
+let initUrl = domain + '/live/liveroomh5/init.do';
+//互动消息分页查询
+let getMsgPageUrl = domain + '/live/liveroomh5/hudong.do';
+//scoket地址
+// let webscoket_url = 'ws://tgs-api.lzyunying.com/live';
+let webscoket_url = 'wss://tgs.gp58.com/live';
+//默认用户图像
+let default_ico =
+  'http://dakaname.oss-cn-hangzhou.aliyuncs.com/pubimages/headImg.png';
+export default class Live extends wepy.page {
+  config = {
+    navigationBarTitleText: '视频直播',
+    enablePullDownRefresh: false,
+    disableScroll: true
+  };
+  components = {
+    hegui: HeGui,
+    notice: BigManNotice
+  };
+  data = {
+    //播放器高度,根据16:9动态设置
+    videoHeight: 0,
+    //播放器宽度
+    videoWidth: '100%',
+    //标题栏高度
+    headerHeight: 40,
+    //聊天区域高度
+    chatHeight: 0,
+    //底部高度
+    bottomHeight: 50,
+    //直播室信息
+    liveRoomInfo: {},
+    //播放器上下文
+    livePlayerContext: null,
+    //是否展示播放器覆盖图片
+    showCover: false,
+    //播放器覆盖图片
+    coverImage: '',
+    //直播室id
+    roomid: null,
+    //视频是否正在播放
+    playerIsPlay: false,
+    //视频控制区是否显示
+    playerControlShow: true,
+    //播放器是否处于全屏状态
+    playerIsFullScreen: false,
+    //直播数据
+    liveData: null,
+    //发送消息
+    msg: '',
+    //滚动条滚动位置
+    scrollIntoView: '',
+    //socket断线重连次数
+    socketReconnectTimes: 0,
+    //发送失败的消息队列,如果重连成功,则发送队列里的消息
+    msgQueue: [],
+    //是否正在加载
+    isLoading: false,
+    //是否还有更多数据
+    hasNoMore: false,
+    offset: 1,
+    //最近一条消息的时间(用于控制消息时间显示)
+    lastMsgTime: 0,
+    //主播信息
+    zhuBoInfo: null,
+    //控制主播信息弹窗显示
+    zhuBoInfoShow: false,
+    // 聚焦input是键盘高度
+    keyboardHeight:0,
+    // errcode对应提示及跳转
+    errcodeData:{
+      // '501':{
+      //   'msg':'小程序暂不支持',
+      //   'action':'',
+      // },
+      // '502':{
+      //   'msg':'小程序暂不支持',
+      //   'action':'',
+      // },
+      '501':{
+        'msg':'你的大咖币余额不足，是否现在充值?',
+        'action':'coinRecharge',
+      },
+      '502':{
+        'msg':'您不是VIP用户,暂时无法观看VIP直播,是否立即升级VIP?',
+        'action':'vipCenter',
+      }
+    },
+    // 网络状态
+    netWorkType:'none',
+    // 顯示layer
+    showLayer:false,
+    // 彈窗樣式
+    layerData:null,
+    // 直播室基数
+    liveDataNum:0,
+    // 视频加载动画
+    loadingAnimate:false,
+    loadingAngle:0,
+    loadingPlayer:null,
+    // 是否在当前页面
+    inCurPage:false,
+    //是否是ios系统
+    isIOS:false,
+  };
+  async onLoad(option) {
+    var res = wx.getSystemInfoSync()
+    if(res.platform == "devtools" || res.platform == "ios"){
+      this.isIOS = true
+    }
+    let sysInfo = await wepy.getSystemInfo();
+    //设置视频宽高
+    this.videoWidth = sysInfo.windowWidth;
+    this.videoHeight = Math.floor(sysInfo.windowWidth * 9 / 16);
+    //设置聊天区域高度
+    this.chatHeight =
+      sysInfo.windowHeight -
+      this.videoHeight -
+      this.bottomHeight -
+      this.headerHeight;
+    this.roomid = option.roomid;
+    //初始化直播室数据
+    await this.getNetWorkType();
+    await this.initLiveInfo();
+    this.$apply();
+
+    //连接websocket
+    wx.connectSocket({
+      url: webscoket_url + '?roomid=' + this.roomid
+    });
+    wx.onSocketOpen(() => {
+      console.log('socket connect success');
+      this.socketReconnectTimes = 0;
+      this.$apply();
+      for (let msg of this.msgQueue) {
+        this.sendSocketMessage(msg);
+      }
+    });
+    wx.onSocketError(() => {
+      console.log('socket-error:reconnect:' + this.socketReconnectTimes);
+      while (this.socketReconnectTimes < 3) {
+        wx.connectSocket({
+          url: webscoket_url + '?roomid=' + this.roomid
+        });
+        this.socketReconnectTimes++;
+        this.$apply();
+      }
+      if (this.socketReconnectTimes > 3) {
+        windowUtil.alert('服务器连接失败,请刷新重试');
+      }
+    });
+    wx.onSocketMessage(resp => {
+      let { object: body, websocketMsgType: msgType } = JSON.parse(resp.data);
+      console.log('收到socket消息', body, msgType);
+      if (msgType == 'USERMSGYES') {
+        //审核消息通过
+        let { msglist, userInfo } = this.liveData;
+        if (body.msgFrom != userInfo['userid']) {
+          msglist.push(body);
+          this.scrollIntoView = 'id-' + body.id;
+          this.$apply();
+        }
+      } else if (
+        msgType == 'LIVESTART' ||
+        msgType == 'LIVESTOP' ||
+        msgType == 'LIVETICKET'
+      ) {
+        //直播室开播/停播/开启门票,重新刷新数据
+        this.initLiveInfo();
+      } else if (msgType == 'STARTTITLE') {
+        //修改直播标题
+        this.liveData.liveInfo.startTitle = body['startTitle'];
+        this.$apply();
+      } else if (msgType == 'USERMSGREJECT') {
+        //消息撤回,删除已经存在的消息
+        let index = this.liveData.msglist.findIndex(e => body.id == e.id);
+        if (index != -1) {
+          this.liveData.msglist.splice(index, 1);
+          this.$apply();
+        }
+      } else if (msgType == 'ONLINE') {
+        //在线人数信息推送
+        this.liveData.liveInfo.basenum = body['num']+this.liveDataNum;
+        this.$apply();
+      }
+    });
+  }
+  onReady(){
+    var self=this
+    this.inCurPage=true
+    wx.onNetworkStatusChange(function(res) {
+        var curNetworkType=res.networkType
+        if(self.netWorkType==curNetworkType)return
+        if(!self.inCurPage)return
+        self.netWorkType=curNetworkType
+        self.$apply()
+        self.playVideo()
+    })
+  }
+  onShareAppMessage(res) {
+      if (res.from === 'button') {
+          // 来自页面内转发按钮
+          console.log(res.target)
+      }
+      return {
+          title: '股市直播室',
+          path: 'pages/tabBar/index?roomid=' + this.roomid
+      }
+  }
+  onUnload() {
+    wx.closeSocket();
+    this.removeLoadingAnimate();
+    this.inCurPage=false
+  }
+  //初始化直播室数据
+  async initLiveInfo() {
+    windowUtil.showLoading();
+    // 获取直播视频流信息
+    this.liveRoomInfo = await http.getRequest(infoUrl, { roomid: this.roomid });
+    // this.liveRoomInfo.rmtp_live_stream="rtmp://live.hkstv.hk.lxdns.com/live/hks" 
+    //创建播放器上下文
+    this.livePlayerContext = wx.createLivePlayerContext('player');
+    this.$apply();
+    //是否需要使用,以及直播室状态
+    let { needPay, status } = this.liveRoomInfo;
+    if (needPay == '0') {
+      // 获取直播评论区信息
+      await this.getLiveData();
+      if (status == '1') {
+        //正在直播,则自动开始播放
+        this.loadingAnimate=true;
+        this.showCover = false;
+        this.setLoadingAnimate();
+        setTimeout(() => {
+          this.playVideo();
+        }, 2000);
+      } else {
+        //暂无直播,显示占位图
+        this.showCover = true;
+        this.coverImage = this.liveRoomInfo['page'];
+        this.playerControlShow = false;
+        this.livePlayerContext.stop();
+        windowUtil.hideLoading();
+      }
+    } else {
+      //需要使用,显示占位图
+      this.showCover = true;
+      this.coverImage = this.liveRoomInfo.noPermCoverImage;
+      this.playerControlShow = false;
+      this.livePlayerContext.stop();
+      windowUtil.hideLoading();
+    }
+    this.$apply();
+  }
+  events = {
+
+  }
+  methods = {
+    //关闭门票弹窗
+    closePay() {
+      wx.navigateBack({});
+    },
+    //使用门票
+    onPayTicket() {
+      // 需要合规显示弹窗
+      this.liveRoomInfo.needPay='0'
+      this.$invoke(
+        'hegui',
+        'startHeguiForDaka',
+        this.liveRoomInfo.userid,
+        this.liveRoomInfo.cert_code
+      );
+      // this.payTicket();
+    },
+    //同意使用
+    agreeRule() {
+      wx.navigateBack();
+      this.payTicket();
+    },
+    //合规结束
+    heguiFinish() {
+      this.payTicket();
+    },
+    //风险测评结束触发
+    fxcpFinish(){
+      wx.redirectTo({ url: '/subPages/activity/pages/live?roomid=' + this.roomid });
+    },
+    //显示视频操作栏
+    showControl() {
+      // if (!this.playerIsPlay) {
+      //   return false;
+      // }
+      // if (this.playerControlShow) {
+      //   this.playerControlShow = false;
+      //   clearTimeout(this.timer);
+      // } else {
+      //   this.playerControlShow = true;
+      //   //5秒自动隐藏
+      //   this.timer = setTimeout(() => {
+      //     this.playerControlShow = false;
+      //     this.$apply();
+      //   }, 5 * 1000);
+      // }
+    },
+    //点击全屏播放
+    onFullScreen() {
+      if (this.playerIsFullScreen) {
+        this.livePlayerContext.exitFullScreen({
+          success: () => {
+            this.playerIsFullScreen = false;
+            this.$apply();
+          }
+        });
+      } else {
+        this.livePlayerContext.requestFullScreen({
+          direction: 90,
+          success: () => {
+            this.playerIsFullScreen = true;
+            this.$apply();
+          }
+        });
+      }
+    },
+    //输入消息
+    onInputMsg(e) {
+      this.msg = e.detail.value;
+    },
+    //发送消息
+    sendMsg(e) {
+      if (!this.msg) {
+        windowUtil.alert('消息内容不能为空');
+        return false;
+      }
+      if (this.msg.length < 6) {
+        windowUtil.alert('请最少输入6个字符');
+        return false;
+      }
+      let { userInfo, msglist } = this.liveData;
+      if (userInfo.userFlag == -1) {
+        userInfo.userName = '游客' + userInfo.userid;
+        userInfo.userIco = default_ico;
+      }
+      let id = Date.now();
+      let msgBody = {
+        id: id,
+        msgType: 1,
+        userName: userInfo.userName,
+        userIco: userInfo.userIco,
+        content: this.msg,
+        roomid: this.roomid,
+        msgFrom: userInfo.userid,
+        msgTo: this.liveData.dkInfo.bignameId,
+        createTime: id
+      };
+      msglist.push(msgBody);
+      this.scrollIntoView = 'id-' + msgBody.id;
+      this.msg = '';
+      this.$apply();
+      this.sendSocketMessage(msgBody);
+      var formId = e.detail.formId
+      this.$root.$parent.sendFormId(formId) 
+    },
+    //上拉加载更多
+    scrolltoupper(e) {
+      if (this.isLoading || this.hasNoMore) {
+        return false;
+      }
+      this.isLoading = true;
+      let pageSize = 20;
+      http
+        .getRequest(getMsgPageUrl, {
+          roomid: this.roomid,
+          offset: this.offset,
+          pageSize
+        })
+        .then(data => {
+          for (let i = 0; i < data.length; i++) {
+            let d = this.timeShow(data[i]);
+            this.liveData.msglist.unshift(d);
+          }
+          this.offset += 1;
+          this.hasNoMore = data.length < pageSize;
+          this.isLoading = false;
+          this.$apply();
+        })
+        .catch(err => windowUtil.alert('数据加载失败'));
+    },
+    //播放器状态改变
+    playerStatechange(e) {
+      // TODO
+      console.log(e);
+    },
+    //展示主播信息
+    async showZhuBoInfo() {
+      return
+      if (this.zhuBoInfo == null) {
+        windowUtil.showLoading();
+        this.zhuBoInfo = await http.getRequest(API_URL.DAKA_DETAIL, {
+          userid: this.liveData.dkInfo.bignameId
+        });
+        windowUtil.hideLoading();
+      }
+      this.zhuBoInfoShow = true;
+      this.$apply();
+    },
+    //关闭主播信息弹窗
+    closeZhuBoInfo() {
+      this.zhuBoInfoShow = false;
+    },
+    // 关注
+    notice(userId) {
+      this.$invoke('notice', 'notice', userId);
+    },
+    // 发表评论input监听
+    inputFocus(e){
+      var height=e.detail.height
+      this.keyboardHeight=height
+    },
+    inputBlur(){
+      this.keyboardHeight=0
+    },
+    // 公用彈窗監聽
+    layerCancle(){
+      this.showLayer=false
+    },
+    layerSure(action){
+      if(!action){
+        this.showLayer=false;
+        return
+      }
+      var param={
+        url:action,
+      }
+      navigateTo(param)
+      this.showLayer=false;
+    },
+    // 有券是支付类型切换
+    togSwitch(payType){
+      this.liveRoomInfo.ticketInfo.payType=payType
+    },
+  };
+  events = {
+    // 关注操作成功触发事件
+    noticeOptionSuccess(userId) {
+      console.log('success');
+      this.zhuBoInfo.mynoticed = 1;
+      this.$apply();
+    }
+  };
+  //使用门票
+  payTicket() {
+    windowUtil.showLoading();
+    http
+      .getRequest(payUrl, {
+        roomid: this.roomid,
+        payType: this.liveRoomInfo.ticketInfo.payType
+      })
+      .then(() => {
+        this.payTicketSuccess();
+      })
+      .catch(err => {
+        let { status, errmessage } = err;
+        //已经使用过门票
+        if (status == '2') {
+          this.payTicketSuccess();
+        } else {
+          this.payTicketFail(err);
+        }
+      });
+  }
+  //使用门票成功
+  payTicketSuccess() {
+    this.liveRoomInfo.needPay = '0';
+    this.showCover = false;
+    this.getLiveData().then(() => {
+      windowUtil.alert('使用成功')
+      this.playVideo();
+    });
+    this.$apply();
+  }
+  //使用门票失败
+  payTicketFail(err) {
+    let { errcode, errmessage } = err
+    var errData=this.errcodeData[errcode]
+    if(!errData){
+      windowUtil.alert(err.errmessage)
+      return
+    }
+    windowUtil.hideLoading();
+    this.layerData=errData
+    this.showLayer=true
+    this.$apply()
+    // var msg=errData.msg
+    // var action=errData.action
+    // wx.showModal({
+    //   content: msg,
+    //   confirmColor:'#000000',
+    //   success: function(res) {
+    //       if (res.confirm) {
+    //           var param={
+    //             url:action,
+    //           }
+    //           navigateTo(param)
+    //       } else if (res.cancel) {
+    //           console.log('用户点击取消')
+    //       }
+    //   }
+    // })
+  }
+  //获取游客姓名
+  getVisitor() {
+    let visitor = wx.getStorageSync('live_visitor');
+    if (visitor) {
+      return visitor;
+    }
+    //随机生成7位随机数作为游客姓名
+    for (let i = 0; i < 7; i++) {
+      visitor += Math.floor(Math.random() * 10);
+    }
+    wx.setStorageSync('live_visitor', visitor);
+    return visitor;
+  }
+  //获取直播初始信息
+  async getLiveData() {
+    windowUtil.showLoading();
+    this.liveData = await http.getRequest(initUrl, {
+      roomid: this.roomid,
+      fingerprint: this.getVisitor()
+    });
+    this.liveDataNum = this.liveData.liveInfo.basenum;
+    let msglist = this.liveData.msglist;
+    msglist = msglist.map(msg => this.timeShow(msg));
+    //滚动条滚动到底部
+    if (msglist.length > 0) {
+      this.scrollIntoView = 'id-' + msglist[msglist.length - 1]['id'];
+    }
+    this.$apply();
+    windowUtil.hideLoading();
+  }
+  //开始播放直播
+  playVideo() {
+    var self=this
+    if(this.netWorkType!='wifi'&&this.netWorkType!='none'){
+      this.livePlayerContext.pause()
+      wx.showModal({
+          title:'提示',
+          content: '您正在使用手机网络，播放会消耗流量',
+          success: function(res) {
+              if (res.confirm) {
+                self.livePlayerPlay()   
+              } else if (res.cancel) {     
+                  console.log('用户点击取消')
+              }
+          }
+      })
+    }else{
+      self.livePlayerPlay() 
+    }   
+  }
+  livePlayerPlay(){
+    this.livePlayerContext.play({
+      success: () => {
+        console.log('video start play');
+        this.playerControlShow = true;
+        this.loadingAnimate=false;
+        this.removeLoadingAnimate();
+        this.$apply();
+        windowUtil.hideLoading();
+      }
+    });
+  }
+  //发送websocket消息
+  sendSocketMessage(msg) {
+    let self = this;
+    wx.sendSocketMessage({
+      data: JSON.stringify(msg),
+      success: function() {
+        //如果消息存在消息队列里,则移除这条消息
+        let index = self.msgQueue.findIndex(e => msg.id == e.id);
+        if (index != -1) {
+          self.msgQueue.splice(index, 1);
+        }
+      },
+      fail: function() {
+        let index = self.msgQueue.findIndex(e => msg.id == e.id);
+        if (index == -1) {
+          self.msgQueue.push(msg);
+        }
+      }
+    });
+  }
+  //消息时间显示处理
+  timeShow(msg) {
+    let createTime = msg.createTime;
+    //两条消息间隔6分钟,则显示时间
+    if (Math.abs(this.lastMsgTime - createTime) > 60000) {
+      msg.time = util.formatTimeLocal(createTime);
+    }
+    this.lastMsgTime = createTime;
+    return msg;
+  }
+  async getNetWorkType(){
+    var self=this
+    wx.getNetworkType({
+        success: function(res) {
+            // 返回网络类型, 有效值：
+            // wifi/2g/3g/4g/unknown(Android下不常见的网络类型)/none(无网络)
+            self.netWorkType = res.networkType
+        }
+    })
+  }
+  // 设置加载动画
+  setLoadingAnimate(){
+    this.loadingPlayer=setInterval(()=>{
+      this.loadingAngle+=8
+      this.$apply()
+    },50)
+  }
+  // 取消加载动画
+  removeLoadingAnimate(){
+    if(this.loadingPlayer){
+      clearInterval(this.loadingPlayer)
+    }
+    this.loadingAngle=0
+    this.$apply()
+  }
+}
+</script>

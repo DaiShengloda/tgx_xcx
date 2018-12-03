@@ -1,0 +1,237 @@
+<!--合规组件-->
+<style lang="scss">
+@import '../sass/base/reset';
+cover-view{
+  white-space: normal;
+}
+.pop-bg {
+  width: 100%;
+  height: 100%;
+  background: rgba($color: #000000, $alpha: 0.6);
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 999;
+}
+.pop-c {
+  position: absolute;
+  width: 80%;
+  background: rgba($color: #fff, $alpha: 1);
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 1000;
+  border-radius: 5px;
+}
+.pop-c .top {
+  padding: 10px;
+}
+.pop-c .top .content {
+  text-indent: 2em;
+  font-size: 15px;
+  margin-bottom: 20px;
+}
+.pop-c .top .sm {
+  font-size: 12px;
+  color: #999;
+}
+.pop-c .btns {
+  display: flex;
+  justify-content: space-between;
+  font-size: 17px;
+  border-top: 1px solid #ccc;
+  height: 40px;
+  line-height: 40px;
+}
+.pop-c .btns .btn {
+  width: 50%;
+  height: 100%;
+  line-height: 40px;
+  text-align: center;
+  display: table-cell;
+  vertical-align: middle;
+}
+.pop-c .btns .border-l {
+  border-right: 1px solid #ccc;
+}
+</style>
+
+<template>
+  <view>
+    <cover-view class='pop-bg' wx:if='{{confirm}}'>
+      <cover-view class='pop-c'>
+        <cover-view class='top'>
+          <cover-view class='content'>{{remind}}</cover-view>
+          <cover-view class='sm'>
+            注:以上信息仅作监管备案用,不会以任何形式泄漏给第三方,请放心填写。
+          </cover-view>
+        </cover-view>
+        <cover-view class='btns'>
+          <cover-view class='btn border-l' @tap='cancelFun'>取消</cover-view>
+          <cover-view class='btn' @tap='okFun'>确定</cover-view>
+        </cover-view>
+      </cover-view>
+    </cover-view>
+  </view>
+</template>
+<script>
+import wepy from 'wepy';
+import http from '@/utils/http-util';
+import { API_URL, hgStatus, subjects } from '@/const';
+import windowUtil from '@/utils/window-util';
+import { navigateTo, navigateBack } from '@/utils/route';
+export default class HeGui extends wepy.component {
+  data = {
+    //是否显示弹窗
+    confirm: false,
+    //弹窗提示信息
+    remind: '',
+    //点击确认合规执行方法
+    okFun: '',
+    //当前风险测评状态
+    status: null,
+    //合规接口返回数据
+    heguiData: null,
+    //合规的大咖id
+    dakaId: null,
+    //合规类型
+    type: ''
+  };
+  //开始合规流程
+  startHeguiForRecharge(status) {
+    this.status = status;
+    this.type = '补充';
+    if (this.status == hgStatus.NO_SHOW) {
+      this.$emit('finish');
+    } else {
+      this.executeHugui();
+    }
+  }
+  //大咖合规
+  async startHeguiForDaka(dkId, certCode) {
+    this.type = '投资消费';
+    //从缓存查询已经合规的证书编号
+    let localCode = wx.getStorageSync('hg_cert_code') || 'NONE';
+    if (localCode.includes(certCode)) {
+      this.$emit('finish');
+      return false;
+    }
+    this.dakaId = dkId;
+    if (this.status == null) {
+      this.status = hgStatus.NO_SHOW;
+    }
+    //本地没有数据,请求服务器判断是否需要合规
+    windowUtil.showLoading();
+    let result;
+    try {
+      result = await http.getRequest(API_URL.HG_CONFIRM, {
+        bigNameId: dkId,
+        version: '3.8'
+      });
+      windowUtil.hideLoading();
+    } catch (error) {
+      throw error;
+      windowUtil.hideLoading();
+    }
+    this.status = result.status;
+    if (this.status == hgStatus.NO_SHOW) {
+      let s = wx.getStorageSync('hg_cert_code');
+      if (s) {
+        s = s + ',' + certCode;
+      }
+      wx.setStorageSync('hg_cert_code', s);
+      this.$emit('finish');
+      return false;
+    }
+    this.heguiData = result;
+    this.$apply();
+    this.executeHugui();
+  }
+  //执行合规流程
+  executeHugui() {
+    if (this.status < hgStatus.NO_SHOW) {
+      //提示信息
+      let msg = `应证监会要求,为了保障您的资金安全,请您在${this.type}前完成`;
+      if (this.status == hgStatus.NO_ALL) {
+        this.okFun = () => {
+          wx.navigateTo({ url: '/subPages/user/pages/userCheckIn' });
+        };
+        msg += '投资者信息登记和风险能力测评。';
+      } else if (this.status == hgStatus.NO_REGISTRATED) {
+        this.okFun = () => {
+          wx.navigateTo({ url: '/subPages/user/pages/userCheckIn' });
+        };
+        msg += '投资者信息登记。';
+      } else if (this.status == hgStatus.NO_ANSWER) {
+        this.okFun = () => {
+          wx.navigateTo({ url: '/subPages/user/pages/fxcp' });
+        };
+        msg += '风险能力测评。';
+      }
+      //注册回调方法
+      let o = this.getObserver();
+      o.subscription(subjects.fxcp, this.fxcpFinish.bind(this));
+      o.subscription(subjects.userCheckIn, this.checkInFinish.bind(this));
+      //显示弹窗
+      this.confirm = true;
+      this.remind = msg;
+      this.$apply();
+    } else if (this.status == hgStatus.IS_RETSET) {
+      //风险等级不够提示重新测评
+      wx.showModal({
+        content: this.heguiData.message,
+        showCancel: false
+      });
+    } else if (this.status == hgStatus.SHOW_CONFIRM) {
+      //显示确认书
+      let o = this.getObserver();
+      o.subscription(subjects.agreePayRule, this.agreeRule.bind(this));
+      wx.navigateTo({
+        url: '/subPages/user/pages/payConfirmBook?bignameId=' + this.dakaId
+      });
+    }
+  }
+  //风险测评结束触发
+  fxcpFinish() {
+    this.$emit('fxcpFinish');
+  }
+  //登记结束触发
+  checkInFinish() {
+    this.$emit('checkInFinish');
+    if (this.status == -3 || this.status == -1) {
+      //还没有进行风险测评,跳转风险测评
+      wx.navigateTo({ url: '/subPages/user/pages/fxcp' });
+    } else {
+      this.$emit('fxcpFinish');
+    }
+  }
+  //同意确认书触发
+  agreeRule() {
+    this.$emit('agreeRuleFinish');
+  }
+  methods = {
+    okFun() {
+      this.okFun && this.okFun();
+      this.confirm = false;
+    },
+    cancelFun() {
+      this.confirm = false;
+      navigateBack();
+    }
+  };
+  //获取observer工具
+  getObserver() {
+    let o = null;
+    let app = this;
+    do {
+      app = app.$parent;
+      if (!app) {
+        break;
+      }
+      o = app.observer;
+    } while (!o);
+    return o;
+  }
+}
+</script>
+

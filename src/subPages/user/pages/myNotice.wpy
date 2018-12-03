@@ -1,0 +1,156 @@
+<!--我的关注页面-->
+<style lang='scss'>
+@import '../../../sass/base/reset';
+@import '../../../sass/commons/function';
+.list {
+  height: 100%;
+  .list_item {
+    display: flex;
+    align-items: center;
+    border-bottom: 1px solid #ccc;
+    padding: 30rpx;
+    .icon {
+      width: 120rpx;
+      height: 120rpx;
+      border-radius: 50%;
+    }
+    .info {
+      margin: 0 2%;
+      font-size: 13px;
+      color: #999999;
+      width: 60%;
+      .name {
+        font-size: 16px;
+        color: black;
+      }
+      .user_title {
+        color: #e93030;
+      }
+      .profile {
+        display: box;
+        display: -webkit-box;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+      }
+    }
+    .btn {
+      font-size: 26rpx;
+      width: 110rpx;
+      padding: 10rpx 0px;
+      text-align: center;
+      border-radius: 10rpx;
+    }
+    .active {
+      color: #e93030;
+      border: 1px #e93030 solid;
+    }
+    .disable {
+      color: #ccc;
+      border: 1px solid #ccc;
+    }
+  }
+}
+</style>
+<template>
+  <scrollView :url.sync='url' :param.sync='param'  @dataLoad.user='setPageData'>
+    <view slot='content'>
+      <view class='list'>
+        <repeat for='{{list}}' item="item" key="userid">
+          <view class='list_item' @tap='toUserDetail({{item.userid}})'>
+              <image class='icon' src='{{item.user_ico}}' wx:if="{{item.user_ico}}"/>
+              <image class="icon" src="/static/images/person.png" wx:else></image>
+              <view class='info'>
+                <text class='name'>{{item.user_name}}</text>
+                <text class='user_title'> | {{item.user_title}}</text>
+                <text class='profile'>{{item.user_profiles}}</text>
+                <text>关注:{{item.user_notice_num}}</text>
+              </view>
+              <view class='btn active' wx:if='{{item.my_noticed == 0}}' @tap.stop='notice({{item.userid}})'>加关注</view>
+              <view class='btn disable' wx:if='{{item.my_noticed == 1}}' @tap.stop='cancelNotice({{item.userid}})'>取消关注</view>
+          </view>
+        </repeat>
+      </view>
+    <notice></notice>
+    </view>
+  </scrollView>
+</template>
+<script>
+import wepy from 'wepy';
+import ScrollView from '@/components/scrollView';
+import BigManNotice from '@/components/bigManNotice';
+import { API_URL } from '@/const';
+export default class MyNotice extends wepy.page {
+  config = {
+    navigationBarTitleText: '我的关注'
+  };
+  data = {
+    url: API_URL.DAKA_LIST,
+    param: {
+      list_type: 1,
+      page_no: 1,
+      page_size: 10
+    },
+    list: [],
+    isRefresh: false
+  };
+  components = {
+    scrollView: ScrollView,
+    notice: BigManNotice
+  };
+  methods = {
+    setPageData(data) {
+      if (this.isRefresh) {
+        this.list = [];
+      }
+      this.list.push(...data);
+      this.$apply();
+    },
+    // 关注
+    notice(userId) {
+      this.$invoke('notice', 'notice', userId);
+    },
+    // 取消关注
+    cancelNotice(userId) {
+      let that = this;
+      wx.showModal({
+        content:'确定不再关注此大咖?',
+        mask:true,
+        complete:function(res){
+          if(res.confirm){
+            that.$invoke('notice', 'cancel', userId);
+          }
+        }
+      })
+    },
+    // 跳转详情
+    toUserDetail(userId) {
+      wx.navigateTo({ url: `/subPages/content/pages/detail/bigManDetail?id=${userId}` });
+    }
+  };
+  events = {
+    // 关注操作成功触发事件
+    noticeOptionSuccess(userId) {
+      let item = this.list.find(e => e.userid == userId);
+      item.my_noticed = item.my_noticed == 1 ? 0 : 1;
+    }
+  };
+  onLoad() {
+    this.$invoke('scrollView', 'nextPage');
+    // let o = this.$parent.observer;
+  }
+  onLoginSuccess(){
+
+  }
+  onPullDownRefresh() {
+    this.isRefresh = true;
+    this.$invoke('scrollView', 'refresh');
+  }
+  onReachBottom() {
+    this.isRefresh = false;
+    this.$invoke('scrollView', 'nextPage');
+  }
+}
+</script>
+

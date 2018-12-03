@@ -1,0 +1,442 @@
+<style lang="scss">
+@import '../../../sass/base/reset';
+@import '../../../sass/commons/function';
+@import '../sass/activityOne';
+</style>
+<template>
+<view class="activity">
+    <view class="d-common-scss">
+        <view class="common-box">
+            <image class="common-img" 
+                   mode="widthFix"
+                   src="https://tgs.gp58.com/static/adXcx/prize/prize_01.jpg"/>
+            <view class="notice common-view" @tap.stop="notice(1)"></view>
+        </view>
+        <!-- 中奖提示轮播 -->
+        <view class="common-box ">
+            <image class="common-img"
+                   mode="widthFix" 
+                   src="https://tgs.gp58.com/static/adXcx/prize/prize_02.jpg"/>
+            <view class="swiper-box">
+                <swiper circular="{{true}}" 
+                        indicator-dots="{{false}}" 
+                        autoplay="{{true}}" 
+                        vertical="{{true}}"
+                        interval="2400" 
+                        duration="800"
+                        class="act-swiper">
+                    <block>
+                        <swiper-item wx:for="{{indexData.log}}" 
+                                     wx:for-item="item" 
+                                     wx:for-index="u" 
+                                     catchtouchmove='{{false}}'
+                                     class="act-swiperItem">
+                            <view>
+                                恭喜<text>{{item.userName}}</text>获得了
+                                <text style="color:#fff71c">{{item.prizeName}}</text>
+                            </view>
+                        </swiper-item>
+                    </block>
+                </swiper>
+            </view>
+        </view>
+        <view class="common-box">
+            <image class="common-img"
+                   mode="widthFix" 
+                   src="https://tgs.gp58.com/static/adXcx/prize/prize_03.jpg"/>
+            <!-- 抽奖次数 -->
+            <view class="drawTime">
+                今日免费抽奖次数：<text style="color:#fc3826;font-size:37rpx">{{indexData.leftTimes}}</text>次
+            </view>
+            <!-- 红包 -->
+            <view class="hongbao-box">
+                <image class="hongbao-img {{activeIndex==1 ?'active':''}}" 
+                       src="https://tgs.gp58.com/static/adXcx/prize/hongbao.png"
+                       @tap.stop="drawStart"/>
+                <image class="hongbao-img {{activeIndex==2 ?'active':''}}" 
+                       src="https://tgs.gp58.com/static/adXcx/prize/hongbao.png"
+                       @tap.stop="drawStart"/>
+                <image class="hongbao-img {{activeIndex==3 ?'active':''}}" 
+                       src="https://tgs.gp58.com/static/adXcx/prize/hongbao.png"
+                       @tap.stop="drawStart"/>
+                <image class="hongbao-img {{activeIndex==4 ?'active':''}}" 
+                       src="https://tgs.gp58.com/static/adXcx/prize/hongbao.png"
+                       @tap.stop="drawStart"/>
+                <image class="hongbao-img {{activeIndex==5 ?'active':''}}" 
+                       src="https://tgs.gp58.com/static/adXcx/prize/hongbao.png"
+                       @tap.stop="drawStart"/>
+                <image class="hongbao-img {{activeIndex==6 ?'active':''}}" 
+                       src="https://tgs.gp58.com/static/adXcx/prize/hongbao.png"
+                       @tap.stop="drawStart"/>
+            </view>
+            <button class="share" open-type="share" plain="{{true}}">
+                <image class="common-img"
+                   mode="widthFix" 
+                   src="https://tgs.gp58.com/static/adXcx/prize/share.png"/>
+            </button>
+            <button class="contact" open-type="contact" plain="{{true}}">
+                <image class="common-img"
+                   mode="widthFix" 
+                   src="https://tgs.gp58.com/static/adXcx/prize/contact.png"/>
+            </button>
+            <view class="award" @tap.stop="showPrice(1)">
+                <image class="common-img"
+                   mode="widthFix" 
+                   src="https://tgs.gp58.com/static/adXcx/prize/myGood.png"/>
+            </view>
+        </view>
+        <view class="common-box">
+            <image class="common-img" 
+                   mode="widthFix"
+                   src="https://tgs.gp58.com/static/adXcx/prize/prize_04.jpg"/>
+            <view class="wantSign common-view" @tap.stop="action(sign)"></view>
+            <button class="wantShare common-view" open-type="share" plain="{{true}}"></button>
+            <view class="wantRecharge common-view" @tap.stop="action(recharge)"></view>
+        </view>
+        <image class="common-img" 
+               mode="widthFix"
+               src="https://tgs.gp58.com/static/adXcx/prize/prize_05.jpg"/>
+    </view>
+    <!-- 中奖弹窗 -->
+    <view class="common-bgBox" 
+          wx:if="{{yesGetPrice==1}}"
+          @tap.stop="prevent">
+        <view class="getPrize-Box">
+            <image class="getPrize-img" 
+                   mode="widthFix"
+                   src="https://tgs.gp58.com/static/adXcx/prize/getPrize.png"/>
+            <view class="getPrize-Content">
+                <view class="cont-msg"> 恭喜你获得 <text style="color:red">{{getPriceMsg}}</text></view>
+            </view>
+            <view class="again common-view" @tap.stop="yesGet(0)"></view>
+            <view class="common-close" @tap.stop="yesGet(0)"></view>
+        </view>
+    </view>
+    <!-- 没有中奖弹窗 -->
+    <view class="common-bgBox"  
+          wx:if="{{noGetPrice==1}}"
+          @tap.stop="prevent">
+        <view class="notPrize-Box">
+            <image class="notPrize-img" 
+                   mode="widthFix"
+                   src="https://tgs.gp58.com/static/adXcx/prize/again.png"/>
+            <view class="again" @tap.stop="noGet(0)"></view>
+            <view class="common-close" @tap.stop="noGet(0)"></view>
+        </view>
+    </view>
+    <!-- 我的奖品弹窗 -->
+    <view class="common-bgBox"
+          wx:if="{{myPriceBox==1}}"
+          @tap.stop="prevent">
+        <view class="myPrize-box">
+            <image class="myPrize-img" 
+                   mode="widthFix"
+                   src="https://tgs.gp58.com/static/adXcx/prize/my_price.png"/>
+            <view class="content-box">
+                <scroll-view scroll-y="{{true}}" 
+                             class="scroll-box" 
+                             wx:if="{{myPriceData.length>0}}">
+                    <view class="box-slider" 
+                          style="height:{{180*myPriceData.length}}rpx">
+                        <block wx:for="{{myPriceData}}" 
+                               wx:for-item="item" 
+                               wx:for-index="index">
+                               <view class="content"
+                                     @tap.stop="toSeriseCourese({{item}})">
+                                    <view class="icon">
+                                        <image class="icon-img" 
+                                               mode="widthFix"
+                                               src="http://tgs-api.lzyunying.com/static/tgs_zt_mobile//lib/images/prize/coin.png"
+                                               wx:if="{{item.prizeType==1}}">
+                                        <image class="icon-img" 
+                                               mode="widthFix"
+                                               src="http://tgs-api.lzyunying.com/static/tgs_zt_mobile//lib/images/prize/lesson.png"
+                                               wx:else>
+                                    </view>
+                                    <view class="describe">
+                                        <view class="describe-data">{{item.createTime}}</view>
+                                        <view class="describe-content">{{item.prizeName}}</view>
+                                    </view> 
+                                    <view class="describe-rt">已中奖</view>                            
+                                </view>
+                        </block>
+                    </view>
+                </scroll-view> 
+                <view class="box-none" wx:else>
+                    暂无记录
+                </view>
+            </view>
+            <view class="common-close" @tap.stop="myPrice(0)"></view>
+        </view>
+    </view>
+    <!-- 活动须知弹窗 -->
+    <view class="common-bgBox" 
+          wx:if="{{activityNotice==1}}"
+          @tap.stop="prevent">
+        <view class="notice-box">
+            <image class="myPrize-img common-img" 
+                   mode="widthFix"
+                   src="https://tgs.gp58.com/static/adXcx/prize/notice.png"/>
+            <view class="common-close" @tap.stop="notice(0)"></view>
+        </view>
+    </view>
+    <!-- 未登录弹窗 -->
+    <view class="common-bgBox" 
+          wx:if="{{layerLogin==1}}" 
+          @tap.stop="prevent">
+        <view class="login-box">
+            <view class="box-title">提示</view>
+            <view class="box-content">请先登录参与抽奖活动</view>
+            <view class="btns">
+                <view class="btn-cancle" @tap.stop="cancleClick">取消</view>
+                <view class="btn-sure" @tap.stop="sureClick">确定</view>       
+            </view>
+        </view>
+    </view>
+</view>
+</template>
+<script>
+import wepy from 'wepy';
+import userManager from '@/utils/user-manager';
+import windowUtil from '@/utils/window-util';
+import sessionUtil from '@/utils/session-util.js';
+import http from '@/utils/http-util';
+import utils from '@/utils/common-util';
+import { subjects,domain } from '@/const';
+import {navigateTo, switchTab, navigateBack, redirectTo} from '@/utils/route';
+let index_url = domain+"/api/activity/lucky_draw/index.do";
+let on_login = domain+"/api/activity/lucky_draw/onLogin.do";
+let start_url = domain+"/api/activity/lucky_draw/start.do";
+let award_url = domain+"/api/activity/lucky_draw/myPrize.do";
+let share_url = domain+"/api/activity/lucky_draw/onShare.do";
+export default class activityOne extends wepy.page{
+    config = {
+        navigationBarTitleText: '抽奖活动',
+        enablePullDownRefresh: false
+    }
+    data={
+        // 请求公共头
+        header:null,
+        // 活动须知
+        activityNotice:0,
+        // 用户信息
+        indexData:{},
+        // 红包动画
+        activeIndex:1,
+        playerTimer:null,
+        // 未中奖弹窗
+        noGetPrice:0,
+        // 中奖弹窗
+        yesGetPrice:0,
+        // 中奖信息
+        getPriceMsg:'888大咖币',
+        // 我的奖品
+        myPriceBox:0,
+        myPriceData:[],
+        // 分享出去的token
+        shareToken:null,
+        // 用户的token
+        userToken:null,
+        // 登录弹窗
+        layerLogin:0,
+    }
+    onLoad(options){
+        this.shareToken=options.shareToken 
+        this.setAnimate()
+    }
+    onShow(){
+        this.header = Object.assign({}, {
+            'Cookie': "SESSION=" + sessionUtil.getSessionId(),
+            'version':3.8,
+        }, this.header)
+        this.userToken = wx.getStorageSync('auth')
+        this.onLogin()    
+    }
+    onUnload(){
+        if(this.playerTimer){
+            clearInterval(this.playerTimer)
+        }
+    }
+    onShareAppMessage(res) {
+        if (res.from === 'button') {
+          // 来自页面内转发按钮
+          console.log(res.target)
+        }
+        return {
+          title: '投顾说',
+          imageUrl:"/static/images/page.jpg",
+          path: 'pages/tabBar/index?shareToken=' + this.userToken,
+        }
+    }
+    methods = {
+        prevent(){
+            return false
+        },
+        // 活动须知
+        notice(type){
+            this.activityNotice=type
+        }, 
+        // 跳转
+        action(action){
+            var param={
+                url:action,
+                fail:function(err){
+                    switchTab({url:action})
+                }
+            }
+            navigateTo(param)
+        },
+        // 抽奖
+        drawStart(){
+            var self=this
+            if (this.indexData.leftTimes <= 0) {
+                windowUtil.alert('抽奖次数不够')
+                return
+            }
+            windowUtil.showLoading()
+            wx.request({
+                type: "get",
+                url:start_url,
+                dataType: 'json',
+                header: this.header,
+                success: function (res) {
+                    var response=res.data
+                    if (response.status == '0') {
+                        self.indexData.leftTimes = 0
+                        self.$apply()
+                        windowUtil.alert(response.errmessage)
+                        return false
+                    }
+                    self.indexData.leftTimes = self.indexData.leftTimes <= 1 ? 0 : --self.indexData.leftTimes               
+                    var data = response
+                    if (data.errcode == 1003) { 
+                        // 未中奖弹窗
+                        self.noGetPrice=1
+                    } else {     
+                        //中奖的弹窗
+                        self.getPriceMsg=data.data.name
+                        self.yesGetPrice=1
+                    }
+                    self.$apply()
+                },
+                error: function (error) {
+                    windowUtil.alert('网络异常')
+                },
+                complete: function(){
+                    windowUtil.hideLoading()
+                }
+            })
+        },
+        noGet(type){
+            this.noGetPrice=type
+        },
+        yesGet(type){
+            this.yesGetPrice=type
+        },
+        showPrice(type){
+            http.getRequest(award_url).then(data=>{
+                this.myPriceData=data
+                this.myPriceBox=type
+                this.formatTime(this.myPriceData)
+                this.$apply()
+            })
+        },
+        myPrice(type){
+            this.myPriceBox=type
+        },
+        cancleClick(){
+            switchTab({url:'index'})
+            this.layerLogin=0
+        },
+        sureClick(){
+            navigateTo({url:'login'})
+            this.layerLogin=0
+        },
+        toSeriseCourese(item){
+            var type=item.prizeType
+            if(type==2){
+               navigateTo({url:'seriesDetail?id=117'}) 
+            }
+        }
+    }
+    async onLogin(){
+        let result = await this.login()
+        if(result.data.errcode==100){
+            this.layerLogin=1
+            this.$apply()
+            return
+        }else if(result.data.status != '1') {
+            console.warn('非第一次登录,不增加抽奖次数')
+        }
+        this.loadIndexData()
+        this.shareFriend()
+    }
+    login(){
+        return new Promise((resolve, reject)=>{
+            wx.request({
+                type: "get",
+                url:on_login,
+                dataType: 'json',
+                header: this.header,
+                success: function (response) {
+                    resolve(response)
+                },
+                error: function (error) {
+                    reject(error)
+                }
+            })
+        }) 
+    }
+    // 初始化
+    loadIndexData(){
+        http.getRequest(index_url).then(data=>{
+            this.indexData=data
+            this.$apply()
+        })
+    }
+    setAnimate(){
+        this.playerTimer=setInterval(()=>{
+            this.activeIndex=this.activeIndex<6?++this.activeIndex:1
+            this.$apply()
+        },1000)
+    }
+    // 时间戳
+    formatTime(data){
+        var list,time,prizeType,prizeName;
+        var reg = /^(?=.*\d.*\b)/;
+        for(var i in data){
+            list = data[i];
+            time = list.createTime;
+            time = utils.formatTimestampAct(time);
+            prizeName = list.prizeName;
+            if(reg.test(prizeName)){
+                data[i].prizeType=1  //金币
+            }else{
+                data[i].prizeType=2  //课程
+            }
+            data[i].createTime = time;
+        }
+    }
+    // 分享
+    shareFriend(){
+        var self=this
+        if(!this.shareToken)return
+        wx.request({
+            type: "get",
+            url:share_url,
+            data:{
+                token:this.shareToken
+            },
+            dataType: 'json',
+            header: this.header,
+            success: function (response) {
+                console.log('...分享...')
+                console.log(response)
+                console.log('...分享...')
+            },
+            error: function (error) {
+            }
+        })
+    }
+}
+</script>

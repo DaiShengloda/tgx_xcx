@@ -1,0 +1,164 @@
+<style lang="scss">
+    @import '../../../../sass/base/reset';
+    @import '../../../../sass/commons/function';
+    @import '../../../../sass/pages/hotReportDetail';
+</style>
+<template>
+<view class="hot-report-detail">
+    <lodingPage></lodingPage>
+
+    <scrollView :url.sync="url" :param.sync="param" :objArryField.sync="objArryField" @dataLoad.user="setReportData">
+        <view slot="content">
+            <!--  -->
+            <view class="detail-top">
+                <image class="top-img" src="{{hotReportDetail.bannerImage}}" wx:if="{{hotReportDetail.bannerImage}}"/>
+                <image class="top-img" mode="aspectFill" src="/static/images/zw2.png" wx:else/>
+                <view class="top-title">{{hotReportDetail.title}}</view>
+                <view class="top-sum">{{hotReportDetail.summary}}</view>
+                <view class="top-msg">
+                    <text class="msg-num">{{hotReportDetail.reportNum}}篇研报</text>
+                    <text class="msg-read">{{hotReportDetail.readNum}}人阅读</text>
+                </view>
+            </view>
+            <!-- 列表 -->
+            <view class="detail-list">
+                <repeat for="{{hotReportDetail.reportList}}" item="item" index="index">
+                    <view class="list-box" @tap.stop="toReportDetail({{item.id}})">
+                        <view class="box-lef">
+                            <image mode="aspectFill" class="lef-img" src="{{item.coverImage}}" wx:if="{{item.coverImage}}"/>   
+                            <image mode="aspectFill" class="lef-img" src="/static/images/zw1.png" wx:else/>               
+                            <view class="lef-cat">{{item.category}}</view>
+                        </view>
+                        <view class="box-rig">
+                            <view class="rig-title">{{item.title}}</view>
+                            <view class="rig-level">
+                                <view class="level-word">研报评级:</view>
+                                <repeat for="{{item.level}}" item="value" index="u">
+                                    <image class="level-start" src="{{value?'/static/images/star-red.png':'/static/images/star.png'}}"/>
+                                </repeat>
+                            </view>
+                            <view class="rig-label">
+                                <repeat for="{{item.label}}" item="value" index="key_i">
+                                    <text class="label-txt" wx:if="{{value&&key_i<4}}">{{value}}</text>
+                                </repeat>
+                            </view>
+                            <view class="right-com">
+                                <text class="com-name" wx:if="{{item.company}}">{{item.company}}</text>
+                                <text class="com-time">{{item.createTime}}</text>
+                            </view>
+                        </view>
+                    </view>
+                </repeat>
+            </view>
+        </view>
+    </scrollView>
+
+</view>
+</template>
+<script>
+import wepy from 'wepy'
+import http from '@/utils/http-util'
+import utils from '@/utils/common-util'
+import { API_URL } from '@/const'
+import ScrollView from '@/components/scrollView'
+import LodingPage from '@/components/lodingPage'
+export default class HotReportDetail extends wepy.page {
+    config = {
+        navigationBarTitleText: '热门研报'
+    }
+    components = {
+        scrollView:ScrollView,
+        lodingPage:LodingPage,
+    }
+    data ={
+        // 分页URL及参数
+        url:API_URL.REPORT_HOT_DETAIL,
+        param:{
+            id:'',
+            page_no:1,
+            page_size:10,
+        },
+        objArryField:'reportList',
+        // 研报系列数据
+        hotReportDetail:'',
+        // 研报系列Id
+        report_id:'',
+    }
+    methods={
+        // 接受热门研报详情分页数据
+        setReportData(data,type){
+            this.formatData(data.reportList)
+            this.formatlev(data.reportList)
+            if(type==0){
+                this.hotReportDetail = data
+            }else{
+                this.hotReportDetail.reportList.push(...data.reportList)
+            }    
+            this.$apply()
+            this.hideLoading()
+        },
+        // 研报详情
+        toReportDetail(id){
+            wx.navigateTo({
+                url: `/subPages/content/pages/detail/reportDetail?id=${id}`,
+            })
+        },
+    }
+    onLoad(option){
+        this.showLoading()
+        this.param.id=option.id
+        this.$invoke('scrollView','refresh');
+    }
+    // 下拉刷新
+    onPullDownRefresh () {
+        this.$invoke('scrollView','refresh');
+    }
+    // 上拉加载
+    onReachBottom () {
+        this.$invoke('scrollView','nextPage');
+    }
+    // 处理时间戳
+    formatData(data){
+        var list,time;
+        for(var i in data){
+            list = data[i];
+            time = list.createTime;
+            time = utils.formatTimeLocal(time);
+            data[i].createTime = time;
+        }
+    }
+    // 处理评级、关键字
+    formatlev(data){
+        var levelData={
+            '一星':[1,0,0,0,0],
+            '二星':[1,1,0,0,0],
+            '三星':[1,1,1,0,0],
+            '四星':[1,1,1,1,0],
+            '五星':[1,1,1,1,1],                      
+        }
+        var list,level,label
+        for(var i in data){
+            list=data[i]
+            label=list.label
+            label=label?label.split(','):[]
+            data[i].label=label
+
+            level= list.level
+            for(var name in levelData){
+                if(level==name){
+                   data[i].level=levelData[name]
+                   break
+                }
+            }
+        }
+    }
+    // 显示加载层
+    showLoading(){
+        this.$invoke('lodingPage','show')
+    }
+    // 隐藏加载层
+    hideLoading(){
+        this.$invoke('lodingPage','hide')
+    }
+}
+</script>

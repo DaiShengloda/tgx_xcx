@@ -1,0 +1,20 @@
+.scroll-loading {
+    height: 80rpx;
+    line-height: 80rpx;
+    font-size: 28rpx;
+    text-align: center;
+    color: #999;
+    image {
+      width:50rpx;
+      height:50rpx;
+      vertical-align:middle;
+    }
+    text {
+        padding-left: 10rpx
+    }
+  }
+  .no-data{
+    // position:relative;
+    // top:100rpx;
+    // font-size:16px;    
+  }

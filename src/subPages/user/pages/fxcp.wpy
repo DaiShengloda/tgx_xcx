@@ -1,0 +1,476 @@
+<style lang='scss'>
+@import '../../../sass/base/reset';
+@import '../../../sass/commons/function';
+.fxcp {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background: #fff;
+}
+.fxcp .top {
+  padding: 10px 20px;
+  background-color: #fff0e0;
+  color: #000;
+  font-size: 14px;
+  line-height: 1.4;
+}
+.fxcp .list {
+  width: 100%;
+  height: 85%;
+  overflow: scroll;
+  font-size: 14px;
+}
+.fxcp .list .list_item {
+  padding: 10px 20px;
+  box-sizing: border-box;
+  margin-bottom: 10px;
+  .title {
+    font-size: 15px;
+    line-height: 1.5;
+  }
+  .op_item {
+    display: flex;
+    margin-top: 10px;
+    align-items: center;
+    radio,
+    checkbox {
+      display: block;
+      transform: scale(0.8);
+    }
+  }
+}
+.fxcp .bottom {
+  position: fixed;
+  left: 0;
+  width: 100%;
+  bottom: 0;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  box-sizing: border-box;
+  padding: 5px;
+  background: #fff;
+}
+.fxcp .bottom .submit_btn {
+  width: 90%;
+  font-size: 15px;
+  background: #e93030;
+  color: #fff;
+}
+.fxcp .dialog {
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  top: 0;
+  left: 0;
+  background: #000;
+  opacity: 0.7;
+  z-index: 99;
+}
+.tan {
+  width: 90%;
+  height: 80%;
+  margin: auto;
+  background: #fff;
+  border-radius: 10px;
+  position: fixed;
+  left: 50%;
+  top: 5%;
+  z-index: 100;
+  padding: 10px;
+  transform: translate(-50%);
+  .header {
+    font-size: 15px;
+    font-weight: 700;
+    text-align: center;
+    height: 10%;
+  }
+  .header .close {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    width: 20px;
+    height: 20px;
+  }
+  .body {
+    height: 80%;
+    font-size: 14px;
+    overflow: scroll;
+    overflow-x: hidden;
+    line-height: 20px;
+    view {
+      margin-top: 10px;
+    }
+    text {
+      color: #e93030;
+    }
+    .line {
+      width: 100%;
+      border: 1px solid #ccc;
+    }
+  }
+  .foot {
+    height: 10%;
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    font-size: 14px;
+    .btn {
+      width: 80%;
+      text-align: center;
+      padding: 5px;
+      border-radius: 5px;
+      background: #e93030;
+      color: #fff;
+      border: 1px solid #e93030;
+    }
+  }
+}
+.tan2 {
+  position: fixed;
+  left: 10%;
+  right: 10%;
+  top: 20%;
+  padding: 10px;
+  font-size: 14px;
+  background: #fff;
+  z-index: 999;
+  border-radius: 10px;
+  .header2 {
+    text-align: center;
+    font-weight: 600;
+    font-size: 15px;
+  }
+  .result {
+    text-align: center;
+    margin: 10px 0px;
+    font-size: 17px;
+    color: #e93030;
+    font-weight: bold;
+  }
+  button {
+    width: 50%;
+    font-size: 14px;
+    color: #fff;
+    background: #e93030;
+    margin: 10px auto;
+  }
+}
+
+.tan3 {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  max-height: 100%;
+  overflow: scroll;
+  background: #fff;
+  padding: 30rpx;
+  z-index: 100;
+  box-sizing: border-box;
+}
+.tan3 .title {
+  font-size: 40rpx;
+  font-weight: bold;
+  text-align: center;
+  height: 40px;
+  line-height: 40px;
+}
+.tan3 .content {
+  overflow: scroll;
+  box-sizing: border-box;
+  font-size: 15px;
+  line-height: 1.5;
+}
+.tan3 .content view {
+  text-indent: 2em;
+}
+.tan3 .start-btn {
+  width: 70%;
+  font-size: 14px;
+  background: #e93030;
+  color: #fff;
+  margin: 10px auto;
+}
+</style>
+<template>
+<view class='fxcp'>
+  <view class='top'>本问卷共21道题，旨在了解您可承受的风险程度等情况，借此协助您选择合适的产品或服务类别。</view>
+  <view class='list'>
+    <scroll-view style='height:100%' scroll-y='true' scroll-into-view='{{toView}}'  scroll-with-animation='true'>
+    <repeat for='{{list}}' index='index'>
+      <view class='list_item' id='id-{{item.question.questionId}}'>
+        <view class='title'>{{item.question.question}}</view>
+        <view wx:if="{{item.question.type == 1}}">
+          <radio-group @change="select({{item.question.questionId}})">
+            <repeat for='{{item.list}}' item='op'>
+              <label class='op_item' for='{{op.optionId}}'>
+                <radio color='#ff6e06' value='{{op.optionId}}' id='{{op.optionId}}'/>
+                <text>{{op.answer}}</text>
+              </label>
+            </repeat>
+          </radio-group>
+        </view>
+        <view wx:else>
+            <checkbox-group  @change='mutileSelect({{item.question.questionId}})'>
+              <repeat for='{{item.list}}' item='op'>
+                  <label class='op_item' for='{{op.optionId}}'>
+                    <checkbox color='#ff6e06' value='{{op.optionId}}' id='{{op.optionId}}'/>
+                    <text>{{op.answer}}</text>
+                  </label>
+              </repeat>
+            </checkbox-group>
+        </view>
+      </view>
+    </repeat>
+    <view style='text-indent:2em;font-size:15px;padding:0 20px;'>
+      本人已经了解并愿意遵守国家有关证券市场管理的法律、法规、
+      规章及相关业务规则，本人在此郑重承诺以上填写的内容真实、准确、完整。
+    </view>
+    <view style='height:50px'></view>
+    </scroll-view>
+  </view>
+  <view class='bottom' style='height:50px'>
+    <button class='submit_btn' @tap='submit'>提交</button>
+  </view>
+  <view class='dialog' hidden='{{!showDialog}}'></view>
+  <view class='tan'  wx:if='{{showConfirm}}'>
+      <view class='header'>
+        <view class='title'>风险承受能力评估结果确认书</view>
+        <image class='close' @tap='cancel' src='/static/images/close.png'></image>
+      </view>
+      <view class='body'>
+        <view>
+          尊敬的投资者(姓名/名称:{{result.userName}};平台ID:{{result.userId}}):
+        </view>
+        <view>根据您填写的总分为100分的《投资者风险承受能力问卷调查》</view>
+        <view>您的得分为：<text>{{result.score}}</text></view>
+        <view>您的风险承受能力等级为：<text>{{result.levelName}}</text></view>
+        <view>您的拟投资期限为：<text>{{result.tzqx}}</text></view>
+        <view>您的拟投资品种为：<text>{{result.tzpz}}</text></view>
+        <view>与您的风险等级相匹配的产品或服务为：<text>{{result.serveritem}}</text></view>
+        <view>
+          本公司在此郑重提醒：本公司向您销售的产品或提供的服务将以您的风险承受能力等级和投资品种、
+          期限为基础，若您提供的信息发生任何重大变化，您都应当及时书面通知本公司。
+          本公司建议您审慎评判自身风险承受能力、结合自身投资行为，认真反馈您的投资品种、期限，作出审慎的投资判断。
+        </view>
+        <view class='line'></view>
+        <view>
+          本人经贵公司提示，已充分知晓贵公司向本人销售的产品或
+          提供的服务将以本人此次确认的风险承受能力等级和投资品种、
+          期限为基础。若本人提供的信息发生任何重大变化，本人都会及时书面通知贵公司。
+        </view>
+        <view>
+          本确认函系本人独立、自主、真实的意思表示，特此确认。
+        </view>
+        <view style='margin-top:20px;text-align:right;'>
+          <view>投资者姓名:{{result.userSign}}</view>
+          <view>日期:{{result.currDate}}</view>
+        </view>
+      </view>
+      <view class='foot'>
+        <view class='btn'  @tap='confirm'>我已阅读并同意</view>
+      </view>
+  </view>
+  <view class='tan2' wx:if='{{showDownDialog}}'>
+    <view class='header2'>您的风险测评结果为:</view>
+    <view class='result'>{{result.levelName}}</view>
+    <view class='sm'>
+      【第一创业】由于您的风险承受能力测评结果发生了下调，
+       由原来的{{result.lastLevelName}}调整为{{result.levelName}}，
+       您在我司签署的投顾服务风险级别可能高于您目前的风险承受能力，现提醒您注意相应业务的投资风险，谨慎投资。如有疑问，可联系在线客服
+       <text style='color:red'>027-82888927</text>
+    </view>
+    <button @tap='confirmDown'>确认下调</button>
+  </view>
+  <view class='tan3' wx:if='{{showSm}}'>
+    <view class='title'>投资者风险承受能力评估问卷</view>
+    <view class='content'>
+      <view>
+        风险承受能力评估是本公司履行投资者适当性管理职责的一个环节，
+        旨在了解您的风险承受能力等情况，借此协助您选择合适的金融产品或金融服务类别，
+        使本公司所提供的产品或服务与您的风险承受能力等级相匹配。
+      </view>
+      <view>
+        本公司特别提醒您：本公司向投资者履行风险承受能力评估等适当性职责，
+        并不能取代您自己的投资判断，也不会降低产品或服务的固有风险。
+        同时，与产品或服务相关的投资风险、履约责任以及费用等将由您自行承担。
+      </view>
+      <view>
+        本公司提示您：本公司根据您提供的信息对您进行风险承受能力评估，
+        开展适当性工作。您应当如实提供相关信息及证明材料，
+        并对所提供的信息和证明材料的真实性、准确性、完整性负责。
+      </view>
+      <view>
+        本公司建议：当您的各项状况发生重大变化时，需对您所投资的产品及时进行重新审视，
+        以确保您的投资决定与您可承受的投资风险程度等实际情况一致。
+      </view>
+      <view>
+        本公司在此承诺，对于您在本问卷中所提供的一切信息，
+        本公司将严格按照法律法规要求承担保密义务。
+        除法律法规规定的有权机关依法定程序进行查询以外，
+        本公司保证不会将涉及您的任何信息提供、泄露给任何第三方，或者将相关信息用于违法、不当用途。
+      </view>
+      <view style='margin-top:20px'>
+        为了让您能正确了解自身的风险承受能力。便于为您提供相适合的产品和服务，我们为您设计了一套科学的评估问卷。
+      </view>
+    </view>
+    <button class='start-btn' @tap='startCp'>开始测评</button>
+  </view>
+
+</view>
+</template>
+
+<script>
+import wepy from 'wepy';
+import http from '@/utils/http-util';
+import { API_URL, subjects } from '@/const';
+import windowUtil from '@/utils/window-util';
+import userManager from '@/utils/user-manager';
+import { navigateTo, navigateBack } from '@/utils/route';
+export default class Fxcp extends wepy.page {
+  config = {
+    navigationBarTitleText: '风险测评',
+    enablePullDownRefresh: false,
+    disableScroll: true
+  };
+  data = {
+    list: [],
+    showDialog: false,
+    showConfirm: false,
+    showDownDialog: false,
+    result: {},
+    toView: '',
+    //是否显示声明
+    showSm: true
+  };
+  onLoad() {}
+  async onShow() {
+    windowUtil.showLoading();
+    let userInfo = await userManager.getUserDetail();
+    windowUtil.hideLoading();
+    if (userInfo.registration != 1) {
+      let self = this;
+      wx.showModal({
+        title: '温馨提示',
+        content: '您还没有完成信息登记,是否去完成信息登记?',
+        showCancel: true,
+        success: function(resp) {
+          if (resp.confirm) {
+            self.$parent.observer.subscription(
+              subjects.userCheckIn,
+              function() {
+                navigateTo({ url: 'fxcp' });
+              }
+            );
+            navigateTo({ url: 'userCheckIn' });
+          } else {
+            navigateBack();
+          }
+        }
+      });
+    } else {
+      this.showSm = true;
+      this.$apply();
+    }
+  }
+  methods = {
+    //开始测评
+    async startCp() {
+      this.showSm = false;
+      if (this.list.length == 0) {
+        windowUtil.showLoading();
+        this.list = await http.getRequest(API_URL.FXCP_LIST);
+        this.$apply();
+        windowUtil.hideLoading();
+      }
+    },
+    //单选
+    select(questionId, e) {
+      let q = this.list.find(e => {
+        return e.question.questionId == questionId;
+      });
+      q.selected = e.detail.value;
+    },
+    //多选
+    mutileSelect(questionId, e) {
+      let q = this.list.find(e => {
+        return e.question.questionId == questionId;
+      });
+      let v = e.detail.value;
+      if (v.length == 0) {
+        q.selected = null;
+      } else {
+        q.selected = v.join(',');
+      }
+    },
+    //提交服务器
+    submit() {
+      let unSelectedIndex = this.list.findIndex(v => {
+        return !v.selected;
+      });
+      if (unSelectedIndex > -1) {
+        windowUtil.alert(`第${unSelectedIndex + 1}题还没有填写`);
+        let id = this.list[unSelectedIndex].question.questionId;
+        this.toView = `id-${id}`;
+        this.$apply();
+        return false;
+      }
+      let selected = this.list.map(v => {
+        return v.selected;
+      });
+      windowUtil.showLoading();
+      http
+        .getRequest(API_URL.FXCP_SUBMIT, {
+          optionIdList: selected.join(',')
+        })
+        .then(data => {
+          windowUtil.hideLoading();
+          this.showDialog = true;
+          this.result = data;
+          if (this.result.low == 0) {
+            this.showConfirm = true;
+            this.showDownDialog = false;
+          } else {
+            this.showDownDialog = true;
+            this.showConfirm = false;
+          }
+          this.$apply();
+        })
+        .catch(err => windowUtil.alert(err.errmessage));
+    },
+    //确认下调
+    confirmDown() {
+      this.showConfirm = true;
+      this.showDownDialog = false;
+    },
+    //确认提交
+    confirm() {
+      let selected = this.list.map(v => {
+        return v.selected;
+      });
+      windowUtil.showLoading();
+      http
+        .getRequest(API_URL.FXCP_CONFIRM, {
+          optionIdList: selected.join(',')
+        })
+        .then(data => {
+          windowUtil.hideLoading();
+          let observer = this.$parent.observer;
+          observer.broadcast(subjects.fxcp);
+        })
+        .catch(err => windowUtil.alert(err.errmessage));
+    },
+    cancel() {
+      this.showDialog = false;
+      this.showConfirm = false;
+      this.showDownDialog = false;
+      this.result = {};
+    },
+    scroll() {
+      // this.toView = '';
+      // this.$apply();
+    }
+  };
+}
+</script>

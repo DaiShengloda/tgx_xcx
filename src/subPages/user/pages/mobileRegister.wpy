@@ -1,0 +1,201 @@
+<style lang='scss'>
+@import '../../../sass/base/reset';
+@import '../../../sass/commons/function';
+.input-div {
+  padding: 10px 5px;
+  height: 30px;
+  line-height: 30px;
+  border-bottom: 1px solid #ccc;
+  .icon {
+    width: 40rpx;
+    height: 60rpx;
+    vertical-align: middle;
+  }
+  input {
+    font-size: 14px;
+    width: 90%;
+    float: right;
+    height: 100%;
+  }
+}
+#yzm_btn {
+  width: 90%;
+  font-size: 16px;
+  background: #e83030;
+  color: white;
+  margin: 40rpx auto;
+}
+.wx_login {
+  text-align: center;
+  color: #a9a9a9;
+  font-size: 28rpx;
+  margin-top: 100px;
+  .line {
+    height: 0;
+    width: 100%;
+    border-top: 1px solid #ccc;
+  }
+  .title {
+    position: relative;
+    font-size: 28rpx;
+    top: -13px;
+    padding: 0 10px;
+    background: #f5f5f5;
+    display: inline;
+  }
+  .wx_icon {
+    width: 120rpx;
+    height: 120rpx;
+    display: block;
+    margin: 20px auto;
+    background-image: url('https://dakaname.oss-cn-hangzhou.aliyuncs.com/img/wxdenglu%403x.png');
+    background-size: cover;
+  }
+}
+</style>
+<template>
+  <view>
+    <view class='input-div'>
+      <image class='icon' src='/static/images/sjicon@3x.png'/>
+      <input 
+        type='number'
+        maxlength='11'
+        placeholder='请输入手机号码'
+        adjust-position='true'
+        confirm-type='done'
+        @input='inputMobile'
+      />
+    </view>
+    <button id='yzm_btn' @tap='getCode'>获取验证码</button>
+    <view class='wx_login' wx:if='{{register}}'>
+      <view class='line'></view>
+      <text class='title'>推荐用以下方式一键登录</text>
+      <button class='wx_icon' 
+        open-type='getUserInfo' 
+        @getuserinfo='weixinLogin' 
+        withCredentials='true'>
+      </button>
+      <text>点击微信图标自动登录</text>
+    </view>
+  </view>
+</template>
+
+<script>
+import wepy from 'wepy';
+import http from '@/utils/http-util';
+import userManager from '@/utils/user-manager';
+import { regular } from '@/utils/common-util';
+import windowUtil from '@/utils/window-util';
+import { API_URL,subjects } from '@/const';
+export default class MobileRegister extends wepy.page {
+  data = {
+    //是否是注册
+    register: false,
+    mobile: null
+  };
+  methods = {
+    inputMobile(e) {
+      this.mobile = e.detail.value;
+    },
+    weixinLogin(e) {
+      windowUtil.showLoading();
+      userManager
+        .loginByWeChat(e.detail)
+        .then(data => {
+          let observer = this.$parent.observer;
+          observer.broadcast(subjects.loginSuccess);
+        })
+        .catch(err => {
+          Logger.error('微信登录失败:%o', err);
+          windowUtil.alert('登录异常,请稍后重试');
+        });
+    },
+    async getCode() {
+      if (!regular().isPhone(this.mobile)) {
+        windowUtil.alert('请输入正确的手机号码');
+        return false;
+      }
+      windowUtil.showLoading();
+      let error = null;
+      let result = null;
+      if (this.register) {
+        // 注册流程检查手机号
+        try {
+          await http.getRequest(API_URL.CHECK_MOBILE, {
+            mobile: this.mobile
+          });
+        } catch (error) {        
+          windowUtil.alert(error.errmessage);
+          throw error;
+        }
+      }else{
+        // 非注册检查手机号--（未注册、绑定未设置密码）
+        // 104--号码已存在；
+        // 4001 -- 号码存在需设置密码；
+        // 0 -- 号码未注册；
+        result=await this.checkMobile()
+        if(result.data.errcode==0&&result.data.status==1){
+          windowUtil.alert('该手机号未注册')
+          return
+        } else if(result.data.errcode==4001){
+          wx.navigateTo({
+            url:
+            `/subPages/user/pages/setPassword?mobile=${this.mobile}`
+          })
+          windowUtil.hideLoading();
+          return
+        }  
+      }
+
+      try {
+        await http.getRequest(API_URL.GET_YZ_CODE, {
+          mobile: this.mobile
+        });
+      } catch (error) {
+        windowUtil.alert(error.errmessage);
+        throw error;
+      }
+      wx.navigateTo({
+        url: `/subPages/user/pages/identifyCode?register=${
+          this.register
+        }&mobile=${this.mobile}`
+      });
+       windowUtil.hideLoading();
+    }
+  };
+  onLoad(option) {
+    if (option.register == 'true') {
+      this.register = true;
+      wx.setNavigationBarTitle({ title: '手机号注册' });
+    } else {
+      this.register = false;
+      wx.setNavigationBarTitle({ title: '找回密码' });
+    }
+  }
+  onShow(){
+    userManager.checkSession();
+  }
+  checkMobile() {
+    var self=this
+    return new Promise((resolve, reject)=>{
+      wx.request({
+        type: "get",
+        // url:'http://tgs-api.lzyunying.com/api/user/checkMobile.do',
+        url:'https://tgs.gp58.com/api/user/checkMobile.do',
+        dataType: 'json',
+        data:{mobile:self.mobile},
+        'xhrFields': {
+            withCredentials: true
+        },
+        success: function (response) {
+            resolve(response)
+        },
+        error: function (error) {
+            reject(error)
+        }
+      })
+    })
+  }
+}
+</script>
+

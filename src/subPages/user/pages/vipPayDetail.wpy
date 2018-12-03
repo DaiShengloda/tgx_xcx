@@ -1,0 +1,118 @@
+<style lang="scss">
+
+.coinRechargeLog{
+  height: 100%;
+  background: #efeff4;
+}
+.coinRechargeLog .list{
+  padding: 0px 30rpx;
+  display: flex;
+  display: -webkit-flex;
+  justify-content: space-between;
+  height: 100rpx;
+  background: #fff;
+  padding-top: 20rpx;
+  border-bottom: 1px solid #ccc;
+}
+.coinRechargeLog .list .left{
+  font-size: 16px;
+}
+.coinRechargeLog .list .right{
+  text-align: right;
+  .red{
+    color: red;
+  }
+  .result{
+    font-size: 16px;
+  }
+  .time{
+    font-size: 13px;
+    color: #999;
+  }
+}
+</style>
+<template>
+<lodingPage></lodingPage>
+  <scrollView :url='url' :param='param' :pageSize.sync='pageSize' @dataLoad.user='setPageData'>
+    <view slot='content' class='coinRechargeLog'>
+      <repeat for='{{logs}}'>
+        <view class='list'>
+          <view class='left'>{{item.name}}</view>
+          <view class='right'>
+            <text wx:if='{{item.gatherStatus == 2}}' class='result red'>使用成功</text>
+            <text wx:elif='{{item.gatherStatus == 3}}' class='result'>使用取消</text>
+            <text wx:else class='result'>订单正在处理中</text>
+            <view class='time'>{{item.gatherTime}}</view>
+          </view>
+        </view>
+      </repeat>
+    </view>
+  </scrollView>
+</template>
+
+<script>
+import wepy from 'wepy';
+import ScrollView from '@/components/scrollView';
+import http from '@/utils/http-util';
+import { API_URL } from '@/const';
+import utils from '@/utils/common-util';
+import windowUtil from '@/utils/window-util';
+import LodingPage from '@/components/lodingPage';
+export default class VipPayDetail extends wepy.page {
+    config = {
+        navigationBarTitleText: '购买记录'
+    }
+    components = {
+        scrollView: ScrollView,
+        lodingPage:LodingPage,
+    };
+    data = {
+        url: API_URL.COIN_RECHARGE_LOG,
+        param: {
+          page_no: 1,
+          page_size: '15',
+          type: 2
+        },
+        logs: [],
+        pageSize:'15',
+    };
+    methods = {
+        setPageData(data,type) {
+          this.formatDate(data)
+          if(type==0){
+            this.logs=data
+          }else(
+            this.logs.push(...data)
+          )
+          this.hideLoading()
+          this.$apply()
+        }
+    };
+    onLoad() {
+      this.showLoading()
+      this.$invoke('scrollView', 'refresh');
+    }
+    onPullDownRefresh() {
+        this.$invoke('scrollView', 'refresh');
+    }
+    onReachBottom() {
+        this.$invoke('scrollView', 'nextPage');
+    }
+    formatDate(data){
+      data.forEach((v,index)=>{
+          data[index].gatherTime = utils.formatTimeLocal(v.gatherTime)
+      })
+    }
+    // 显示加载层
+    showLoading(){
+        this.$invoke('lodingPage','show')
+    }
+    // 隐藏加载层
+    hideLoading(){
+        this.$invoke('lodingPage','hide')
+    }
+}
+</script>
+
+<style>
+</style>

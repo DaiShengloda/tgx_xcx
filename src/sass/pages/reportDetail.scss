@@ -1,0 +1,149 @@
+.report-detail{
+    // 
+   .detail-cont{
+    padding:0 30rpx;
+    background:#fff;      
+        .cont-title{
+            font-size:44rpx;
+            padding-top:30rpx;        
+        }
+        .cont-msg{
+            font-size:28rpx;
+            color:#999; 
+            display:flex;
+            align-items:center;
+            justify-content:space-between;                           
+            .msg-lef{
+                display:flex;
+                align-items:center;
+                .msg-name{
+                    margin-right:30rpx;
+                    max-width:10em;
+                    display:inline-block;
+                    white-space:nowrap;
+                    overflow:hidden;
+                    text-overflow:ellipsis;                                  
+                }
+                .msg-com{
+    
+                }
+            }
+            .msg-time{
+                             
+            }
+        }
+        .cont-guide{
+            font-size:30rpx;
+            background:#f3f1f1;
+            padding:20rpx 30rpx;
+            color:rgb(72,72,72);  
+            text-indent:2em;
+            margin:30rpx 0;            
+        }
+        .cont-btn{
+            font-size:34rpx;
+            background:#e93030;
+            color:#fff;
+            height:80rpx;
+            line-height:80rpx;
+            text-align:center;
+            border-radius:10rpx;            
+        }
+        .cont-sum{
+            font-size:34rpx;
+            line-height:1.5rem;         
+        }
+        .cont-dec{
+            padding:50rpx 0 30rpx 0;
+            font-size:26rpx;            
+            color: #e93030;
+        }
+   }
+    // 
+    .comment {
+        background:#fff; 
+        border-top:20rpx solid #eee;       
+        .comment-title {
+            font-size:30rpx;
+            border-bottom:1px #e6e6e6 solid;  
+            height:90rpx;
+            line-height: 90rpx;
+            padding-left:30rpx;          
+        }
+        .comment-list {
+            .comment-box {
+                margin:0 30rpx;
+                border-bottom:#e6e6e6 1px solid;
+                padding:20rpx 0;                
+                .box-top {
+                    display:flex;
+                    align-items:center;  
+                    position:relative;                    
+                    .top-icon {
+                        width:80rpx;
+                        height:80rpx;
+                        border-radius: 50%;
+                    }
+                    .top-msg {
+                        padding-left:15rpx;                        
+                        .msg-name {
+                            font-size:28rpx;                            
+                        }
+                        .msg-time {
+                            font-size:24rpx;
+                            color:#999;                            
+                        }
+                    }
+                    .top-num {
+                        font-size:23rpx;   
+                        position:absolute;
+                        right:0;  
+                        display: flex; 
+                        color:#999;                                          
+                        .num-finger {
+                            display:flex;
+                            align-items:center;
+                        }
+                        .num-comment {
+                            display:flex;
+                            align-items:center;
+                            padding:0 15rpx;                            
+                        }
+                        image {
+                            width:35rpx;
+                            height:35rpx; 
+                            padding-right:5rpx;                            
+                        }
+                    }
+                }
+                .box-mid {
+                    padding-left:95rpx;
+                    padding-top:20rpx;
+                    font-size:28rpx;                    
+                    .mid-com {
+                        overflow: hidden;
+                        text-overflow: ellipsis;
+                        display: -webkit-box;
+                        -webkit-line-clamp: 3;
+                        -webkit-box-orient: vertical; 
+                    }
+                }
+                .last-comment {
+                    margin-top:20rpx;
+                    background:#f7f7f7;
+                    padding:15rpx;                    
+                    .last-box {
+                        padding:5rpx 0;
+                        .last-box-name {
+                            color:#507daf;
+                            padding-right:10rpx;                            
+                        }
+                        .last-box-word {
+
+                        }
+                    }
+                }
+            }
+        }
+    }
+}

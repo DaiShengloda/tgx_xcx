@@ -1,0 +1,21 @@
+@function r($px){//$rpx为需要转换的字号
+    @return $px*1rpx;
+  }
+
+ /* 属性多值传递
+ex:
+@include remCalc(padding,10,20);
+padding: 0.13333rem 0.26667rem;*/
+@mixin remCalc($property, $values...) {
+    $max: length($values);
+    $remValues: '';
+    @for $i from 1 through $max {
+      $value: nth($values, $i);
+      $remValues: $value*1rpx;
+  
+      @if $i < $max {
+        $remValues: #{$remValues + " "};
+      }
+    }
+    #{$property}: $remValues;
+  }

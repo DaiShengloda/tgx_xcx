@@ -1,0 +1,112 @@
+.his-detail{
+    background:#fff;    
+    .his-blank{
+        height:90rpx;
+    }
+    .his-head{
+        height:90rpx;
+        line-height:90rpx;
+        font-size:30rpx;
+        display:flex;
+        align-items:center; 
+        position: fixed;
+        top:0;      
+        width:100%;    
+        background:#fff;
+        border-bottom:#e6e6e6 1px solid;            
+        .name{
+            width:33.33%;
+            text-align:left;
+            padding-left:30rpx;                      
+        }
+        .price{
+            width:33.33%;
+            text-align:center;            
+        }
+        .wave{
+            width:33.33%;
+            text-align:right;  
+            padding-right: 30rpx;           
+        }
+    }
+    // 
+    .his-list{    
+        .list-box{
+            border-bottom:#e6e6e6 1px solid;            
+            .box-date{
+                display:flex;
+                align-items:center;                
+                justify-content:space-between;
+                font-size:28rpx;
+                color:#787878;
+                background:#eee;
+                height:85rpx;
+                line-height:85rpx;                
+                padding:0 30rpx;                
+                .date-time{
+
+                }
+                .date-arrow{
+                    width:40rpx;
+                    height:40rpx;                    
+                }
+            }
+            .box-content{
+                margin:0 30rpx;
+                font-size:30rpx;                
+                .cont-box{
+                    display:flex;
+                    align-items:center; 
+                    height:102rpx;
+                    border-bottom:#e6e6e6 1px solid;                                       
+                    .cont-msg{
+                        width:33.33%;
+                        text-align:left;
+                        // padding-left:30rpx;                                              
+                        .msg-name{
+
+                        }
+                        .msg-code{
+                            font-size:24rpx;
+                            color:#999;                            
+                        }
+                    }
+                    .cont-price{
+                        width:33.33%;
+                        text-align:center;                        
+                    }
+                    .cont-wave{
+                        width:33.33%;
+                        text-align:right;  
+                        font-size:36rpx;
+                        color:#e93030;                                             
+                    }
+                }
+            }
+        }
+    }
+    // 
+    .up-blank{
+        height:90rpx;
+    }
+    .up-btn{
+        height:110rpx;
+        position:fixed;
+        bottom:0;
+        width:100%;
+        background:#fff;
+        border-top:#e6e6e6 1px solid;          
+        .vip-btn{
+            background:#e93030;
+            color:#fff;
+            font-size:32rpx;
+            height:90rpx;
+            line-height:90rpx;
+            text-align:center;
+            width:90%;
+            margin:10rpx auto;
+            border-radius:10rpx;
+            
+        }
+    }
+}

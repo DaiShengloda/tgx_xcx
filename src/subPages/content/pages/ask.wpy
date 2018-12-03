@@ -1,0 +1,274 @@
+<style lang="scss">
+  @import '../../../sass/commons/function';
+  @import '../sass/ask';
+</style>
+<template>
+    <view class="note">
+        <!-- <lodingPage></lodingPage> -->
+     <!-- tab栏 -->
+     <view class="note-tab">
+         <!-- tab切换 -->
+        <view class="tab-box">
+          <view class="default {{activeTabIndex==0 ?'active':''}}" @tap.stop="swichNav(0)">热门推荐</view>
+          <view class="default {{activeTabIndex==1 ?'active':''}}" @tap.stop="swichNav(1)">我的关注</view>
+        </view>
+        <!-- 内容区 -->
+        <view class="content-box">
+          <!-- 全部 -->
+          <view class="{{activeTabIndex==0 ?'contShow':'contHid'}}">
+          <allDakaScroll :url.sync="url" :param.sync="param" @dataLoad.user="setDakaData">
+            <view slot="content">
+                    <!-- 列表 -->
+                    <!-- <view class="bigMan-list"> -->
+                            <repeat for="{{listData}}" item="item" key="userid">
+                            <view class="list">
+                                <view class="li-lef">
+                                <image src="{{item.contents.user_ico}}" wx:if="{{item.contents.user_ico}}"/>
+                                <image src="/static/images/person.png" wx:else></image>
+                                </view>
+                                <view class="li-btw" @tap.stop="dakaDetail({{item.contents.userid}})">
+                                <view class="btw-man">
+                                    <text class="man-name">{{item.contents.user_name}}</text>
+                                    <text class="man-tg"> | {{item.contents.user_title}}</text>
+                                </view>
+                                <view class="man-int">{{item.contents.user_profiles}}</view>
+                                <view class="man-num">关注: {{item.contents.user_noticer_nums}}</view>
+                                </view>
+                                <view class="li-rig"> 
+                                    <view class="man-atten" data-code="{{item.contents.cert_code}}" data-name="{{item.contents.user_name}}" data-userid="{{item.contents.userid}}" data-price="{{item.contents.answer_price}}" bindtap="showInput">提问</view>
+                                </view>
+                            </view>
+                            </repeat>
+                    <!-- </view> -->
+            </view>
+          </allDakaScroll>
+          </view>
+          <!-- 我的关注 -->
+        
+            <view class="{{activeTabIndex==1 ?'contShow':'contHid'}}">    
+            <noticeNoteScroll :url.sync="urlNotice" :param.sync="paramNotice" @dataLoad.user="setNoticeData"> 
+                    <!-- 列表 -->
+                    <!-- <view class="bigMan-list"> -->
+                        <view slot="content">
+                            <repeat for="{{noticeDakaList}}" item="item" key="userid">
+                            <view class="list">
+                                <view class="li-lef">
+                                <image src="{{item.user_ico}}" wx:if="{{item.user_ico}}"/>
+                                <image src="/static/images/person.png" wx:else></image>
+                                </view>
+                                <view class="li-btw" @tap.stop="dakaDetail({{item.userid}})">
+                                <view class="btw-man">
+                                    <text class="man-name">{{item.user_name}}</text>
+                                    <text class="man-tg"> | {{item.user_title}}</text>
+                                </view>
+                                <view class="man-int">{{item.user_profiles}}</view>
+                                <view class="man-num">关注: {{item.user_notice_num}}</view>
+                                </view>
+                                <view class="li-rig">
+                                <view class="man-atten" data-code="{{item.cert_code}}" data-name="{{item.user_name}}" data-userid="{{item.userid}}" data-price="{{item.answer_price}}" bindtap="showInput">提问</view>
+                                </view>
+                            </view>
+                            </repeat>
+                    </view>
+            </noticeNoteScroll>
+            </view>        
+        </view>
+    </view>
+  </view>
+  <commentInput :url.sync="askUrl" :param.sync="askParam"></commentInput>
+  <hegui @finish.user='finishHeGui' @agreeRuleFinish.user='agreeRule' @fxcpFinish.user='fxcpFinish'/>
+</template>
+
+<script>
+import wepy from 'wepy';
+import http from '@/utils/http-util';
+import utils from '@/utils/common-util';
+import window from '@/utils/window-util'
+import { API_URL } from '@/const';
+import LodingPage from '@/components/lodingPage';
+import BigManNotice from '@/components/bigManNotice';
+import CommentInput from '@/components/commentInput';
+import HeGui from '@/components/hegui';
+import ScrollView from '@/components/scrollView';
+export default class ask extends wepy.page {
+   config = {
+        navigationBarTitleText: '提问',
+        enablePullDownRefresh: false
+    }
+    components = {
+        allDakaScroll: ScrollView,
+        noticeNoteScroll: ScrollView,
+        lodingPage:LodingPage,
+         commentInput: CommentInput,
+         hegui: HeGui,
+    }
+    data = {
+        //所有tab列表
+        tabs:['allDakaScroll','noticeNoteScroll'],
+        //当前选中的tab
+        activeTabIndex:0,
+        tabBoxTop:null,
+        url: API_URL.RECOMMEND,  
+
+        // 问股列表 
+        listData:[],
+        param: {
+            'positionid': 200105
+        },
+        // 关注大咖列表
+        noticeDakaList: [],
+        urlNotice:API_URL.DAKA_LIST,
+        paramNotice: {
+            'page_no': 1,
+            'page_size': 10,
+            'list_type': 1
+        },
+        askUrl:API_URL.QUESTION_ASK,
+        askParam:{
+            answer_userid:'',
+            question_content:''
+        }
+       ,
+       name:'',
+       price:'',
+       userid:'',
+       code:'',
+       balance:0,
+    }
+    //事件处理函数
+    methods = {
+        swichNav(index){
+            this.activeTabIndex=index;
+            let currScroll = this.getCurrScroll();
+            var items = this.$invoke(currScroll,'getItems');
+            //没有数据时才重新加载,否则不做任何处理
+            if(items.length <= 0){
+                this.$invoke(currScroll,'init');
+                wx.showLoading({title: '加载中...',}) 
+            }
+        },
+        setDakaData (data,type) {
+        if(!type){
+          this.listData=data
+        }else{
+          this.listData.push(...data)
+        }  
+        this.hideLoding(); 
+        this.$apply()
+      },
+        setNoticeData (data,type) {
+            // this.formatNoteData(data)
+            if(!type){
+                this.noticeDakaList=data
+            }else{
+                this.noticeDakaList.push(...data)
+            }
+            wx.hideLoading()
+            this.$apply()
+        },
+         // 显示评论输入框组件
+        showInput(event){
+            window.showLoading();
+            this.name = event.target.dataset.name;
+            this.price = event.target.dataset.price;
+            this.userid= event.target.dataset.userid;
+            this.code = event.target.dataset.code;
+            http.getRequest(API_URL.QUERY_COIN, {})
+                .then(data => {
+                    window.hideLoading();
+                     if(this.price > data){
+                        wx.showModal({
+                                        title: '剩余不足',
+                                        content: '您当前拥有'+ data+'大咖币,本次消费需要'+this.price+'大咖币，剩余不足，是否立即补充？',
+                                        success: function(res) {
+                                            if (res.confirm) {
+                                                wx.navigateTo({url: '/subPages/user/pages/coinRecharge'});
+                                            }
+                                        }
+                                        })
+                    }else{
+                        this.$invoke('hegui', 'startHeguiForDaka', this.userid, this.code);
+                    }
+                }).catch(error=>{
+                    window.hideLoading();
+                });
+        },
+        dakaDetail(userid){
+            // var userid = event.currentTarget.dataset.userid;
+           wx.navigateTo({url: `/subPages/content/pages/detail/bigManDetail?id=${userid}`})
+        },
+          //风险测评结束触发
+        fxcpFinish() {
+        wx.redirectTo({
+            url: '/subPages/content/pages/ask'
+        });
+        },
+    //合规结束
+        finishHeGui() {
+            this.askParam.answer_userid=this.userid;
+            this.$invoke('commentInput', 'showInput',3,null,this.price,this.name)
+        },
+        //同意使用
+        agreeRule(){
+        wx.navigateBack({});
+            this.askParam.answer_userid=this.userid;
+            this.$invoke('commentInput', 'showInput',3,null,this.price,this.name)
+           
+        },
+    }
+      events = {
+  
+  };
+    //页面生命周期函数
+    onLoad(option) {
+        this.showLoding();
+        this.$invoke(this.getCurrScroll(),'init');
+    }
+    onShow(){
+    }
+
+    // 下拉刷新
+    onPullDownRefresh () {
+       this.$invoke(this.getCurrScroll(),'init');      
+    }
+    // 上拉加载
+    onReachBottom () {
+      this.$invoke(this.getCurrScroll(),'nextPage');
+    }
+    //获取当前激活的tab
+    getCurrScroll(){
+       return this.tabs[this.activeTabIndex]; 
+    } 
+
+    //显示加载动画
+    showLoding(){
+      this.$invoke('lodingPage','show');
+    }
+    //隐藏加载动画
+    hideLoding(){
+      this.$invoke('lodingPage','hide');
+    }
+    chechBalance(){
+         http.getRequest(API_URL.QUERY_COIN, {})
+                .then(data => {
+                    window.hideLoading();
+                     if(this.price > data){
+                        wx.showModal({
+                                        title: '剩余不足',
+                                        content: '您当前拥有'+ data+'大咖币,本次消费需要'+this.price+'大咖币，剩余不足，是否立即补充？',
+                                        success: function(res) {
+                                            if (res.confirm) {
+                                                wx.navigateTo({url: '/subPages/user/pages/coinRecharge'});
+                                            }
+                                        }
+                                        })
+                    }else{
+                        this.$invoke('commentInput', 'showInput',3,null,this.price,this.name)
+                    }
+                }).catch(error=>{
+                    window.hideLoading();
+                });
+    }
+}
+</script>
+

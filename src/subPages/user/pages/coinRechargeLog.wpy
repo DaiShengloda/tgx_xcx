@@ -1,0 +1,104 @@
+<style lang="scss">
+@import '../../../sass/base/reset';
+@import '../../../sass/commons/function';
+.coinRechargeLog{
+  height: 100%;
+  background: #efeff4;
+}
+.coinRechargeLog .list{
+  padding: 0px 30rpx;
+  display: flex;
+  display: -webkit-flex;
+  justify-content: space-between;
+  height: 100rpx;
+  background: #fff;
+  padding-top: 20rpx;
+  border-bottom: 1px solid #ccc;
+}
+.coinRechargeLog .list .left{
+  font-size: 16px;
+}
+.coinRechargeLog .list .right{
+  text-align: right;
+  .red{
+    color: red;
+  }
+  .result{
+    font-size: 16px;
+  }
+  .time{
+    font-size: 13px;
+    color: #999;
+  }
+}
+</style>
+<template>
+  <scrollView :url='url' :param='param' @dataLoad.user='setPageData'>
+    <view slot='content' class='coinRechargeLog'>
+      <repeat for='{{logs}}'>
+        <view class='list'>
+          <view class='left'>{{item.name}}</view>
+          <view class='right'>
+            <text wx:if='{{item.gatherStatus == 2}}' class='result red'>支付成功</text>
+            <text wx:elif='{{item.gatherStatus == 3}}' class='result'>支付取消</text>
+            <text wx:else class='result'>订单正在处理中</text>
+            <view class='time'>{{item.gatherTime}}</view>
+          </view>
+        </view>
+      </repeat>
+    </view>
+  </scrollView>
+</template>
+
+<script>
+import wepy from 'wepy';
+import ScrollView from '@/components/scrollView';
+import http from '@/utils/http-util';
+import { API_URL } from '@/const';
+import utils from '@/utils/common-util';
+import windowUtil from '@/utils/window-util';
+export default class CoinRechargeLog extends wepy.page {
+  config = {
+    naviationBarTitleText: '充值记录'
+  };
+  components = {
+    scrollView: ScrollView
+  };
+  data = {
+    url: API_URL.COIN_RECHARGE_LOG,
+    param: {
+      page_no: 1,
+      page_size: 10,
+      type: 1
+    },
+    logs: [],
+    isRefresh:false
+  };
+  onLoad() {
+    this.$invoke('scrollView', 'nextPage');
+  }
+  methods = {
+    setPageData(data) {
+      if(this.isRefresh){
+        this.logs = [];
+      }
+      data.forEach(v=>{
+        v.gatherTime = utils.formatTimeLocal(v.gatherTime);
+        this.logs.push(v);
+      });
+      this.$apply();
+    }
+  };
+  onPullDownRefresh() {
+    this.isRefresh = true;
+    this.$invoke('scrollView', 'refresh');
+  }
+  onReachBottom() {
+    this.isRefresh = false;
+    this.$invoke('scrollView', 'nextPage');
+  }
+}
+</script>
+
+<style>
+</style>

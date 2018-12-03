@@ -1,0 +1,537 @@
+<style lang="scss">
+@import '../../sass/base/reset';
+@import '../../sass/commons/function';
+@import '../../sass/pages/index';
+.common-form-btn {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  padding: 0;
+  margin: 0;
+  top: 0;
+  left: 0;
+  z-index: 9;
+}
+.common-form-btn[plain] {
+  border: none;
+}
+</style>
+
+<template>
+ <view class="index">
+     <lodingPage></lodingPage>
+    <!-- banner -->
+    <view class="dex-banner" wx:if="{{indexData.ads.length>0}}">
+        <swiper circular="true" indicator-dots="{{indexData.ads.length>1?true:false}}" autoplay="false" interval="4000" duration="1000" indicator-color="rgba(255, 255, 255, 0.5)" indicator-active-color="#ffffff">
+            <block>
+                <swiper-item wx:for="{{indexData.ads}}" wx:for-item="item" wx:for-index="u" catchtouchmove='{{indexData.ads.length==1}}'>
+                    <form bindsubmit="bannerEvt({{item.action}})" report-submit='true'>
+                      <button class="common-form-btn" formType="submit" plain="{{true}}"></button>
+                    </form>
+                    <image class="slide-image" src="{{item.icon}}"></image>
+                </swiper-item>
+            </block>
+        </swiper>
+    </view>
+    <!-- tab -->
+    <view class="dex-tab">
+        <swiper indicator-dots="{{indexData.buttons.length>1?true:false}}" style="height:{{indexData.buttons[0].length>4?200:100}}px" indicator-color="rgba(235, 78, 78,0.5)" indicator-active-color="rgb(235, 78, 78)">
+            <swiper-item wx:for="{{indexData.buttons}}" wx:for-item="value" wx:for-index="u" catchtouchmove='{{indexData.buttons.length==1}}'>
+                <repeat for="{{value}}" item="item" index="index"> 
+                  <form class="tab-box" bindsubmit="bannerEvt({{item.action}})" report-submit='true' wx:if="{{!(isIOS&&item.title=='一键充值')}}">   
+                    <button class="tab-box-btn"  formType="submit">
+                        <image class="box-img" src="{{item.icon}}"></image>
+                        <view class="box-title">{{item.title}}</view>
+                    </button>
+                  </form>
+                </repeat>
+            </swiper-item>
+        </swiper>
+    </view>
+    <!-- 签到 -->
+    <view class="dex-qd">
+        <image class="box-img" src="https://dakaname.oss-cn-hangzhou.aliyuncs.com/mini_app_icons/punch.jpg" wx:if="{{!punch}}"></image>
+        <image class="box-img" src="https://dakaname.oss-cn-hangzhou.aliyuncs.com/mini_app_icons/punch-over.jpg" wx:if="{{punch}}"></image>
+        <view class="punch">
+          <form bindsubmit="punch" report-submit='true'>
+            <button class="common-form-btn" formType="submit" plain="{{true}}"></button>
+          </form>
+        </view>
+    </view>
+    <!-- 补充 -->
+    <!-- <view class="dex-qd" @tap="chongzhi()">
+        <image class="box-img" src="https://dakaname.oss-cn-hangzhou.aliyuncs.com/mini_app_icons/chongzhi110.jpg"  />
+    </view> -->
+    <!-- 股市直播 -->
+    <view class="vip-live" wx:if="{{indexData.live_place}}">
+        <view class="live-title">股市直播</view>
+        <view class="live-place"> 
+            <!-- <repeat for="{{liveData}}" item="item" index="index"> --> 
+                <view class="live-box">
+                    <form bindsubmit="bannerEvt({{indexData.live_place.action}})" report-submit='true'>
+                      <button class="common-form-btn" formType="submit" plain="{{true}}"></button>
+                    </form>
+                    <image class="box-img" src="{{indexData.live_place.image}}" wx:if="{{indexData.live_place.status==1}}"/>
+                    <image class="box-img" src="{{indexData.live_place.stop_image}}" wx:else/>        
+                    <view class="box-name">{{indexData.live_place.name}}</view>
+                    <view class="box-status" wx:if="{{indexData.live_place.status==1}}">直播中</view>
+                    <view class="box-status" wx:else>直播回放</view>
+                    <view class="box-title">{{indexData.live_place.title}}</view>
+                    <view class="box-msg">
+                        <image class="msg-icon" src="{{indexData.live_place.user_ico}}"/>
+                        <text class="msg-name">{{indexData.live_place.bigname_name}}</text>
+                    </view>
+                </view>
+            <!-- </repeat> -->
+        </view>
+    </view>
+    <!-- 今日话题 -->
+    <view class="dex-theme" wx:if="{{indexData.hots.oneItem.length>0||indexData.hots.twoItem.length>0}}">
+        <view class="theme-title">今日话题</view>
+        <view class="theme-col">
+            <repeat for="{{indexData.hots.oneItem}}" item="item">
+                <view class="col-box">
+                    <form bindsubmit="bannerEvt({{item.action}})" report-submit='true'>
+                      <button class="common-form-btn" formType="submit" plain="{{true}}"></button>
+                    </form>
+                    <view class="box-top">
+                        <!-- <view class="top-sign">{{item.sign}}</view> -->
+                        <image class="top-img" src="{{item.icon}}"></image>
+                        <text class="top-title">{{item.title}}</text>
+                    </view>      
+                    <view class="box-bom">{{item.profile}}</view>    
+                </view>
+            </repeat>
+        </view>
+        <view class="theme-row" style="height:{{rowHeight}}rpx">
+            <repeat for="{{indexData.hots.twoItem}}" item="item" index="index">
+                <view class="row-box">
+                    <form bindsubmit="bannerEvt({{item.action}})" report-submit='true'>
+                      <button class="common-form-btn" formType="submit" plain="{{true}}"></button>
+                    </form>
+                    <view class="box-msg">
+                        <image class="msg-img" src="{{item.icon}}"></image>
+                        <view class="msg-title">{{item.title}}</view>
+                    </view>
+                </view>
+            </repeat>
+        </view>
+    </view>
+    <!-- 大盘预测 -->
+    <view class="dex-guess" wx:if="{{guessData}}">
+        <form bindsubmit="bannerEvt('guess')" report-submit='true'>
+          <button class="common-form-btn" formType="submit" plain="{{true}}"></button>
+        </form>
+        <view class="guess-title">大盘预测</view>
+        <view class="guess-cont">
+          <view class="cont-lef">
+            <view class="lef-text" wx:if="{{guessData.status==1}}">
+              大盘涨跌<text class="text-red">有奖竞猜</text>正在进行中
+            </view>
+            <view class="lef-text" wx:if="{{guessData.status==2}}">
+              大盘有奖竞猜已结束
+            </view>
+            <view class="lef-join" wx:if="{{guessData.status==1}}">立即参与></view>
+            <view class="lef-join" wx:if="{{guessData.status==2}}">点击查看></view>
+          </view>
+          <view class="cont-mid"></view>
+          <view class="cont-rig">
+            <view class="rig-time">{{guessData.forecastDate}}</view>
+            <view class="rig-detail">
+              <text class="detail-red">{{guessData.upPer}}%</text>看涨
+            </view>
+          </view>
+        </view>
+    </view>
+    <!-- 大咖推荐 -->
+    <view class="dex-recommend" wx:if="{{recommendData.length>0}}">
+        <view class="recom-title">大咖推荐</view>
+        <repeat for="{{recommendData}}" item="item" index="index">
+            <view class="recom-box" wx:if="{{item.hotcontents.length>0}}" @tap.stop="toPageDetail({{item}})">
+                <!-- <form bindsubmit="toPageDetail({{item}})" report-submit='true'>
+                  <button class="common-form-btn" formType="submit" plain="{{true}}"></button>
+                </form> -->
+                <view class="box-top">
+                    <view class="li-lef">
+                        <image src="{{item.user_ico}}" wx:if="{{item.user_ico}}" />
+                        <image src="/static/images/person.png" wx:else />
+                    </view>
+                    <view class="li-btw">
+                        <view>
+                            <text class="man-name">{{item.user_name}}</text>
+                            <text class="man-title"> | {{item.user_title}}</text>
+                        </view>
+                        <view class="man-int">{{item.user_profiles}}</view>
+                    </view>
+                    <view class="li-rig">
+                        <view class="rig-word" style="background:{{item.hotcontents[0].sign.color}}">{{item.hotcontents[0].sign.text}}</view>
+                        <view class="rig-semcle" style="background:{{item.hotcontents[0].sign.color}}"></view>
+                    </view>
+                </view>
+                <view class="box-mid">
+                    <view class="mid-title" wx:if="{{item.hotcontents[0].summry}}">{{item.hotcontents[0].title}}</view>
+                    <view class="mid-int" wx:if="{{item.hotcontents[0].summry}}">{{item.hotcontents[0].summry}}</view>
+                    <view class="mid-int" wx:else>{{item.hotcontents[0].title}}</view>
+                    <view class="mid-audio" wx:if="{{item.hotcontents[0].content_type==4}}">
+                         <image class="audio-icon" src="{{wg_image_2}}" wx:if="{{item.hotcontents[0].listen_price==0}}"/>
+                        <image class="audio-icon" src="{{wg_image_0}}" wx:elif="{{item.hotcontents[0].audio_txt!='已收听'}}"/> 
+                        <image class="audio-icon" src="{{wg_image_3}}" wx:elif="{{item.hotcontents[0].audio_txt=='已收听'}}"/>
+                        <text class="audio-txt" wx:if="{{item.hotcontents[0].audio_txt!='已收听'&&item.hotcontents[0].listen_price>0}}">{{item.hotcontents[0].listen_price}}大咖币收听</text>
+                        <view class="audio-len">{{item.hotcontents[0].audio_length}}"</view>
+                    </view> 
+                    <view class="mid-video" wx:if="{{item.hotcontents[0].video_img}}">
+                        <image class="video-img" src="{{item.hotcontents[0].video_img}}" wx:if="{{item.hotcontents[0].video_img!='test-png'}}" binderror="imgErr({{index}})"/>
+                        <image class="video-img" mode="aspectFill" src="/static/images/zw1.png" wx:else/>
+                        <image class="video-play" src="/static/images/play.png"/>
+                    </view>   
+                    <view class="mid-img" wx:if="{{item.hotcontents[0].noteImgs.length}}">
+                        <image class="img-noteImgs" mode="" src="{{item.hotcontents[0].noteImgs[0].img_url}}" wx:if="{{item.hotcontents[0].noteImgs[0].img_url}}" binderror="noteImgErr({{index}})"/>
+                        <image class="img-noteImgs" mode="aspectFill" src="/static/images/zw2.png" wx:else/>
+                    </view>
+                </view>
+                <view class="box-bom">
+                    <text class="bom-time">{{item.hotcontents[0].create_time}}</text>
+                    <text class="bom-read">{{item.hotcontents[0].readnum}}人读过</text>
+                    <text class="bom-finger">{{item.hotcontents[0].satifynum}}人点赞</text>
+                </view>
+            </view>
+        </repeat>
+    </view>
+    <!-- 客服 -->
+    <view class="dex-contact" @tap.stop="preventClick">
+      <button open-type="contact"
+              plain="{{true}}"
+              class="tact-btn">
+        <image class="tact-img" src="/static/images/contact_per.png"/>
+      </button>
+    </view>
+    <!-- 活动管理组件 -->
+    <activityLayer></activityLayer>
+    <!-- 手机号授权 -->
+    <bindPhone></bindPhone>
+ </view>
+</template>
+<script>
+import wepy from 'wepy';
+import http from '@/utils/http-util';
+import utils from '@/utils/common-util';
+import { API_URL, formIdUrl } from '@/const';
+import LodingPage from '@/components/lodingPage';
+import { navigateTo, switchTab } from '@/utils/route';
+import window from '@/utils/window-util';
+import ActivityLayer from '@/components/activityLayer';
+import BindPhone from '@/components/bindPhone';
+export default class Index extends wepy.page {
+  config = {
+    navigationBarTitleText: 'A股摩院',
+  };
+  components = {
+    lodingPage: LodingPage,
+    activityLayer: ActivityLayer,
+    bindPhone: BindPhone
+  };
+  data = {
+    // 首页数据
+    indexData: {},
+    // 大咖推荐数据
+    recommendData: [],
+    // 大盘预测数据
+    guessData: null,
+    // 签到
+    punch: 0,
+    //免费听
+    wg_image_2:
+      'https://dakaname.oss-cn-hangzhou.aliyuncs.com/mini_app_icons/wgmft.png',
+    //已
+    wg_image_3:
+      'https://dakaname.oss-cn-hangzhou.aliyuncs.com/mini_app_icons/wgyff.png',
+    wg_image_0:
+      'https://dakaname.oss-cn-hangzhou.aliyuncs.com/mini_app_icons/wgfft.png',
+    // 跳转协议匹配
+    actionData: {},
+    //是否是ios系统
+    isIOS: false,
+  };
+  computed = {
+    rowHeight() {
+      if (this.indexData.hots) {
+        return Math.ceil(this.indexData.hots.twoItem.length / 2) * 100;
+      } else {
+        return 0;
+      }
+    }
+  };
+
+  //事件处理函数
+  methods = {
+    // banner/按钮跳转
+    bannerEvt(action, e) {
+      var param = {
+        url: action,
+        fail: function(err) {
+          console.log('跳转tabBar');
+          switchTab({ url: action });
+        }
+      };
+      navigateTo(param);
+      var formId = e.detail.formId;
+      this.sendFormId(formId);
+    },
+    // 签到
+    punch(e) {
+      wx.navigateTo({ url: `/subPages/activity/pages/sign` });
+      var formId = e.detail.formId;
+      this.sendFormId(formId);
+    },
+    // 补充
+    chongzhi() {
+      window.showLoading();
+      http
+        .getRequest(API_URL.QUERY_COIN, {})
+        .then(data => {
+          window.hideLoading();
+          wx.navigateTo({ url: `/subPages/user/pages/coinRecharge` });
+        })
+        .catch(error => {
+          window.hideLoading();
+        });
+    },
+    // 大咖推荐跳转
+    // content_type:4--问股；1--策略；2--资讯
+    // content_sign：2--资讯、1--策略；
+    toPageDetail(item) {
+      var questioner_id = item.hotcontents[0].questioner_id;
+      var contentid = item.hotcontents[0].contentid;
+      var content_type = item.hotcontents[0].content_type;
+      var video_img = item.hotcontents[0].video_img;
+      if (video_img) {
+        wx.navigateTo({
+          url: `/subPages/content/pages/detail/courseDetail?id=${contentid}`
+        });
+      } else if (content_type != 4) {
+        wx.navigateTo({
+          url: `/subPages/content/pages/detail/noteDetail?id=${contentid}`
+        });
+      } else if (content_type == 4) {
+        wx.navigateTo({
+          url: `/subPages/content/pages/detail/quesDetail?id=${contentid}`
+        });
+      }
+    },
+    // 监听图片加载错误
+    imgErr(index) {
+      this.recommendData[index].hotcontents[0].video_img = 'test-png';
+    },
+    noteImgErr(index) {
+      this.recommendData[index].hotcontents[0].noteImgs[0].img_url = '';
+    },
+    preventClick(){
+      return false
+    }
+  };
+
+  //页面生命周期函数
+  onLoad(options) {
+    if (options.redirectUrl) {
+      navigateTo({ url: options.redirectUrl });
+    }
+    this.showLoading();
+    this.loadData();
+    this.loadRecommendData();
+    this.sharePages(options);
+    var res = wx.getSystemInfoSync();
+    if (res.platform == 'devtools' || res.platform == 'ios') {
+      this.isIOS = true;
+    }
+  }
+  onShow() {
+    this.getSignStatus();
+    this.loadGuessData(); 
+  }
+  onPullDownRefresh() {
+    this.loadData();
+    this.loadRecommendData();
+    this.loadGuessData();
+  }
+  onShareAppMessage(res) {
+    return {
+      title: '投顾说—您的炒股好帮手',
+      path: 'pages/tabBar/index',
+      imageUrl: 'https://tgs.gp58.com/static/adXcx/index_share.jpg',
+    }
+  }
+  // 页面分享相关
+  sharePages(options) {
+    if (options.questionId) {
+      wx.navigateTo({
+        url:
+          '/subPages/content/pages/detail/quesDetail?questionid=' +
+          options.questionId
+      });
+    } else if (options.noteId) {
+      wx.navigateTo({
+        url: '/subPages/content/pages/detail/noteDetail?id=' + options.noteId
+      });
+    } else if (options.courseId) {
+      wx.navigateTo({
+        url:
+          '/subPages/content/pages/detail/courseDetail?id=' + options.courseId
+      });
+    } else if (options.webView) {
+      wx.navigateTo({
+        url: '/subPages/user/pages/webview?src=' + options.webView
+      });
+    } else if (options.seriesId) {
+      wx.navigateTo({
+        url:
+          '/subPages/content/pages/detail/seriesDetail?id=' + options.seriesId
+      });
+    } else if (options.guess) {
+      wx.navigateTo({
+        url: '/subPages/activity/pages/guess'
+      });
+    } else if (options.reportDetail) {
+      wx.navigateTo({
+        url:
+          '/subPages/content/pages/detail/reportDetail?id=' +
+          options.reportDetail
+      });
+    } else if (options.bigManCourse) {
+      wx.navigateTo({
+        url: '/subPages/content/pages/bigManCourse'
+      });
+    } else if (options.bigManId) {
+      wx.navigateTo({
+        url:
+          '/subPages/content/pages/detail/bigManDetail?id=' + options.bigManId
+      });
+    } else if (options.roomid) {
+      wx.navigateTo({
+        url: '/subPages/activity/pages/live?roomid=' + options.roomid
+      });
+    } else if (options.adOption) {
+      wx.navigateTo({
+        url: '/subPages/activity/pages/adOne?gdt_vid=' + options.gdt_vid
+      });
+    } else if (options.shareToken) {
+      wx.navigateTo({
+        url: '/subPages/activity/pages/activityOne?shareToken=' + options.shareToken
+      });
+    }
+  }
+  // index数据
+  loadData() {
+    http
+      .getRequest(API_URL.INDEX_SET, {
+        position: 100104
+      })
+      .then(data => {
+        this.indexData = data;
+        //测试数据--start
+        // this.indexData.buttons.unshift({
+        //   action:'webview?url=https://tgs.gp58.com/static/html/xcx_tg_mobile/xfbj.html',
+        //   title:'布局',
+        //   icon:'http://file.gp58.com/image/2018-07-24/1532413206266.png'
+        // })
+        // this.indexData.buttons.unshift({
+        //   action:'webview?url=https://tgs.gp58.com/static/html/xcx_tg_mobile/test.html',
+        //   title:'二维码',
+        //   icon:'http://file.gp58.com/image/2018-07-24/1532413206266.png'
+        // })
+        // 测试数据--end
+        utils.tools().setLocal('indexSetData', this.indexData);
+        this.formatButton(this.indexData.buttons);
+        this.$apply();
+        wx.stopPullDownRefresh();
+        this.hideLoading();
+      })
+      .catch(error => {});
+  }
+  // 处理按钮数据
+  formatButton(data) {
+    var button, n, r;
+    var buttons = [];
+    for (var i in data) {
+      button = data[i];
+      n = Math.floor(i / 8);
+      r = i % 8;
+      if (r == 0 && button) {
+        buttons[n] = [];
+      }
+      buttons[n][r] = button;
+    }
+    this.indexData.buttons = buttons;
+  }
+  // 大咖推荐
+  loadRecommendData() {
+    http.postRequest(API_URL.INDEX_HOT, {}).then(data => {
+      this.recommendData = data;
+      this.formatData(this.recommendData);
+      this.$apply();
+    });
+  }
+  // 处理时间戳
+  formatData(data) {
+    var list, time, sign;
+    for (var i in data) {
+      list = data[i];
+      if (!list.hotcontents[0]) continue;
+      time = list.hotcontents[0].create_time;
+      time = utils.formatTimeLocal(time);
+      data[i].hotcontents[0].create_time = time;
+      sign = utils.tools().matchColor(list.hotcontents[0]);
+      data[i].hotcontents[0].sign = sign;
+    }
+  }
+  // 签到状态
+  getSignStatus() {
+    var isSignIn;
+    http.getRequest(API_URL.SIGN_DETAIL, {}).then(data => {
+      this.punch = data.isSignIn;
+      this.$apply();
+    });
+  }
+  // 显示加载层
+  showLoading() {
+    this.$invoke('lodingPage', 'show');
+  }
+  // 隐藏加载层
+  hideLoading() {
+    this.$invoke('lodingPage', 'hide');
+  }
+  // 加载大盘预测数据
+  loadGuessData() {
+    http.getRequest(API_URL.FORECAST_TO, {}).then(data => {
+      this.guessData = data;
+      this.formateGuessData(this.guessData);
+      this.$apply();
+    });
+  }
+  formateGuessData(data) {
+    var totalBonus, upBonus;
+    data.forecastDate = this.monAndDayTime(data.forecastDate);
+    totalBonus = data.bonusPool.totalBonus;
+    upBonus = data.bonusPool.upBonus;
+    if (!totalBonus) {
+      data.upPer = 0;
+      return;
+    }
+    data.upPer = parseInt((upBonus / totalBonus) * 100);
+    this.$apply();
+  }
+  monAndDayTime(time) {
+    var month, day;
+    time = new Date(time);
+    month = time.getMonth() + 1;
+    day = time.getDate();
+    month = month > 9 ? month : '0' + month;
+    day = day > 9 ? day : '0' + day;
+    time = month + '月' + day + '日';
+    return time;
+  }
+  // 提交formId数据
+  sendFormId(formId) {
+    this.$root.$parent.sendFormId(formId);
+  }
+}
+</script>

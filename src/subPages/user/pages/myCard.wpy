@@ -1,0 +1,183 @@
+<style lang="scss">
+.mycard{
+	background: #eee;
+	padding-bottom:50px;
+	.card-list{
+		.card-box{
+			display:flex;
+			align-items: center;
+			height:228rpx;
+			margin:0 30rpx;
+			margin-top:30rpx;
+			.box-lef{
+				position:relative;
+				width:78%;
+				color:#fff;
+				.lef-img{
+					width:100%;
+					display:block;
+				}
+				.lef-name{
+					position:absolute;
+					top:20rpx;
+					font-size:38rpx;
+					left:15rpx;
+				}
+				.lef-des{
+					position:absolute;
+					font-size:32rpx;
+					top:100rpx;
+					left:15rpx;
+					max-width:95%;
+					white-space:nowrap;
+					overflow:hidden;
+					text-overflow:ellipsis;
+				}
+				.lef-time{
+					position:absolute;
+					font-size:30rpx;
+					top:145rpx;
+					left:15rpx;
+					max-width:95%;
+					white-space:nowrap;
+					overflow:hidden;
+					text-overflow:ellipsis;
+				}
+			}
+			.box-rig{
+				position:relative;
+				width:22%;
+				height:100%;
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				.rig-img{
+					width:100%;
+					height:100%;
+					display:block;
+					position:absolute;
+					left:0;
+					top:0;
+				}
+				.rig-btn{
+					width:82%;
+					height:70rpx;
+					background:#e93030;
+					text-align:center;
+					line-height:70rpx;
+					font-size:34rpx;
+					color:#fff;
+					border-radius:15rpx;
+					z-index: 99;
+				}
+			}
+		}
+		.card-no{
+			font-size:38rpx;
+			width:100%;
+			text-align:center;
+			padding-top:50rpx;
+			color:#999;
+		}
+	}
+	.card-used{
+		margin-top:100rpx;
+		text-align:center;
+		width:100%;
+		font-size:35rpx;
+		text-decoration:underline;
+	}
+}
+</style>
+<template>
+<lodingPage></lodingPage>
+<view class="mycard">
+	<view class="card-list">
+		<repeat for="{{cardData.list}}" item="item" index="index">
+			<view class="card-box">
+				<view class="box-lef">
+					<image class="lef-img" mode="widthFix" src="/static/images/card-red.png" />
+					<view class="lef-name">{{item.name}}</view>
+					<view class="lef-des">{{item.description}}</view>
+					<view class="lef-time">
+						有效期:{{item.effectiveDate}}-{{item.expiryDate}}
+					</view>
+				</view>
+				<view class="box-rig">
+					<image class="rig-img" mode="" src="/static/images/card-blank.png" />
+					<view class="rig-btn" @tap.stop="toAction({{item.action}})">使用</view>
+				</view>
+			</view>
+		</repeat>
+		<view class="card-no" wx:if="{{cardData.list.length==0}}">暂无数据</view>
+	</view>
+	<view class="card-used" @tap.stop="toAction('myCardUsed')">查看已使用的和已过期的券</view>
+</view>
+</template>
+<script>
+import wepy from 'wepy'
+import { API_URL } from '@/const'
+import http from '@/utils/http-util';
+import utils from '@/utils/common-util';
+import LodingPage from '@/components/lodingPage';
+import {navigateTo, switchTab } from '@/utils/route';
+export default class MyCard extends wepy.page {
+	config = {
+		navigationBarTitleText: '我的券包',
+		enablePullDownRefresh: false
+	}
+	components = {
+        lodingPage:LodingPage,
+    }
+    data = {
+        cardData:'',
+    }
+    methods = {
+    	toAction(action){
+    		action=action.replace('note?id','noteDetail?id')
+    		var param={
+		        url:action,
+		        fail:function(err){
+		          switchTab({url:action})
+		        }
+		    }
+		    navigateTo(param)
+    	},
+    }
+    onLoad() {
+      this.showLoading()
+      this.loadCardData()
+    }
+    loadCardData(){
+    	http.postRequest(API_URL.CARD_ENABLE, {}).then(data => {
+	      this.cardData = data
+	      this.formatDate(this.cardData)
+	      // this.filterData(this.cardData)
+	      this.$apply()
+	      this.hideLoading()
+	    })
+    }
+    formatDate(data){
+      data.list.forEach((v,index)=>{
+          data.list[index].effectiveDate = utils.formatTimestampCard(v.effectiveDate)
+          data.list[index].expiryDate = utils.formatTimestampCard(v.expiryDate)
+      })
+    }
+    filterData(data){
+    	for (var i=0;i<data.list.length;i++){
+	    	if(data.list[i].type!=4){
+	    		data.list.splice(i,1) 
+				i=i-1
+	    	}	
+		}
+    }
+    // 显示加载层
+    showLoading(){
+        this.$invoke('lodingPage','show')
+    }
+    // 隐藏加载层
+    hideLoading(){
+        this.$invoke('lodingPage','hide')
+    }
+}
+</script>

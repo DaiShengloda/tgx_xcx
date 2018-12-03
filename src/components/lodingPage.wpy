@@ -1,0 +1,50 @@
+<style lang="scss">
+@import '../sass/base/reset';
+@import '../sass/commons/function';
+@import '../sass/components/payment';
+.loadPage{
+  width: 100%;
+  height: 100%;
+  position:absolute;
+  left:0px;
+  top:0px;
+  background-color: #fff;
+  z-index: 99;
+}
+</style>
+<template>
+<view class="loadPage"  wx:if="{{show}}">
+    
+</view>
+</template>
+<script>
+import wepy from 'wepy'
+export default class lodingPage extends wepy.component {
+    data={
+        show:true,
+    }
+    props={
+   
+    }
+    methods={
+        // 显示使用组件
+        show(){
+            this.show=true
+             wx.showLoading({
+                title: '加载中...',
+                }) 
+        },
+        // 隐藏组件
+        hide(){
+            wx.hideLoading(); 
+            this.show=false
+            this.$apply()
+        },
+        // 阻止向上冒泡
+        preventHide(){
+            return false
+        },
+       
+    }
+}
+</script>

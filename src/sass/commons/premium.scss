@@ -1,0 +1,171 @@
+@import "variables";
+@import "function";
+.premium-box {
+  #premium_from {
+    width: 100%;
+    display: block;
+    .title-h3 {
+      display: block;
+      @include remCalc(min-height, 42);
+      @include remCalc(line-height, 42);
+      padding: r(15) r(30);
+      position: relative;
+      .name {
+        display: inline-block;
+        border-left: 3px solid #ff6e06;
+        padding-left: 5px;
+        @include remCalc(font-size, 34);
+        line-height: r(42);
+        @include remCalc(min-height, 42);
+      }
+      .description {
+        display: block;
+        color: $bg-color-ff6e06;
+        @include remCalc(font-size, 24);
+        padding: r(10) 0 0 8px;
+        line-height: 1.5;
+        @include remCalc(min-height, 42);
+        font-weight: 200;
+      }
+    }
+    .box {
+      padding: 0 r(30);
+      background-color: #fff;
+      position: relative;
+    }
+    .items {
+      padding: r(15) 0;
+      min-height: r(90);
+      border-top: 1px solid #eeeeee;
+      @include remCalc(font-size, 32);
+      position: relative;
+      &:first-child {
+        border-top: none;
+      }
+      &:last-child {
+        border-bottom: none;
+      }
+    }
+    .lables {
+      display: inline-block;
+      @include remCalc(line-height, 60);
+      height: r(60);
+      color: #000;
+      float: left;
+    }
+    .from-right {
+      max-width: 70%;
+      height: r(60);
+      @include remCalc(line-height, 60);
+      float: right;
+      display: inline-block;
+      &.moreWid{
+        width: 80%;
+      }
+    }
+    .max-width {
+      max-width: 90%;
+      overflow: hidden;
+    }
+    //核保身高体重样式，勿删
+    .from-width {
+      max-width: 60%;
+    }
+    .form-input,.form-number{
+      width: 100%;
+      height: 100%;
+      text-align: right;
+    }
+    .input-text{
+      display: block;
+      width: 100%;
+      height: 100%;
+      text-align: right;
+    }
+  
+    .occupaCheck {
+      display: inline-block;
+      width: 100%;
+      height: r(60);
+      line-height: r(60);
+      color: #000;
+    }
+    .lz-radio {
+      margin-left: 5px;
+      margin-right: 5px;
+    }
+    .birth-input, .placeCheck,.placeAccount, .a-input {
+      display: inline-block;
+      @include remCalc(line-height, 60);
+      @include remCalc(height, 60);
+      min-width: r(200);
+      color: #000;
+      text-align: right !important;
+      -webkit-appearance: none;
+      padding-right: 15px;
+    }
+    #places {
+      direction: ltr;
+      min-width: r(400);
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      max-width: 99%;
+      float: inherit;
+    }
+    .birth-input {
+      border: none;
+      padding: 0;
+      margin: 0;
+      height: 100%;
+      text-align: right;
+      margin-left: 15px;
+      padding-right: 15px;
+    }
+    .icon-gengduo {
+      position: absolute;
+      right: 0;
+      top: 50%;
+      transform:translateY(-50%);
+      -webkit-transform:translateY(-50%);
+      color: #999;
+    }
+    p.more-infor {
+      line-height: 1.8;
+      @include remCalc(font-size, 26);
+      width: 100%;
+    }
+  }
+  .btn-bottom {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    margin-top: 10px;
+    width: 100%;
+    height: r(100);
+    .left {
+      float: left;
+      width: 60%;
+      height: 100%;
+      line-height: r(100);
+      font-size: r(36); //border-top: 1px solid #ececec;
+      background-color: #fff;
+      padding-left: 10px;
+      color: #000;
+      span {
+        color: #ff7007;
+      }
+    }
+    .btn-next {
+      float: left;
+      width: 40%;
+      height: 100%;
+      line-height: r(100);
+      font-size: r(32);
+      text-align: center;
+      color: #fff;
+      background-color: #ff7007;
+      display: inline-block;
+    }
+  }
+}

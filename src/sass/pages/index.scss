@@ -1,0 +1,431 @@
+.index {
+    background: #eee;
+    overflow-x:hidden;    
+    // 
+    .dex-banner {
+        swiper{
+            width:100%;
+            height:250rpx;
+            swiper-item{
+                .slide-image{
+                    width:100%;
+                    height:250rpx;                    
+                }
+            }
+            .wx-swiper-dot{
+                width:30rpx;
+                height:8rpx;
+                border-radius: 8rpx;
+            }
+        }  
+    }
+    // 
+    .dex-tab{
+        background: #fff;
+        // display:flex;
+        padding-top:24rpx;
+        // min-height:168rpx;
+        margin-bottom:16rpx;
+        border-bottom:#e6e6e6 1rpx solid;            
+        .tab-box{
+            width:25%;
+            text-align:center;
+            display:inline-block;
+            padding:0;
+            margin:0;
+            background:#fff;
+            line-height:unset;
+            margin-bottom:20rpx;   
+            .tab-box-btn{
+                padding:0;
+                margin:0;
+                background:#fff;
+                .box-img{
+                    width:120rpx;
+                    height:120rpx;  
+                    vertical-align:bottom;                
+                }
+                .box-title {
+                    font-size:28rpx;  
+                    height:60rpx;
+                    line-height:60rpx;                    
+                }
+            }                      
+        }
+    }
+    // 
+    .dex-qd {
+        background: #fff;
+        height:110rpx;    
+        position:relative;  
+        border-top:#e6e6e6 1px solid;  
+        margin-bottom:16rpx;
+        border-bottom:#e6e6e6 1px solid;              
+        .box-img{
+            width:100%;
+            height:100%;            
+        }
+        .punch{
+            position:absolute;
+            width:170rpx;
+            height:50rpx;
+            top:30rpx;
+            right:20rpx;    
+        }
+    }
+    // 股市直播
+    .vip-live{
+        padding:0 30rpx; 
+        margin-bottom:15rpx;
+        padding-bottom:28rpx;
+        background:#fff;               
+        .live-title{
+            height:80rpx;
+            line-height:80rpx;
+            font-size:32rpx;            
+        }
+        .live-place{
+            .live-box{
+                position:relative; 
+                height:250rpx;           
+                .box-img{
+                    width:100%;
+                    height:250rpx;
+                    display:block;                
+                }
+                .box-name{
+                    position:absolute;
+                    top:20rpx;
+                    color:#fff;
+                    left:20rpx;
+                    font-size:24rpx;                
+                }
+                .box-status{
+                    position:absolute;
+                    top:20rpx;
+                    right:20rpx;
+                    background:#e93030;
+                    color:#fff;
+                    font-size:24rpx;
+                    padding:0 15rpx;
+                    border-radius:15rpx;                
+                }
+                .box-title{
+                    position:absolute;
+                    top:80rpx;
+                    color:#fff;
+                    font-size:34rpx;
+                    width:100%;
+                    text-align:center;                                   
+                }
+                .box-msg{
+                    position:absolute;
+                    color:#fff;
+                    width:100%;
+                    display:flex;
+                    bottom:25rpx;
+                    align-items:center;
+                    justify-content:center;
+                    font-size:24rpx;
+                    .msg-name{
+                        margin-left:10rpx;                    
+                    }
+                    .msg-icon{
+                        width:50rpx;
+                        height:50rpx;
+                        border-radius:50%;                    
+                    }
+                }
+            }
+        }
+    }
+    // 今日话题
+    .dex-theme{
+        background:#fff; 
+        border-top:#e6e6e6 1px solid;   
+        border-bottom:#e6e6e6 1px solid;        
+        .theme-title{
+            font-size:32rpx;
+            padding-left:30rpx;
+            border-bottom:#e6e6e6 1px solid;
+            height:90rpx;
+            line-height:90rpx;                        
+        }
+        .theme-col{
+            .col-box{
+                text-align:center;
+                border-bottom:#e6e6e6 1px solid;             
+                padding:20rpx 0;    
+                position: relative;            
+                .box-top{
+                    display:flex;
+                    align-items:center;
+                    justify-content:center;  
+                    .top-img{
+                        width:70rpx;                        
+                        height:40rpx; 
+                    }
+                    .top-title{
+                        font-size:36rpx;  
+                        padding-left:10rpx; 
+                        color:#333333;  
+                        font-weight: bold;                     
+                    }
+                }
+                .box-bom{
+                    font-size:34rpx;
+                    color:#333333;                  
+                }
+            }
+        }
+        .theme-row{
+            padding:0 30rpx;            
+            .row-box{
+                width:50%;
+                float:left;  
+                height:100rpx;
+                line-height:100rpx;
+                border-bottom:#e6e6e6 1px solid;  
+                position: relative;                             
+                .box-msg{
+                    display:flex;
+                    align-items:center;                    
+                    .msg-img{
+                        width:46rpx;                        
+                        height:46rpx;  
+                        // padding-left:20rpx;                        
+                    }
+                    .msg-title{
+                        font-size:34rpx;
+                        padding-left:15rpx;
+                        white-space:nowrap;
+                        overflow:hidden;
+                        text-overflow:ellipsis;                        
+                    }
+                }
+            }
+        }
+    }
+    // 大盘预测
+    .dex-guess{
+        background:#fff; 
+        border-top:#e6e6e6 1px solid;   
+        border-bottom:#e6e6e6 1px solid;   
+        margin-top:15rpx;
+        position: relative;
+        .guess-title{
+            font-size:32rpx;
+            padding-left:30rpx;
+            border-bottom:#e6e6e6 1px solid;
+            height:90rpx;
+            line-height:90rpx; 
+        }
+        .guess-cont{
+            display:flex;
+            height:140rpx;
+            align-items:center;
+            justify-content:space-between;
+            padding:0 30rpx;
+            font-size:32rpx;            
+            .cont-lef{
+                .lef-text{
+                    font-size:34rpx;                    
+                    .text-red{
+                        color:#e93030;                        
+                    }
+                }
+                .lef-join{
+                    font-size:28rpx;                    
+                }
+            }
+            .cont-mid{
+                border-left:#e6e6e6 1px solid;
+                height:100rpx;                
+            }
+            .cont-rig{
+                .rig-time{
+                    font-size:28rpx;                    
+                }
+                .rig-detail{
+                    font-size:30rpx;                    
+                    .detail-red{
+                        font-size:34rpx;
+                        color:#e93030;                        
+                    }
+                }
+            }
+        }
+    }
+    // 
+    .dex-recommend {
+        background:#fff;        
+        border-bottom:#e6e6e6 1px solid;    
+        margin-top:16rpx;            
+        .recom-title{
+            font-size:32rpx;
+            padding-left:30rpx;
+            height:90rpx;
+            line-height: 90rpx;
+            border-bottom:#e6e6e6 1px solid;            
+        }
+        .recom-box{
+            border-bottom:#e6e6e6 16rpx solid; 
+            padding:20rpx 30rpx;      
+            position:relative;            
+            .box-top {
+                background:#fff; 
+                display: flex;
+                align-items: center;
+                position:relative;
+                .li-lef {   
+                    image {
+                        width: r(80);
+                        height: r(80);
+                        border-radius:50%;  
+                        display:block;                        
+                    }
+                }
+                .li-btw {
+                    padding-left:20rpx; 
+                    width:500rpx;                    
+                    .man-name {
+                        font-weight:bold;
+                        font-size: r(27); 
+                    }
+                    .man-title {
+                        color:#e93030;
+                        font-size:r(20);                
+                    }
+                    .man-int {
+                        color:#999; 
+                        font-size: r(25);
+                        margin:2rpx 0;
+                        overflow: hidden;
+                        text-overflow: ellipsis;
+                        white-space:nowrap;                        
+                    }
+                }
+                .li-rig {
+                    position:absolute;
+                    top:-20rpx;
+                    right:0;                    
+                    .rig-word{
+                        // background:#cdae48;
+                        width:45rpx;
+                        height:50rpx;
+                        color:#fff;
+                        line-height:35rpx;
+                        text-align:center;
+                        font-size:27rpx;
+                        padding:8rpx 10rpx 0rpx 10rpx;                               
+                    }   
+                    .rig-semcle{
+                        width:45rpx;
+                        height:30rpx;
+                        border-radius:0rpx 0rpx 70rpx 70rpx;
+                        padding:0 10rpx;                                                     
+                    }           
+                }
+            }
+            .box-mid{
+                padding:20rpx 0; 
+                .mid-title{
+                    margin-bottom:15rpx;
+                    font-size:32rpx;
+                    font-weight:bold;  
+                    overflow:hidden;
+                    text-overflow: ellipsis;
+                    display: -webkit-box;
+                    -webkit-line-clamp: 1;
+                    -webkit-box-orient: vertical;                      
+                }               
+                .mid-int{
+                    font-size:30rpx;  
+                    overflow: hidden;
+                    text-overflow: ellipsis;
+                    display: -webkit-box;
+                    -webkit-line-clamp: 3;
+                    -webkit-box-orient: vertical;
+                    letter-spacing:2rpx;                  
+                }
+                .mid-audio{
+                    position:relative;
+                    display:flex;
+                    align-items:center;   
+                    margin-top:20rpx;                    
+                    .audio-icon{
+                        height:80rpx;
+                        width:64%;                                               
+                    }
+                    .audio-txt{
+                        position:absolute;
+                        font-size:28rpx;
+                        color:#fff;
+                        left:90rpx;                        
+                    }
+                    .audio-len{
+                        font-size:28rpx;
+                        color:#999;
+                        padding-left:20rpx;                        
+                    }
+                }
+                .mid-video{
+                    position: relative;
+                    .video-img{
+                        width:100%;
+                        height:300rpx;                    
+                    }
+                    .video-play{
+                        position: absolute;
+                        width:100rpx;
+                        height:100rpx;
+                        top:100rpx;
+                        left:40%;                        
+                    }
+                }
+                .mid-img{
+                    margin-top:20rpx;
+                    .img-noteImgs{
+                        width:500rpx;
+                        height:278rpx;
+                        display:block;
+                    }
+                }
+            }
+            .box-bom{
+                font-size:24rpx;
+                color:#999;                
+                .bom-time{
+
+                }
+                .bom-read{
+                    padding:0 20rpx;                    
+                }
+                .bom-finger{
+
+                }
+            }
+        }
+        .recom-box:last-child{
+            border-bottom:none;
+        }
+    }
+    /*首页客服*/
+    .dex-contact{
+        position: fixed;
+        right: r(0);
+        bottom: r(180);
+        z-index: 22;
+        .tact-btn{
+            border: none;
+            margin: 0;
+            padding: 0;
+            line-height: unset;
+            .tact-img{
+                width: r(110);
+                height: r(110);
+                display: block;
+            }
+        }
+    }
+}
